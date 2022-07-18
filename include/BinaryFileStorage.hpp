@@ -67,7 +67,9 @@ private:
 
 	void loadKeys() {
 		for (const auto & p : std::filesystem::directory_iterator(this->folder_path)) {
-			this->keys.insert(p.path().string());
+			if (p.path().extension() == this->extension) {
+				this->keys.insert(p.path().stem().string());
+			}
 		}
 	}
 
