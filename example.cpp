@@ -1,14 +1,15 @@
 #include <cassert>
 #include <iostream>
 
+#include "modules/rapidjson/document.h"
+
+#include "include/Json.hpp"
 #include "include/ItemStorage.hpp"
 #include "include/FileStorage.hpp"
 #include "include/BinaryFileStorage.hpp"
 
-#include "modules/rapidjson/document.h"
 
-
-class CertificateMetadata {
+class CertificateMetadata : public Json {
 
 public:
 
@@ -21,9 +22,7 @@ public:
 	CertificateMetadata(const std::string& a, const std::string& b):
 		a(a), b(b) {}
 
-	void fromJson(const std::string& json_text) {
-
-		std::cout << "CertificateMetadata.fromJson" << std::endl;
+	void updateFromJson(const std::string& json_text) {
 
 		rapidjson::Document json;
 		json.Parse(json_text.c_str());
@@ -33,7 +32,7 @@ public:
 
 	}
 
-	const std::string toJson() const {
+	std::string toJson() const {
 		return (
 			"{"
 				"\"a\":" "\"" + this->a + "\"" ","
@@ -53,7 +52,7 @@ int main(void) {
 	ItemStorage<CertificateMetadata> storage(data_storage, metadata_storage);
 
 	std::string usi = "1234";
-	std::vector<uint8_t> data{'d', 'e', 'r'};
+	std::string data("der");
 	std::string metadata_a = "lalala";
 	std::string metadata_b = "lblblb";
 
@@ -64,6 +63,8 @@ int main(void) {
 			CertificateMetadata(metadata_a, metadata_b)
 		)
 	);
+
+	assert(storage.load(usi).metadata.toJson() == Json::create<CertificateMetadata>(storage.load(usi).metadata.toJson()).toJson());
 
 	assert(storage.load(usi).data == data);
 	assert(storage.load(usi).metadata.a == metadata_a);

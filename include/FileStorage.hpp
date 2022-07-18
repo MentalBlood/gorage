@@ -52,10 +52,7 @@ protected:
 
 		file.close();
 
-		T result;
-		result.fromJson(result_stream.str());
-
-		return result;
+		return Json::create<T>(result_stream.str());
 
 	}
 

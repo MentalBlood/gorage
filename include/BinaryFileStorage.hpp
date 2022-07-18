@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <sstream>
 #include <fstream>
 #include <iostream>
 #include <filesystem>
@@ -9,7 +10,7 @@
 
 
 
-class BinaryFileStorage : public Storage<std::vector<uint8_t>> {
+class BinaryFileStorage : public Storage<std::string> {
 
 public:
 
@@ -21,7 +22,7 @@ public:
 
 protected:
 
-	void _save(const std::string& id, const std::vector<uint8_t>& content) {
+	void _save(const std::string& id, const std::string& content) {
 
 		std::string file_path = this->FilePath(id);
 
@@ -30,13 +31,13 @@ protected:
 			throw std::runtime_error("Can not save file " + file_path);
 		}
 
-		file.write(reinterpret_cast<const char*>(&content[0]), content.size());
+		file.write(content.c_str(), content.length());
 
 		file.close();
 
 	}
 
-	std::vector<uint8_t> _load(const std::string& id) {
+	std::string _load(const std::string& id) {
 
 		std::string file_path = this->FilePath(id);
 
@@ -45,17 +46,12 @@ protected:
 			throw std::runtime_error("Can not load file " + file_path);
 		}
 
-		file.seekg(0, std::ios::end);
-		size_t length = file.tellg();
-		file.seekg(0, std::ios::beg);
-
-		std::vector<uint8_t> result(length);
-
-		file.read(reinterpret_cast<char*>(&result[0]), length);
+		std::ostringstream result_stream;
+		result_stream << file.rdbuf();
 
 		file.close();
 
-		return result;
+		return result_stream.str();
 
 	}
 

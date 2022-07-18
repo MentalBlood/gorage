@@ -3,23 +3,55 @@
 #include <vector>
 #include <iostream>
 
+#include "../modules/rapidjson/writer.h"
+#include "../modules/cpp-base64/base64.h"
+#include "../modules/rapidjson/document.h"
+#include "../modules/rapidjson/stringbuffer.h"
+
+#include "Json.hpp"
 #include "Storage.hpp"
 
 
 
 template<class T>
-class Item {
+class Item : public Json {
 
 public:
 
-	std::vector<uint8_t> data;
+	std::string data;
 	T metadata;
 
 	Item():
-		data(std::vector<uint8_t>{}), metadata(T()) {}
+		data(std::string{}), metadata(T()) {}
 
-	Item(std::vector<uint8_t> data, T metadata):
+	Item(std::string data, T metadata):
 		data(data), metadata(metadata) {}
+
+	void updateFromJson(const std::string& json_text) {
+
+		std::cout << "json " << json_text << std::endl;
+
+		rapidjson::Document json;
+		json.Parse(json_text.c_str());
+
+		std::string data_base64 = json["data"].GetString();
+
+		this->data = std::string(base64_decode(data_base64));
+
+		rapidjson::StringBuffer buffer;
+		rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+		json["metadata"].Accept(writer);
+		this->metadata = Json::create<T>(std::string(buffer.GetString()));
+
+	}
+
+	std::string toJson() const {
+		return
+		"{"
+			"\"data\":" "\"" + base64_encode(this->data) + "\"" ","
+			"\"metadata\":" +  this->metadata.toJson() + ""
+		"}";
+	}
 
 };
 
@@ -29,10 +61,10 @@ class ItemStorage : public Storage<Item<Metadata>> {
 
 public:
 
-	Storage<std::vector<uint8_t>>& data_storage;
+	Storage<std::string>& data_storage;
 	Storage<Metadata>& metadata_storage;
 
-	ItemStorage(Storage<std::vector<uint8_t>>& data_storage, Storage<Metadata>& metadata_storage):
+	ItemStorage(Storage<std::string>& data_storage, Storage<Metadata>& metadata_storage):
 		data_storage(data_storage), metadata_storage(metadata_storage) {
 		this->cache.disable();
 	}

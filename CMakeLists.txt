@@ -8,6 +8,8 @@ add_executable(${PROJECT_NAME}
 
 	example.cpp
 
+	modules/cpp-base64/base64.cpp
+
 	src/Cache.cpp
 	src/Storage.cpp
 	src/ItemStorage.cpp
@@ -17,5 +19,5 @@ add_executable(${PROJECT_NAME}
 )
 
 set(CMAKE_CXX_STANDARD 17)
-set (CMAKE_CXX_FLAGS "-std=c++17") 
+set (CMAKE_CXX_FLAGS "/std:c++17") 
 target_link_libraries(${PROJECT_NAME} -static-libstdc++ -std=c++17)
