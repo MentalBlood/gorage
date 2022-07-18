@@ -25,31 +25,36 @@ public:
 
 
 template<class Metadata>
-class ItemStorage {
+class ItemStorage : public Storage<Item<Metadata>> {
 
 public:
-
-	ItemStorage(Storage<std::vector<uint8_t>>& data_storage, Storage<Metadata>& metadata_storage):
-		data_storage(data_storage), metadata_storage(metadata_storage) {}
 
 	Storage<std::vector<uint8_t>>& data_storage;
 	Storage<Metadata>& metadata_storage;
 
-	void save(const std::string& usi, const Item<Metadata>& item) {
+	ItemStorage(Storage<std::vector<uint8_t>>& data_storage, Storage<Metadata>& metadata_storage):
+		data_storage(data_storage), metadata_storage(metadata_storage) {
+		this->cache.disable();
+	}
+
+	void _save(const std::string& usi, const Item<Metadata>& item) {
 		this->data_storage.save(usi, item.data);
 		this->metadata_storage.save(usi, item.metadata);
 	}
 
-	Item<Metadata> load(const std::string& usi) {
+	Item<Metadata> _load(const std::string& usi) {
 		return Item<Metadata>(
 			this->data_storage.load(usi),
 			this->metadata_storage.load(usi)
 		);
 	}
 
-	void clearCache() {
-		this->data_storage.clearCache();
-		this->metadata_storage.clearCache();
+private:
+
+	void loadKeys() {
+		for (const auto & k : this->data_storage) {
+			this->keys.insert(k);
+		}
 	}
 
 };

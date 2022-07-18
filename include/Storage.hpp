@@ -1,7 +1,11 @@
 #pragma once
 
 #include <iostream>
+#include <stdbool.h>
+#include <unordered_set>
 #include <unordered_map>
+
+#include "Cache.hpp"
 
 
 
@@ -10,40 +14,54 @@ class Storage {
 
 public:
 
+	Cache<T> cache;
+
+	Storage() {
+		this->loadKeys();
+	}
+
 	void save(const std::string& usi, const T& something) {
-		this->cache[usi] = something;
+		this->cache.set(usi, something);
+		this->keys.insert(usi);
 		return this->_save(usi, something);
 	}
 
 	T load(const std::string& usi) {
-		try {
-			return this->cache.at(usi);
-		} catch (std::out_of_range) {
-			T result = this->_load(usi);
-			this->cache[usi] = result;
-			return result;
-		}
-	}
 
-	void clearCache() {
-		this->cache.clear();
+		try {
+
+			T result = this->cache.get(usi);
+			this->keys.insert(usi);
+			return result;
+
+		} catch (std::out_of_range) {
+
+			T result = this->_load(usi);
+			this->cache.set(usi, result);
+			this->keys.insert(usi);
+			return result;
+
+		}
+
 	}
 
 	auto begin() {
-		return this->cache.begin();
+		return this->keys.begin();
 	}
 
 	auto end() {
-		return this->cache.end();
+		return this->keys.end();
 	}
 
 protected:
+
+	std::unordered_set<std::string> keys;
 
 	virtual void _save(const std::string& usi, const T& something) = 0;
 	virtual T _load(const std::string& usi) = 0;
 
 private:
 
-	std::unordered_map<std::string, T> cache;
+	void loadKeys() {};
 
 };

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 
 #include "Storage.hpp"
 
@@ -62,6 +63,12 @@ private:
 
 	const std::string FilePath(const std::string& id) const {
 		return this->folder_path + "/" + id + this->extension;
+	}
+
+	void loadKeys() {
+		for (const auto & p : std::filesystem::directory_iterator(this->folder_path)) {
+			this->keys.insert(p.path().string());
+		}
 	}
 
 };

@@ -73,7 +73,8 @@ int main(void) {
 	assert(storage.metadata_storage.load(usi).a == metadata_a);
 	assert(storage.metadata_storage.load(usi).b == metadata_b);
 
-	storage.clearCache();
+	storage.data_storage.cache.clear();
+	storage.metadata_storage.cache.clear();
 
 	assert(storage.load(usi).data == data);
 	assert(storage.load(usi).metadata.a == metadata_a);

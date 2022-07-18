@@ -8,6 +8,7 @@ add_executable(${PROJECT_NAME}
 
 	example.cpp
 
+	src/Cache.cpp
 	src/Storage.cpp
 	src/ItemStorage.cpp
 	src/FileStorage.cpp
