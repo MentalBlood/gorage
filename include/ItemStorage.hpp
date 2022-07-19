@@ -46,13 +46,13 @@ public:
 	}
 
 	std::string dataToJson() const {
-		return base64_encode(this->data);
+		return "\"" + base64_encode(this->data) + "\"";
 	}
 
 	std::string toJson() const {
 		return
 		"{"
-			"\"data\":" "\"" + this->dataToJson() + "\"" ","
+			"\"data\":" + this->dataToJson() + ","
 			"\"metadata\":" +  this->metadata.toJson() + ""
 		"}";
 	}
