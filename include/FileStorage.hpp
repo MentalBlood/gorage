@@ -5,6 +5,7 @@
 #include <iostream>
 #include <filesystem>
 
+#include "Json.hpp"
 #include "Storage.hpp"
 
 
@@ -54,10 +55,6 @@ protected:
 
 		return Json::create<T>(result_stream.str());
 
-	}
-
-	void _remove(const std::string& id) {
-		std::filesystem::remove(this->folder_path + id + this->extension);
 	}
 
 private:
