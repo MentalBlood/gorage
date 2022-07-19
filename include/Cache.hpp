@@ -29,6 +29,9 @@ public:
 	T get(const std::string& key) {
 		return this->map.at(key);
 	}
+	void remove(const std::string& key) {
+		this->map.erase(key);
+	}
 
 	void clear() {
 		this->map.clear();

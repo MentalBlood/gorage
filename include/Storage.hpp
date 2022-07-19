@@ -45,6 +45,12 @@ public:
 
 	}
 
+	void remove(const std::string& usi) {
+		this->_remove(usi);
+		this->cache.remove(usi);
+		this->keys.erase(usi);
+	}
+
 	auto begin() {
 		return this->keys.begin();
 	}
@@ -59,6 +65,7 @@ protected:
 
 	virtual void _save(const std::string& usi, const T& something) = 0;
 	virtual T _load(const std::string& usi) = 0;
+	virtual void _remove(const std::string& usi) = 0;
 
 private:
 

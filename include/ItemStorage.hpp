@@ -85,6 +85,11 @@ public:
 		);
 	}
 
+	void _remove(const std::string& usi) {
+		this->data_storage.remove(usi);
+		this->metadata_storage.remove(usi);
+	}
+
 private:
 
 	void loadKeys() {

@@ -55,6 +55,10 @@ protected:
 
 	}
 
+	void _remove(const std::string& id) {
+		std::filesystem::remove(this->folder_path + id + this->extension);
+	}
+
 private:
 
 	const std::string FilePath(const std::string& id) const {
