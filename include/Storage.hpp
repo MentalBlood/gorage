@@ -17,6 +17,10 @@ public:
 	Cache<T> cache;
 
 	Storage() {
+		this->reload();
+	}
+
+	void reload() {
 		this->loadKeys();
 	}
 
