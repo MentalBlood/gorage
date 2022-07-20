@@ -39,7 +39,7 @@ protected:
 
 	}
 
-	T _load(const std::string& id) {
+	T _load(const std::string& id, const bool use_cache) {
 
 		std::string file_path = this->FilePath(id);
 

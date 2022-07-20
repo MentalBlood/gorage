@@ -26,7 +26,13 @@ public:
 		return this->_save(usi, something);
 	}
 
-	T load(const std::string& usi) {
+	T load(const std::string& usi, const bool use_cache = true) {
+
+		if (use_cache) {
+			this->cache.enable();
+		} else {
+			this->cache.disable();
+		}
 
 		try {
 
@@ -36,7 +42,7 @@ public:
 
 		} catch (std::out_of_range) {
 
-			T result = this->_load(usi);
+			T result = this->_load(usi, use_cache);
 			this->cache.set(usi, result);
 			this->keys.insert(usi);
 			return result;
@@ -64,7 +70,7 @@ protected:
 	std::unordered_set<std::string> keys;
 
 	virtual void _save(const std::string& usi, const T& something) = 0;
-	virtual T _load(const std::string& usi) = 0;
+	virtual T _load(const std::string& usi, const bool use_cache) = 0;
 	virtual void _remove(const std::string& usi) = 0;
 
 private:

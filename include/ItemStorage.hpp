@@ -78,10 +78,10 @@ public:
 		this->metadata_storage.save(usi, item.metadata);
 	}
 
-	Item<Metadata> _load(const std::string& usi) {
+	Item<Metadata> _load(const std::string& usi, const bool use_cache) {
 		return Item<Metadata>(
-			this->data_storage.load(usi),
-			this->metadata_storage.load(usi)
+			this->data_storage.load(usi, use_cache),
+			this->metadata_storage.load(usi, use_cache)
 		);
 	}
 
