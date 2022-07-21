@@ -22,7 +22,7 @@ public:
 
 protected:
 
-	void _save(const std::string& id, const std::string& content) {
+	void save(const std::string& id, const std::string& content) {
 
 		std::string file_path = this->FilePath(id);
 
@@ -37,7 +37,7 @@ protected:
 
 	}
 
-	std::string _load(const std::string& id, const bool use_cache) {
+	std::string load(const std::string& id) {
 
 		std::string file_path = this->FilePath(id);
 
@@ -55,7 +55,7 @@ protected:
 
 	}
 
-	void _remove(const std::string& id) {
+	void remove(const std::string& id) {
 		std::filesystem::remove(this->folder_path + id + this->extension);
 	}
 

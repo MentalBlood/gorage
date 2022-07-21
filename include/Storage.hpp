@@ -5,8 +5,6 @@
 #include <unordered_set>
 #include <unordered_map>
 
-#include "Cache.hpp"
-
 
 
 template<class T>
@@ -14,54 +12,12 @@ class Storage {
 
 public:
 
-	Cache<T> cache;
-
-	Storage() {
-		this->reload();
-	}
-
-	void reload() {
-		this->loadKeys();
-	}
-
-	void save(const std::string& usi, const T& something) {
-		this->cache.set(usi, something);
-		this->keys.insert(usi);
-		return this->_save(usi, something);
-	}
-
-	T load(const std::string& usi, const bool use_cache = true) {
-
-		if (use_cache) {
-			this->cache.enable();
-		} else {
-			this->cache.disable();
-		}
-
-		try {
-
-			T result = this->cache.get(usi);
-			this->keys.insert(usi);
-			return result;
-
-		} catch (std::out_of_range) {
-
-			T result = this->_load(usi, use_cache);
-			this->cache.set(usi, result);
-			this->keys.insert(usi);
-			return result;
-
-		}
-
-	}
-
-	void remove(const std::string& usi) {
-		this->_remove(usi);
-		this->cache.remove(usi);
-		this->keys.erase(usi);
-	}
+	virtual void save(const std::string& usi, const T& something) = 0;
+	virtual T load(const std::string& usi) = 0;
+	virtual void remove(const std::string& usi) = 0;
 
 	auto begin() {
+		this->loadKeys();
 		return this->keys.begin();
 	}
 
@@ -72,10 +28,6 @@ public:
 protected:
 
 	std::unordered_set<std::string> keys;
-
-	virtual void _save(const std::string& usi, const T& something) = 0;
-	virtual T _load(const std::string& usi, const bool use_cache) = 0;
-	virtual void _remove(const std::string& usi) = 0;
 
 private:
 

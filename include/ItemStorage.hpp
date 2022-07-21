@@ -69,23 +69,21 @@ public:
 	Storage<Metadata>& metadata_storage;
 
 	ItemStorage(Storage<std::string>& data_storage, Storage<Metadata>& metadata_storage):
-		data_storage(data_storage), metadata_storage(metadata_storage) {
-		this->cache.disable();
-	}
+		data_storage(data_storage), metadata_storage(metadata_storage) {}
 
-	void _save(const std::string& usi, const Item<Metadata>& item) {
+	void save(const std::string& usi, const Item<Metadata>& item) {
 		this->data_storage.save(usi, item.data);
 		this->metadata_storage.save(usi, item.metadata);
 	}
 
-	Item<Metadata> _load(const std::string& usi, const bool use_cache) {
+	Item<Metadata> load(const std::string& usi) {
 		return Item<Metadata>(
-			this->data_storage.load(usi, use_cache),
-			this->metadata_storage.load(usi, use_cache)
+			this->data_storage.load(usi),
+			this->metadata_storage.load(usi)
 		);
 	}
 
-	void _remove(const std::string& usi) {
+	void remove(const std::string& usi) {
 		this->data_storage.remove(usi);
 		this->metadata_storage.remove(usi);
 	}

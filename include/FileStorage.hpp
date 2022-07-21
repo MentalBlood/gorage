@@ -23,7 +23,7 @@ public:
 
 protected:
 
-	void _save(const std::string& id, const T& entity) {
+	void save(const std::string& id, const T& entity) {
 
 		const std::string content = entity.toJson();
 
@@ -39,7 +39,7 @@ protected:
 
 	}
 
-	T _load(const std::string& id, const bool use_cache) {
+	T load(const std::string& id) {
 
 		std::string file_path = this->FilePath(id);
 
@@ -57,7 +57,7 @@ protected:
 
 	}
 
-	void _remove(const std::string& id) {
+	void remove(const std::string& id) {
 		std::filesystem::remove(this->folder_path + id + this->extension);
 	}
 
