@@ -10,11 +10,6 @@ add_executable(${PROJECT_NAME}
 
 	modules/cpp-base64/base64.cpp
 
-	src/Storage.cpp
-	src/ItemStorage.cpp
-	src/FileStorage.cpp
-	src/BinaryFileStorage.cpp
-
 )
 
 set(CMAKE_CXX_STANDARD 17)

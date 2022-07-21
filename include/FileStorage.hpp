@@ -10,24 +10,48 @@
 
 
 
+/**
+ * @brief Storage for arbitrary structured, JSONable data. Stores data as files in given folder and with given extension
+ * 
+ */
 template<class T>
 class FileStorage : public Storage<T> {
 
 public:
 
+	/**
+	 * @brief Folder to store files in
+	 * 
+	 */
 	const std::string folder_path;
+	/**
+	 * @brief Extension to store files with
+	 * 
+	 */
 	const std::string extension;
 
+	/**
+	 * @brief Construct a new File Storage object
+	 * 
+	 * @param folder_path Folder to store files in
+	 * @param extension Extension to store files with
+	 */
 	FileStorage(const std::string& folder_path, const std::string& extension):
 		folder_path(folder_path), extension(extension) {}
 
 protected:
 
-	void save(const std::string& id, const T& entity) {
+	/**
+	 * @brief Saves given object with given USI
+	 * 
+	 * @param usi Unique Storage Identifier
+	 * @param object Object to save
+	 */
+	void save(const std::string& usi, const T& object) {
 
-		const std::string content = entity.toJson();
+		const std::string content = object.toJson();
 
-		std::string file_path = this->FilePath(id);
+		std::string file_path = this->FilePath(usi);
 
 		std::ofstream file(file_path, std::ios::out | std::ios::trunc);
 		if (!file.is_open()) {
@@ -39,9 +63,15 @@ protected:
 
 	}
 
-	T load(const std::string& id) {
+	/**
+	 * @brief Loads data with given USI
+	 * 
+	 * @param usi Unique Storage Identifier
+	 * @return T Loaded object
+	 */
+	T load(const std::string& usi) {
 
-		std::string file_path = this->FilePath(id);
+		std::string file_path = this->FilePath(usi);
 
 		std::ifstream file(file_path, std::ios::in);
 		if (!file.is_open()) {
@@ -57,20 +87,35 @@ protected:
 
 	}
 
-	void remove(const std::string& id) {
-		std::filesystem::remove(this->folder_path + id + this->extension);
+	/**
+	 * @brief Removes object with given USI
+	 * 
+	 * @param usi Unique Storage Identifier
+	 */
+	void remove(const std::string& usi) {
+		std::filesystem::remove(this->folder_path + usi + this->extension);
 	}
 
 private:
 
-	const std::string FilePath(const std::string& id) const {
-		return this->folder_path + "/" + id + this->extension;
+	/**
+	 * @brief Composes file path from USI and this storage properties
+	 * 
+	 * @param usi Unique Storage Identifier
+	 * @return const std::string File path
+	 */
+	const std::string FilePath(const std::string& usi) const {
+		return this->folder_path + "/" + usi + this->extension;
 	}
 
-	void loadKeys() {
+	/**
+	 * @brief Method to load USIs for iteration
+	 * 
+	 */
+	void loadUsis() {
 		for (const auto & p : std::filesystem::directory_iterator(this->folder_path)) {
 			if (p.path().extension() == this->extension) {
-				this->keys.insert(p.path().stem().string());
+				this->usis.insert(p.path().stem().string());
 			}
 		}
 	}
