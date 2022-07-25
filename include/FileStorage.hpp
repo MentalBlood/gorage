@@ -20,17 +20,6 @@ class FileStorage : public Storage<T> {
 public:
 
 	/**
-	 * @brief Folder to store files in
-	 * 
-	 */
-	const std::string folder_path;
-	/**
-	 * @brief Extension to store files with
-	 * 
-	 */
-	const std::string extension;
-
-	/**
 	 * @brief Construct a new File Storage object
 	 * 
 	 * @param folder_path Folder to store files in
@@ -40,6 +29,17 @@ public:
 		folder_path(folder_path), extension(extension) {}
 
 protected:
+
+	/**
+	 * @brief Folder to store files in
+	 * 
+	 */
+	const std::string folder_path;
+	/**
+	 * @brief Extension to store files with
+	 * 
+	 */
+	const std::string extension;
 
 	/**
 	 * @brief Saves given object with given USI
