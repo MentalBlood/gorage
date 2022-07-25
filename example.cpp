@@ -1,3 +1,4 @@
+#include <memory>
 #include <cassert>
 #include <iostream>
 
@@ -46,10 +47,16 @@ public:
 
 int main(void) {
 
-	BinaryFileStorage data_storage("storage/data", ".bin");
-	FileStorage<CertificateMetadata> metadata_storage("storage/metadata", ".json");
-
-	ItemStorage<CertificateMetadata> storage(data_storage, metadata_storage);
+	ItemStorage<CertificateMetadata> storage(
+		std::make_shared<BinaryFileStorage>(BinaryFileStorage(
+			"storage/data",
+			".bin"
+		)),
+		std::make_shared<FileStorage<CertificateMetadata>>(FileStorage<CertificateMetadata>(
+			"storage/metadata",
+			".json"
+		))
+	);
 
 	std::string usi = "1234";
 	std::string data("der");
