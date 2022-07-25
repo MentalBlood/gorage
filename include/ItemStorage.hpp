@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 #include <iostream>
 
@@ -112,12 +113,12 @@ public:
 	 * @brief Storage for items data
 	 * 
 	 */
-	Storage<std::string>& data_storage;
+	std::shared_ptr<Storage<std::string>> data_storage;
 	/**
 	 * @brief Storage for items metadata
 	 * 
 	 */
-	Storage<Metadata>& metadata_storage;
+	std::shared_ptr<Storage<Metadata>> metadata_storage;
 
 	/**
 	 * @brief Construct a new ItemStorage object
@@ -125,8 +126,9 @@ public:
 	 * @param data_storage Storage for items data
 	 * @param metadata_storage Storage for items metadata
 	 */
-	ItemStorage(Storage<std::string>& data_storage, Storage<Metadata>& metadata_storage):
-		data_storage(data_storage), metadata_storage(metadata_storage) {}
+	ItemStorage(std::shared_ptr<Storage<std::string>> data_storage, std::shared_ptr<Storage<Metadata>> metadata_storage):
+		data_storage(data_storage),
+		metadata_storage(metadata_storage) {}
 
 	/**
 	 * @brief Saves item with given USI
@@ -135,8 +137,8 @@ public:
 	 * @param item Item to save
 	 */
 	void save(const std::string& usi, const Item<Metadata>& item) {
-		this->data_storage.save(usi, item.data);
-		this->metadata_storage.save(usi, item.metadata);
+		this->data_storage->save(usi, item.data);
+		this->metadata_storage->save(usi, item.metadata);
 	}
 
 	/**
@@ -147,8 +149,8 @@ public:
 	 */
 	Item<Metadata> load(const std::string& usi) {
 		return Item<Metadata>(
-			this->data_storage.load(usi),
-			this->metadata_storage.load(usi)
+			this->data_storage->load(usi),
+			this->metadata_storage->load(usi)
 		);
 	}
 
@@ -158,8 +160,8 @@ public:
 	 * @param usi Unique Storage Identifier
 	 */
 	void remove(const std::string& usi) {
-		this->data_storage.remove(usi);
-		this->metadata_storage.remove(usi);
+		this->data_storage->remove(usi);
+		this->metadata_storage->remove(usi);
 	}
 
 private:
