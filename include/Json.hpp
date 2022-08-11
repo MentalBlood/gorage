@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef __GORAGE__JSON__
+#define __GORAGE__JSON__
+
 #include <iostream>
 
 
@@ -40,3 +43,5 @@ public:
 	}
 
 };
+
+#endif

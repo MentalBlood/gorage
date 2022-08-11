@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef __GORAGE__ITEM_STORAGE__
+#define __GORAGE__ITEM_STORAGE__
+
 #include <memory>
 #include <vector>
 #include <iostream>
@@ -177,3 +180,5 @@ private:
 	}
 
 };
+
+#endif

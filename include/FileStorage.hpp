@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef __GORAGE__FILE_STORAGE__
+#define __GORAGE__FILE_STORAGE__
+
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -121,3 +124,5 @@ private:
 	}
 
 };
+
+#endif

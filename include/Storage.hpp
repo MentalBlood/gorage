@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef __GORAGE__STORAGE__
+#define __GORAGE__STORAGE__
+
 #include <iostream>
 #include <stdbool.h>
 #include <unordered_set>
@@ -76,3 +79,5 @@ private:
 	void loadUsis() {};
 
 };
+
+#endif

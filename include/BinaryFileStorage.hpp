@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef __GORAGE__BINARY_FILE_STORAGE__
+#define __GORAGE__BINARY_FILE_STORAGE__
+
 #include <vector>
 #include <sstream>
 #include <fstream>
@@ -119,3 +122,5 @@ private:
 	}
 
 };
+
+#endif

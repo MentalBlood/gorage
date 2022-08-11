@@ -4,9 +4,7 @@ SET(PROJECT_NAME gorage)
 
 project(${PROJECT_NAME})
 
-add_executable(${PROJECT_NAME} 
-
-	example.cpp
+add_library(${PROJECT_NAME} 
 
 	modules/cpp-base64/base64.cpp
 
