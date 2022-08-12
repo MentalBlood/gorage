@@ -8,6 +8,8 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#include "gorage.hpp"
+
 
 
 /**
@@ -16,7 +18,7 @@
  * @tparam T Type of stored objects
  */
 template<class T>
-class Storage {
+class gorage::Storage {
 
 public:
 

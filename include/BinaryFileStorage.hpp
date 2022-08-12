@@ -9,6 +9,7 @@
 #include <iostream>
 #include <filesystem>
 
+#include "gorage.hpp"
 #include "Storage.hpp"
 
 
@@ -17,7 +18,7 @@
  * @brief Storage for binary data. Stores data as files in given folder and with given extension
  * 
  */
-class BinaryFileStorage : public Storage<std::string> {
+class gorage::BinaryFileStorage : public Storage<std::string> {
 
 public:
 

@@ -10,7 +10,7 @@
 #include "include/BinaryFileStorage.hpp"
 
 
-class CertificateMetadata : public Json {
+class CertificateMetadata : public gorage::Json {
 
 public:
 
@@ -47,15 +47,19 @@ public:
 
 int main(void) {
 
-	ItemStorage<CertificateMetadata> storage(
-		std::make_shared<BinaryFileStorage>(BinaryFileStorage(
-			"storage/data",
-			".bin"
-		)),
-		std::make_shared<FileStorage<CertificateMetadata>>(FileStorage<CertificateMetadata>(
-			"storage/metadata",
-			".json"
-		))
+	gorage::ItemStorage<CertificateMetadata> storage(
+		std::make_shared<gorage::BinaryFileStorage>(
+			gorage::BinaryFileStorage(
+				"storage/data",
+				".bin"
+			)
+		),
+		std::make_shared<gorage::FileStorage<CertificateMetadata>>(
+			gorage::FileStorage<CertificateMetadata>(
+				"storage/metadata",
+				".json"
+			)
+		)
 	);
 
 	std::string usi = "1234";
@@ -65,13 +69,18 @@ int main(void) {
 
 	storage.save(
 		usi,
-		Item<CertificateMetadata>(
+		gorage::Item<CertificateMetadata>(
 			data,
 			CertificateMetadata(metadata_a, metadata_b)
 		)
 	);
 
-	assert(storage.load(usi).metadata.toJson() == Json::create<CertificateMetadata>(storage.load(usi).metadata.toJson()).toJson());
+	assert(
+		storage.load(usi).metadata.toJson() ==
+		gorage::Json::create<CertificateMetadata>(
+			storage.load(usi).metadata.toJson()
+		).toJson()
+	);
 
 	assert(storage.load(usi).data == data);
 	assert(storage.load(usi).metadata.a == metadata_a);

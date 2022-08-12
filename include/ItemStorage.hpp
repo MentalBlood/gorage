@@ -13,6 +13,7 @@
 #include "../modules/rapidjson/stringbuffer.h"
 
 #include "Json.hpp"
+#include "gorage.hpp"
 #include "Storage.hpp"
 
 
@@ -23,7 +24,7 @@
  * @tparam T Metadata object type, should be inherited from Json
  */
 template<class T>
-class Item : public Json {
+class gorage::Item : public Json {
 
 public:
 
@@ -108,7 +109,7 @@ public:
  * @tparam Metadata Items metadata type
  */
 template<class Metadata>
-class ItemStorage : public Storage<Item<Metadata>> {
+class gorage::ItemStorage : public Storage<Item<Metadata>> {
 
 public:
 

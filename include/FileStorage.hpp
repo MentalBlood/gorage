@@ -9,6 +9,7 @@
 #include <filesystem>
 
 #include "Json.hpp"
+#include "gorage.hpp"
 #include "Storage.hpp"
 
 
@@ -18,7 +19,7 @@
  * 
  */
 template<class T>
-class FileStorage : public Storage<T> {
+class gorage::FileStorage : public Storage<T> {
 
 public:
 

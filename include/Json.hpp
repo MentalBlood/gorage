@@ -5,13 +5,15 @@
 
 #include <iostream>
 
+#include "gorage.hpp"
+
 
 
 /**
  * @brief Class for representing JSONable objects
  * 
  */
-class Json {
+class gorage::Json {
 
 public:
 
