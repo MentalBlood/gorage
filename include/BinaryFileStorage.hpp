@@ -18,7 +18,7 @@
  * @brief Storage for binary data. Stores data as files in given folder and with given extension
  * 
  */
-class gorage::BinaryFileStorage : public Storage<std::string> {
+class gorage::BinaryFileStorage : public Storage<gorage::Bytes> {
 
 public:
 
@@ -50,7 +50,7 @@ protected:
 	 * @param usi Unique Storage Identifier
 	 * @param content Arbitrary binary data
 	 */
-	void save(const std::string& usi, const std::string& content) {
+	void save(const std::string& usi, const gorage::Bytes& content) {
 
 		std::string file_path = this->FilePath(usi);
 
@@ -59,7 +59,7 @@ protected:
 			throw std::runtime_error("Can not save file " + file_path);
 		}
 
-		file.write(content.c_str(), content.length());
+		file.write(reinterpret_cast<const char *>(&content[0]), content.size());
 
 		file.close();
 
@@ -71,21 +71,20 @@ protected:
 	 * @param usi Unique Storage Identifier
 	 * @return std::string Loaded data
 	 */
-	std::string load(const std::string& usi) {
+	gorage::Bytes load(const std::string& usi) {
 
 		std::string file_path = this->FilePath(usi);
 
-		std::ifstream file(file_path, std::ios::binary);
+		// std::ifstream file(file_path, std::ios::binary);
+		std::basic_ifstream<unsigned char, std::char_traits<unsigned char>> file(file_path, std::ios::binary);
 		if (!file.is_open()) {
 			throw std::runtime_error("Can not load file " + file_path);
 		}
 
-		std::ostringstream result_stream;
-		result_stream << file.rdbuf();
-
-		file.close();
-
-		return result_stream.str();
+		return gorage::Bytes(
+			std::istreambuf_iterator<unsigned char>(file),
+			std::istreambuf_iterator<unsigned char>()
+		);
 
 	}
 

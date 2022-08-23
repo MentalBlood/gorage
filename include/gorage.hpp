@@ -1,5 +1,6 @@
 namespace gorage {
 
+	using Bytes = std::vector<unsigned char>;
 	template<class T> class Storage;
 	class Json;
 	template<class T> class Item;

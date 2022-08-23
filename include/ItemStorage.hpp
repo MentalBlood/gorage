@@ -11,6 +11,7 @@
 #include "../modules/cpp-base64/base64.h"
 #include "../modules/rapidjson/document.h"
 #include "../modules/rapidjson/stringbuffer.h"
+#include "../modules/cppcodec/base64_rfc4648.hpp"
 
 #include "Json.hpp"
 #include "gorage.hpp"
@@ -32,7 +33,7 @@ public:
 	 * @brief Arbitrary bytes
 	 * 
 	 */
-	std::string data;
+	gorage::Bytes data;
 	/**
 	 * @brief Arbitrary structured JSONable data
 	 * 
@@ -44,7 +45,7 @@ public:
 	 * 
 	 */
 	Item():
-		data(std::string{}), metadata(T()) {}
+		data({}), metadata(T()) {}
 
 	/**
 	 * @brief Construct a new Item object
@@ -52,8 +53,16 @@ public:
 	 * @param data Arbitrary bytes
 	 * @param metadata Arbitrary structured JSONable data
 	 */
-	Item(std::string data, T metadata):
+	Item(gorage::Bytes data, T metadata):
 		data(data), metadata(metadata) {}
+
+	Item(std::string data_base64, T metadata):
+		data(
+			cppcodec::base64_rfc4648::decode(
+				data_base64
+			)
+		),
+		metadata(metadata) {}
 
 	/**
 	 * @brief Updates data and metadata from corresponding JSON text
@@ -69,7 +78,7 @@ public:
 
 		std::string data_base64 = json["data"].GetString();
 
-		this->data = std::string(base64_decode(data_base64));
+		this->data = cppcodec::base64_rfc4648::decode(data_base64);
 
 		rapidjson::StringBuffer buffer;
 		rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
@@ -84,7 +93,7 @@ public:
 	 * @return std::string JSONed data
 	 */
 	std::string dataToJson() const {
-		return "\"" + base64_encode(this->data) + "\"";
+		return "\"" + cppcodec::base64_rfc4648::encode(this->data) + "\"";
 	}
 
 	/**
@@ -117,7 +126,7 @@ public:
 	 * @brief Storage for items data
 	 * 
 	 */
-	std::shared_ptr<Storage<std::string>> data_storage;
+	std::shared_ptr<Storage<gorage::Bytes>> data_storage;
 	/**
 	 * @brief Storage for items metadata
 	 * 
@@ -130,7 +139,7 @@ public:
 	 * @param data_storage Storage for items data
 	 * @param metadata_storage Storage for items metadata
 	 */
-	ItemStorage(std::shared_ptr<Storage<std::string>> data_storage, std::shared_ptr<Storage<Metadata>> metadata_storage):
+	ItemStorage(std::shared_ptr<Storage<gorage::Bytes>> data_storage, std::shared_ptr<Storage<Metadata>> metadata_storage):
 		data_storage(data_storage),
 		metadata_storage(metadata_storage) {}
 

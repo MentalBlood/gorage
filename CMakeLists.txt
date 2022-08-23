@@ -6,6 +6,8 @@ project(${PROJECT_NAME})
 
 add_library(${PROJECT_NAME} 
 
+	include/gorage.hpp
+
 	modules/cpp-base64/base64.cpp
 
 )
