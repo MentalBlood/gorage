@@ -54,12 +54,14 @@ protected:
 
 		std::string file_path = this->FilePath(usi);
 
-		std::ofstream file(file_path, std::ios::trunc);
+		std::ofstream file(file_path, std::ios::trunc | std::ios::binary);
 		if (!file.is_open()) {
 			throw std::runtime_error("Can not save file " + file_path);
 		}
 
-		file.write(reinterpret_cast<const char *>(&content[0]), content.size());
+		size_t content_size = content.size();
+
+		file.write(reinterpret_cast<const char*>(&content[0]), content.size());
 
 		file.close();
 
