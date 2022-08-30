@@ -8,7 +8,6 @@
 #include <iostream>
 
 #include "../modules/rapidjson/writer.h"
-#include "../modules/cpp-base64/base64.h"
 #include "../modules/rapidjson/document.h"
 #include "../modules/rapidjson/stringbuffer.h"
 #include "../modules/cppcodec/base64_rfc4648.hpp"
