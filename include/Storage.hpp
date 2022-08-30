@@ -9,6 +9,7 @@
 #include <unordered_map>
 
 #include "gorage.hpp"
+#include "RandomString.hpp"
 
 
 
@@ -29,6 +30,10 @@ public:
 	 * @param object Object to store
 	 */
 	virtual void save(const std::string& usi, const T& object) = 0;
+
+	void save(const T& object) {
+		this->save(this->Usi(), object);
+	}
 
 	/**
 	 * @brief Loads object stored with USI usi
@@ -79,6 +84,10 @@ private:
 	 * 
 	 */
 	void loadUsis() {};
+
+	std::string Usi() {
+		return RandomString(32); // 62 ^ 32 variants
+	}
 
 };
 
