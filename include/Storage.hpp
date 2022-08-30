@@ -31,8 +31,13 @@ public:
 	 */
 	virtual void save(const std::string& usi, const T& object) = 0;
 
-	void save(const T& object) {
-		this->save(this->Usi(), object);
+	std::string save(const T& object) {
+
+		std::string usi = this->Usi();
+		this->save(usi, object);
+
+		return usi;
+
 	}
 
 	/**
