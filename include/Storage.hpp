@@ -30,7 +30,7 @@ public:
 	 */
 	virtual void save(const std::string& usi, const T& object) = 0;
 
-	std::string save(const T& object) {
+	std::string save(const T object) {
 
 		std::string usi = this->Usi(32); // 62 ^ 32 variants
 		this->save(usi, object);
