@@ -9,7 +9,6 @@
 #include <unordered_map>
 
 #include "gorage.hpp"
-#include "RandomString.hpp"
 
 
 
@@ -33,7 +32,7 @@ public:
 
 	std::string save(const T& object) {
 
-		std::string usi = this->Usi();
+		std::string usi = this->Usi(32); // 62 ^ 32 variants
 		this->save(usi, object);
 
 		return usi;
@@ -90,8 +89,23 @@ private:
 	 */
 	void loadUsis() {};
 
-	std::string Usi() {
-		return RandomString(32); // 62 ^ 32 variants
+	std::string Usi(size_t length) {
+
+		static std::string symbols = 
+			"0123456789" 
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
+			"abcdefghijklmnopqrstuvwxyz";
+
+		std::srand(time(NULL));
+
+		std::string result;
+		result.reserve(length);
+		for (size_t i = 0; i < length; i++) {
+			result += symbols[rand() % (symbols.length() - 1)];
+		}
+
+		return result;
+
 	}
 
 };
