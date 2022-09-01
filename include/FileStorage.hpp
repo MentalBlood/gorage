@@ -14,116 +14,120 @@
 
 
 
-/**
- * @brief Storage for arbitrary structured, JSONable data. Stores data as files in given folder and with given extension
- * 
- */
-template<class T>
-class gorage::FileStorage : public Storage<T> {
-
-public:
+namespace gorage {
 
 	/**
-	 * @brief Construct a new File Storage object
-	 * 
-	 * @param folder_path Folder to store files in
-	 * @param extension Extension to store files with
-	 */
-	FileStorage(const std::string& folder_path, const std::string& extension):
-		folder_path(folder_path), extension(extension) {}
-
-protected:
-
-	/**
-	 * @brief Folder to store files in
+	 * @brief Storage for arbitrary structured, JSONable data. Stores data as files in given folder and with given extension
 	 * 
 	 */
-	const std::string folder_path;
-	/**
-	 * @brief Extension to store files with
-	 * 
-	 */
-	const std::string extension;
+	template<class T>
+	class FileStorage : public Storage<T> {
 
-	/**
-	 * @brief Saves given object with given USI
-	 * 
-	 * @param usi Unique Storage Identifier
-	 * @param object Object to save
-	 */
-	void save(const std::string& usi, const T& object) {
+	public:
 
-		const std::string content = object.toJson();
+		/**
+		 * @brief Construct a new File Storage object
+		 * 
+		 * @param folder_path Folder to store files in
+		 * @param extension Extension to store files with
+		 */
+		FileStorage(const std::string& folder_path, const std::string& extension):
+			folder_path(folder_path), extension(extension) {}
 
-		std::string file_path = this->FilePath(usi);
+	protected:
 
-		std::ofstream file(file_path, std::ios::out | std::ios::trunc);
-		if (!file.is_open()) {
-			throw std::runtime_error("Can not save file " + file_path);
+		/**
+		 * @brief Folder to store files in
+		 * 
+		 */
+		const std::string folder_path;
+		/**
+		 * @brief Extension to store files with
+		 * 
+		 */
+		const std::string extension;
+
+		/**
+		 * @brief Saves given object with given USI
+		 * 
+		 * @param usi Unique Storage Identifier
+		 * @param object Object to save
+		 */
+		void save(const std::string& usi, const T& object) {
+
+			const std::string content = object.toJson();
+
+			std::string file_path = this->FilePath(usi);
+
+			std::ofstream file(file_path, std::ios::out | std::ios::trunc);
+			if (!file.is_open()) {
+				throw std::runtime_error("Can not save file " + file_path);
+			}
+
+			file << content;
+			file.close();
+
 		}
 
-		file << content;
-		file.close();
+		/**
+		 * @brief Loads data with given USI
+		 * 
+		 * @param usi Unique Storage Identifier
+		 * @return T Loaded object
+		 */
+		T load(const std::string& usi) {
 
-	}
+			std::string file_path = this->FilePath(usi);
 
-	/**
-	 * @brief Loads data with given USI
-	 * 
-	 * @param usi Unique Storage Identifier
-	 * @return T Loaded object
-	 */
-	T load(const std::string& usi) {
+			std::ifstream file(file_path, std::ios::in);
+			if (!file.is_open()) {
+				throw std::runtime_error("Can not load file " + file_path);
+			}
 
-		std::string file_path = this->FilePath(usi);
+			std::stringstream result_stream;
+			result_stream << file.rdbuf();
 
-		std::ifstream file(file_path, std::ios::in);
-		if (!file.is_open()) {
-			throw std::runtime_error("Can not load file " + file_path);
+			file.close();
+
+			return Json::create<T>(result_stream.str());
+
 		}
 
-		std::stringstream result_stream;
-		result_stream << file.rdbuf();
+		/**
+		 * @brief Removes object with given USI
+		 * 
+		 * @param usi Unique Storage Identifier
+		 */
+		void remove(const std::string& usi) {
+			std::filesystem::remove(this->folder_path + usi + this->extension);
+		}
 
-		file.close();
+	private:
 
-		return Json::create<T>(result_stream.str());
+		/**
+		 * @brief Composes file path from USI and this storage properties
+		 * 
+		 * @param usi Unique Storage Identifier
+		 * @return const std::string File path
+		 */
+		const std::string FilePath(const std::string& usi) const {
+			return this->folder_path + "/" + usi + this->extension;
+		}
 
-	}
-
-	/**
-	 * @brief Removes object with given USI
-	 * 
-	 * @param usi Unique Storage Identifier
-	 */
-	void remove(const std::string& usi) {
-		std::filesystem::remove(this->folder_path + usi + this->extension);
-	}
-
-private:
-
-	/**
-	 * @brief Composes file path from USI and this storage properties
-	 * 
-	 * @param usi Unique Storage Identifier
-	 * @return const std::string File path
-	 */
-	const std::string FilePath(const std::string& usi) const {
-		return this->folder_path + "/" + usi + this->extension;
-	}
-
-	/**
-	 * @brief Method to load USIs for iteration
-	 * 
-	 */
-	void loadUsis() {
-		for (const auto & p : std::filesystem::directory_iterator(this->folder_path)) {
-			if (p.path().extension() == this->extension) {
-				this->usis.insert(p.path().stem().string());
+		/**
+		 * @brief Method to load USIs for iteration
+		 * 
+		 */
+		void loadUsis() {
+			for (const auto & p : std::filesystem::directory_iterator(this->folder_path)) {
+				if (p.path().extension() == this->extension) {
+					this->usis.insert(p.path().stem().string());
+				}
 			}
 		}
-	}
 
-};
+	};
+
+} // gorage
 
 #endif

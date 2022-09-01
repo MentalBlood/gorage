@@ -13,60 +13,64 @@
 #include "Storage.hpp"
 
 
-/**
- * @brief Storage for arbitrary objects, uses std::unordered_map
- * 
- * @tparam T Objects type
- */
-template<class T>
-class gorage::MemoryStorage : public Storage<T> {
-
-public:
+namespace gorage {
 
 	/**
-	 * @brief Construct a new Memory Storage object
+	 * @brief Storage for arbitrary objects, uses std::unordered_map
 	 * 
+	 * @tparam T Objects type
 	 */
-	MemoryStorage() {}
+	template<class T>
+	class MemoryStorage : public Storage<T> {
 
-protected:
+	public:
 
-	/**
-	 * @brief Saves given object with given USI
-	 * 
-	 * @param usi Unique Storage Identifier
-	 * @param object Arbitrary object
-	 */
-	void save(const std::string& usi, const T& object) {
-		this->storage[usi] = object;
-	}
+		/**
+		 * @brief Construct a new Memory Storage object
+		 * 
+		 */
+		MemoryStorage() {}
 
-	/**
-	 * @brief Loads object with given USI
-	 * 
-	 * @param usi Unique Storage Identifier
-	 * @return T Object type
-	 */
-	T load(const std::string& usi) {
-		return this->storage.at(usi);
-	}
+	protected:
 
-	/**
-	 * @brief Removes object with given USI
-	 * 
-	 * @param usi Unique Storage Identifier
-	 */
-	void remove(const std::string& usi) {
-		this->storage.at(usi);
-		this->storage.erase(usi);
-	}
+		/**
+		 * @brief Saves given object with given USI
+		 * 
+		 * @param usi Unique Storage Identifier
+		 * @param object Arbitrary object
+		 */
+		void save(const std::string& usi, const T& object) {
+			this->storage[usi] = object;
+		}
 
-private:
+		/**
+		 * @brief Loads object with given USI
+		 * 
+		 * @param usi Unique Storage Identifier
+		 * @return T Object type
+		 */
+		T load(const std::string& usi) {
+			return this->storage.at(usi);
+		}
 
-	/**
-	 * @brief Map to store objects in
-	 * 
-	 */
-	std::unordered_map<std::string, T> storage;
+		/**
+		 * @brief Removes object with given USI
+		 * 
+		 * @param usi Unique Storage Identifier
+		 */
+		void remove(const std::string& usi) {
+			this->storage.at(usi);
+			this->storage.erase(usi);
+		}
 
-};
+	private:
+
+		/**
+		 * @brief Map to store objects in
+		 * 
+		 */
+		std::unordered_map<std::string, T> storage;
+
+	};
+
+} // gorage

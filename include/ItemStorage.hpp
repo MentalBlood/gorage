@@ -18,176 +18,180 @@
 
 
 
-/**
- * @brief Abstract class for arbitrary objects to formalize storing
- * 
- * @tparam T Metadata object type, should be inherited from Json
- */
-template<class T>
-class gorage::Item : public Json {
-
-public:
+namespace gorage {
 
 	/**
-	 * @brief Arbitrary bytes
+	 * @brief Abstract class for arbitrary objects to formalize storing
 	 * 
+	 * @tparam T Metadata object type, should be inherited from Json
 	 */
-	gorage::Bytes data;
-	/**
-	 * @brief Arbitrary structured JSONable data
-	 * 
-	 */
-	T metadata;
+	template<class T>
+	class Item : public Json {
 
-	/**
-	 * @brief Construct a new Item object with empty data and metadata
-	 * 
-	 */
-	Item():
-		data({}), metadata(T()) {}
+	public:
 
-	/**
-	 * @brief Construct a new Item object
-	 * 
-	 * @param data Arbitrary bytes
-	 * @param metadata Arbitrary structured JSONable data
-	 */
-	Item(gorage::Bytes data, T metadata):
-		data(data), metadata(metadata) {}
+		/**
+		 * @brief Arbitrary bytes
+		 * 
+		 */
+		gorage::Bytes data;
+		/**
+		 * @brief Arbitrary structured JSONable data
+		 * 
+		 */
+		T metadata;
 
-	Item(std::string data_base64, T metadata):
-		data(
-			cppcodec::base64_rfc4648::decode(
-				data_base64
-			)
-		),
-		metadata(metadata) {}
+		/**
+		 * @brief Construct a new Item object with empty data and metadata
+		 * 
+		 */
+		Item():
+			data({}), metadata(T()) {}
 
-	/**
-	 * @brief Updates data and metadata from corresponding JSON text
-	 * 
-	 * @param json_text JSON text to update from. Should be like {"data": <base64 string>, "metadata": <dict corresponding to T>}
-	 */
-	void updateFromJson(const std::string& json_text) {
+		/**
+		 * @brief Construct a new Item object
+		 * 
+		 * @param data Arbitrary bytes
+		 * @param metadata Arbitrary structured JSONable data
+		 */
+		Item(gorage::Bytes data, T metadata):
+			data(data), metadata(metadata) {}
 
-		std::cout << "json " << json_text << std::endl;
+		Item(std::string data_base64, T metadata):
+			data(
+				cppcodec::base64_rfc4648::decode(
+					data_base64
+				)
+			),
+			metadata(metadata) {}
 
-		rapidjson::Document json;
-		json.Parse(json_text.c_str());
+		/**
+		 * @brief Updates data and metadata from corresponding JSON text
+		 * 
+		 * @param json_text JSON text to update from. Should be like {"data": <base64 string>, "metadata": <dict corresponding to T>}
+		 */
+		void updateFromJson(const std::string& json_text) {
 
-		std::string data_base64 = json["data"].GetString();
+			std::cout << "json " << json_text << std::endl;
 
-		this->data = cppcodec::base64_rfc4648::decode(data_base64);
+			rapidjson::Document json;
+			json.Parse(json_text.c_str());
 
-		rapidjson::StringBuffer buffer;
-		rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-		json["metadata"].Accept(writer);
-		this->metadata = Json::create<T>(std::string(buffer.GetString()));
+			std::string data_base64 = json["data"].GetString();
 
-	}
+			this->data = cppcodec::base64_rfc4648::decode(data_base64);
 
-	/**
-	 * @brief Converts data to JSON using base64
-	 * 
-	 * @return std::string JSONed data
-	 */
-	std::string dataToJson() const {
-		return "\"" + cppcodec::base64_rfc4648::encode(this->data) + "\"";
-	}
+			rapidjson::StringBuffer buffer;
+			rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+			json["metadata"].Accept(writer);
+			this->metadata = Json::create<T>(std::string(buffer.GetString()));
 
-	/**
-	 * @brief Converts the whole item to JSON
-	 * 
-	 * @return std::string JSONed item
-	 */
-	std::string toJson() const {
-		return
-		"{"
-			"\"data\":" + this->dataToJson() + ","
-			"\"metadata\":" +  this->metadata.toJson() + ""
-		"}";
-	}
-
-};
-
-
-/**
- * @brief Items storage. Uses separate storages for data and metadata
- * 
- * @tparam Metadata Items metadata type
- */
-template<class Metadata>
-class gorage::ItemStorage : public Storage<Item<Metadata>> {
-
-public:
-
-	/**
-	 * @brief Storage for items data
-	 * 
-	 */
-	std::shared_ptr<Storage<gorage::Bytes>> data_storage;
-	/**
-	 * @brief Storage for items metadata
-	 * 
-	 */
-	std::shared_ptr<Storage<Metadata>> metadata_storage;
-
-	/**
-	 * @brief Construct a new ItemStorage object
-	 * 
-	 * @param data_storage Storage for items data
-	 * @param metadata_storage Storage for items metadata
-	 */
-	ItemStorage(std::shared_ptr<Storage<gorage::Bytes>> data_storage, std::shared_ptr<Storage<Metadata>> metadata_storage):
-		data_storage(data_storage),
-		metadata_storage(metadata_storage) {}
-
-	/**
-	 * @brief Saves item with given USI
-	 * 
-	 * @param usi Unique Storage Identifier
-	 * @param item Item to save
-	 */
-	void save(const std::string& usi, const Item<Metadata>& item) {
-		this->data_storage->save(usi, item.data);
-		this->metadata_storage->save(usi, item.metadata);
-	}
-
-	/**
-	 * @brief Loads item with given USI
-	 * 
-	 * @param usi Unique Storage Identifier
-	 * @return Item<Metadata> Loaded item
-	 */
-	Item<Metadata> load(const std::string& usi) {
-		return Item<Metadata>(
-			this->data_storage->load(usi),
-			this->metadata_storage->load(usi)
-		);
-	}
-
-	/**
-	 * @brief Removes item with given USI
-	 * 
-	 * @param usi Unique Storage Identifier
-	 */
-	void remove(const std::string& usi) {
-		this->data_storage->remove(usi);
-		this->metadata_storage->remove(usi);
-	}
-
-private:
-
-	/**
-	 * @brief Loads USIs for iteration
-	 * 
-	 */
-	void loadUsis() {
-		for (const auto & k : this->data_storage) {
-			this->usis.insert(k);
 		}
-	}
 
-};
+		/**
+		 * @brief Converts data to JSON using base64
+		 * 
+		 * @return std::string JSONed data
+		 */
+		std::string dataToJson() const {
+			return "\"" + cppcodec::base64_rfc4648::encode(this->data) + "\"";
+		}
+
+		/**
+		 * @brief Converts the whole item to JSON
+		 * 
+		 * @return std::string JSONed item
+		 */
+		std::string toJson() const {
+			return
+			"{"
+				"\"data\":" + this->dataToJson() + ","
+				"\"metadata\":" +  this->metadata.toJson() + ""
+			"}";
+		}
+
+	};
+
+
+	/**
+	 * @brief Items storage. Uses separate storages for data and metadata
+	 * 
+	 * @tparam Metadata Items metadata type
+	 */
+	template<class Metadata>
+	class ItemStorage : public Storage<Item<Metadata>> {
+
+	public:
+
+		/**
+		 * @brief Storage for items data
+		 * 
+		 */
+		std::shared_ptr<Storage<gorage::Bytes>> data_storage;
+		/**
+		 * @brief Storage for items metadata
+		 * 
+		 */
+		std::shared_ptr<Storage<Metadata>> metadata_storage;
+
+		/**
+		 * @brief Construct a new ItemStorage object
+		 * 
+		 * @param data_storage Storage for items data
+		 * @param metadata_storage Storage for items metadata
+		 */
+		ItemStorage(std::shared_ptr<Storage<gorage::Bytes>> data_storage, std::shared_ptr<Storage<Metadata>> metadata_storage):
+			data_storage(data_storage),
+			metadata_storage(metadata_storage) {}
+
+		/**
+		 * @brief Saves item with given USI
+		 * 
+		 * @param usi Unique Storage Identifier
+		 * @param item Item to save
+		 */
+		void save(const std::string& usi, const Item<Metadata>& item) {
+			this->data_storage->save(usi, item.data);
+			this->metadata_storage->save(usi, item.metadata);
+		}
+
+		/**
+		 * @brief Loads item with given USI
+		 * 
+		 * @param usi Unique Storage Identifier
+		 * @return Item<Metadata> Loaded item
+		 */
+		Item<Metadata> load(const std::string& usi) {
+			return Item<Metadata>(
+				this->data_storage->load(usi),
+				this->metadata_storage->load(usi)
+			);
+		}
+
+		/**
+		 * @brief Removes item with given USI
+		 * 
+		 * @param usi Unique Storage Identifier
+		 */
+		void remove(const std::string& usi) {
+			this->data_storage->remove(usi);
+			this->metadata_storage->remove(usi);
+		}
+
+	private:
+
+		/**
+		 * @brief Loads USIs for iteration
+		 * 
+		 */
+		void loadUsis() {
+			for (const auto & k : this->data_storage) {
+				this->usis.insert(k);
+			}
+		}
+
+	};
+
+} // gorage
 
 #endif
