@@ -11,5 +11,6 @@ namespace gorage {
 	template<class Metadata> class ItemStorage;
 	template<class T> class FileStorage;
 	class BinaryFileStorage;
+	template<class T> class MemoryStorage;
 
 }
