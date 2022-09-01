@@ -20,7 +20,7 @@ namespace gorage {
 	 * @brief Storage for binary data. Stores data as files in given folder and with given extension
 	 * 
 	 */
-	class BinaryFileStorage : public Storage<gorage::Bytes> {
+	class BinaryFileStorage : public Storage<Bytes> {
 
 	public:
 
@@ -52,7 +52,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @param content Arbitrary binary data
 		 */
-		void save(const std::string& usi, const gorage::Bytes& content) {
+		void save(const std::string& usi, const Bytes& content) {
 
 			std::string file_path = this->FilePath(usi);
 
@@ -75,7 +75,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return std::string Loaded data
 		 */
-		gorage::Bytes load(const std::string& usi) {
+		Bytes load(const std::string& usi) {
 
 			std::string file_path = this->FilePath(usi);
 
@@ -85,7 +85,7 @@ namespace gorage {
 				throw std::runtime_error("Can not load file " + file_path);
 			}
 
-			return gorage::Bytes(
+			return Bytes(
 				std::istreambuf_iterator<unsigned char>(file),
 				std::istreambuf_iterator<unsigned char>()
 			);

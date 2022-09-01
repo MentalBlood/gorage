@@ -34,7 +34,7 @@ namespace gorage {
 		 * @brief Arbitrary bytes
 		 * 
 		 */
-		gorage::Bytes data;
+		Bytes data;
 		/**
 		 * @brief Arbitrary structured JSONable data
 		 * 
@@ -54,7 +54,7 @@ namespace gorage {
 		 * @param data Arbitrary bytes
 		 * @param metadata Arbitrary structured JSONable data
 		 */
-		Item(gorage::Bytes data, T metadata):
+		Item(Bytes data, T metadata):
 			data(data), metadata(metadata) {}
 
 		Item(std::string data_base64, T metadata):
@@ -127,7 +127,7 @@ namespace gorage {
 		 * @brief Storage for items data
 		 * 
 		 */
-		std::shared_ptr<Storage<gorage::Bytes>> data_storage;
+		std::shared_ptr<Storage<Bytes>> data_storage;
 		/**
 		 * @brief Storage for items metadata
 		 * 
@@ -140,7 +140,7 @@ namespace gorage {
 		 * @param data_storage Storage for items data
 		 * @param metadata_storage Storage for items metadata
 		 */
-		ItemStorage(std::shared_ptr<Storage<gorage::Bytes>> data_storage, std::shared_ptr<Storage<Metadata>> metadata_storage):
+		ItemStorage(std::shared_ptr<Storage<Bytes>> data_storage, std::shared_ptr<Storage<Metadata>> metadata_storage):
 			data_storage(data_storage),
 			metadata_storage(metadata_storage) {}
 
