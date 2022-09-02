@@ -185,7 +185,8 @@ namespace gorage {
 		 * 
 		 */
 		void loadUsis() {
-			for (const auto & k : this->data_storage) {
+			this->usis.clear();
+			for (const auto & k : *this->data_storage) {
 				this->usis.insert(k);
 			}
 		}

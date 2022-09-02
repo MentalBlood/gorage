@@ -63,6 +63,19 @@ namespace gorage {
 			this->storage.erase(usi);
 		}
 
+	protected:
+
+		/**
+		 * @brief Loads USIs for iteration
+		 * 
+		 */
+		void loadUsis() {
+			this->usis.clear();
+			for (const auto & k : this->storage) {
+				this->usis.insert(k.first);
+			}
+		}
+
 	private:
 
 		/**

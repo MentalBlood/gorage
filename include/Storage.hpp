@@ -81,13 +81,13 @@ namespace gorage {
 		 */
 		std::unordered_set<std::string> usis;
 
-	private:
-
 		/**
 		 * @brief Method to load USIs in usis set for iteration
 		 * 
 		 */
-		void loadUsis() {};
+		virtual void loadUsis() = 0;
+
+	private:
 
 		std::string Usi(size_t length) {
 

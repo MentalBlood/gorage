@@ -119,6 +119,7 @@ namespace gorage {
 		 * 
 		 */
 		void loadUsis() {
+			this->usis.clear();
 			for (const auto & p : std::filesystem::directory_iterator(this->folder_path)) {
 				if (p.path().extension() == this->extension) {
 					this->usis.insert(p.path().stem().string());
