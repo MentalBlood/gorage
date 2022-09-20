@@ -6,6 +6,7 @@
 #include <any>
 #include <map>
 #include <vector>
+#include <variant>
 #include <iostream>
 #include <unordered_map>
 
@@ -52,62 +53,71 @@ namespace gorage {
 
 	protected:
 
-		template<typename T>
-		static std::string _toJson(const T& t) {
-			std::cout << "unknown" << std::endl;
-			return "";
-		}
+		using List = std::vector<std::any>;
+		using Dict = std::unordered_map<std::string, std::any>;
+		using String = std::variant<std::string, gorage::Bytes>;
+		using Number = std::variant<int, float, double>;
 
-		template<>
-		static std::string _toJson<std::any>(const std::any& a) {
+		static std::string _toJson(const std::any& a) {
 
 			std::cout << "std::any" << std::endl;
 
 			try {
-				return _toJson(std::any_cast<std::string>(a));
+				return _toJson(std::any_cast<String>(a));
 			} catch (const std::bad_any_cast& e) {};
 			try {
-				return _toJson(std::any_cast<int>(a));
-			} catch (const std::bad_any_cast& e) {};
-			try {
-				return _toJson(std::any_cast<float>(a));
-			} catch (const std::bad_any_cast& e) {};
-			try {
-				return _toJson(std::any_cast<double>(a));
+				return _toJson(std::any_cast<Number>(a));
 			} catch (const std::bad_any_cast& e) {};
 
 			throw std::runtime_error("Can not encode type " + std::string(a.type().name()) + " to JSON");
 
 		}
 
-		template<>
-		static std::string _toJson<std::string>(const std::string& s) {
-			std::cout << "gorage::Bytes" << std::endl;
-			return "\"" + s + "\"";
+		static std::string _toJson(const String& s) {
+
+			std::cout << "Json::String" << std::endl;
+
+			std::string std_string;
+
+			try {
+				std_string = std::get<std::string>(s);
+			} catch (std::bad_variant_access& e) {}
+			try {
+				std_string = cppcodec::base64_rfc4648::encode(std::get<gorage::Bytes>(s));
+			} catch (std::bad_variant_access& e) {}
+
+			if (std_string.length()) {
+				return "\"" + std_string + "\"";
+			}
+
+			throw std::runtime_error("Can not encode string variant type of index " + std::to_string(s.index()) + " to JSON");
+
 		}
-		template<>
-		static std::string _toJson<int>(const int& i) {
-			std::cout << "gorage::Bytes" << std::endl;
-			return "\"" + std::to_string(i) + "\"";
-		}
-		template<>
-		static std::string _toJson<float>(const float& f) {
-			std::cout << "gorage::Bytes" << std::endl;
-			return "\"" + std::to_string(f) + "\"";
-		}
-		template<>
-		static std::string _toJson<double>(const double& d) {
-			std::cout << "gorage::Bytes" << std::endl;
-			return "\"" + std::to_string(d) + "\"";
-		}
-		template<>
-		static std::string _toJson<gorage::Bytes>(const gorage::Bytes& b) {
-			std::cout << "gorage::Bytes" << std::endl;
-			return "\"" + cppcodec::base64_rfc4648::encode(b) + "\"";
+		static std::string _toJson(const Number& i) {
+
+			std::cout << "Json::Number" << std::endl;
+
+			std::string number_string;
+
+			try {
+				number_string = std::to_string(std::get<int>(i));
+			} catch (std::bad_variant_access& e) {}
+			try {
+				number_string = std::to_string(std::get<float>(i));
+			} catch (std::bad_variant_access& e) {}
+			try {
+				number_string = std::to_string(std::get<double>(i));
+			} catch (std::bad_variant_access& e) {}
+
+			if (number_string.length()) {
+				return number_string;
+			}
+
+			throw std::runtime_error("Can not encode number variant type of index " + std::to_string(i.index()) + " to JSON");
+
 		}
 
-		template<typename T>
-		static std::string _toJson(const std::vector<T>& v) {
+		static std::string _toJson(const List& v) {
 
 			std::cout << "std::vector" << std::endl;
 
@@ -115,7 +125,7 @@ namespace gorage {
 
 			result += "[";
 			for (const auto& e : v) {
-				result += _toJson<T>(e) + ",";
+				result += _toJson(e) + ",";
 			}
 			result[result.length() - 1] = ']';
 
@@ -123,8 +133,7 @@ namespace gorage {
 
 		}
 
-		template<typename T>
-		static std::string _toJson(const std::unordered_map<std::string, T>& m) {
+		static std::string _toJson(const Dict& m) {
 
 			std::cout << "std::unordered_map" << std::endl;
 
@@ -132,7 +141,7 @@ namespace gorage {
 
 			result += "{";
 			for (const auto& pair : m) {
-				result += _toJson<std::string>(pair.first) + ":" + _toJson<T>(pair.second) + ",";
+				result += _toJson(pair.first) + ":" + _toJson(pair.second) + ",";
 			}
 			result[result.length() - 1] = '}';
 

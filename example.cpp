@@ -27,7 +27,7 @@ public:
 	std::string toJson() const {
 		std::cout << ".toJson()" << std::endl;
 		return _toJson(
-			std::unordered_map<std::string, std::any>{
+			Dict{
 				{"s", s},
 				{"v", v}
 			}
