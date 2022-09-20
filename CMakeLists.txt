@@ -4,9 +4,10 @@ SET(PROJECT_NAME gorage)
 
 project(${PROJECT_NAME})
 
-add_library(${PROJECT_NAME} 
+add_executable(${PROJECT_NAME} 
 
-	include/gorage.cpp
+	# include/gorage.cpp
+	example.cpp
 
 )
 

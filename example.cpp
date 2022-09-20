@@ -1,44 +1,36 @@
+#include <map>
 #include <memory>
+#include <vector>
 #include <cassert>
 #include <iostream>
+#include <unordered_map>
 
 #include "modules/rapidjson/document.h"
 
-#include "include/Json.hpp"
-#include "include/ItemStorage.hpp"
-#include "include/FileStorage.hpp"
-#include "include/BinaryFileStorage.hpp"
+#include "include/gorage.hpp"
 
 
 class CertificateMetadata : public gorage::Json {
 
 public:
 
-	std::string a;
-	std::string b;
+	std::string s;
+	std::vector<std::string> v;
 
-	CertificateMetadata():
-		a(""), b("") {}
+	CertificateMetadata() {}
 
-	CertificateMetadata(const std::string& a, const std::string& b):
-		a(a), b(b) {}
+	CertificateMetadata(const std::string& s, const std::vector<std::string>& v):
+		s(s), v(v) {}
 
-	void updateFromJson(const std::string& json_text) {
-
-		rapidjson::Document json;
-		json.Parse(json_text.c_str());
-
-		this->a = json["a"].GetString();
-		this->b = json["b"].GetString();
-
-	}
+	void updateFromJson(const std::string& json_text) {}
 
 	std::string toJson() const {
-		return (
-			"{"
-				"\"a\":" "\"" + this->a + "\"" ","
-				"\"b\":" "\"" + this->b + "\"" ""
-			"}"
+		std::cout << ".toJson()" << std::endl;
+		return _toJson(
+			std::unordered_map<std::string, std::any>{
+				{"s", s},
+				{"v", v}
+			}
 		);
 	}
 
@@ -47,59 +39,34 @@ public:
 
 int main(void) {
 
-	gorage::ItemStorage<CertificateMetadata> storage(
-		std::make_shared<gorage::BinaryFileStorage>(
-			gorage::BinaryFileStorage(
-				"storage/data",
-				".bin"
-			)
-		),
-		std::make_shared<gorage::FileStorage<CertificateMetadata>>(
-			gorage::FileStorage<CertificateMetadata>(
-				"storage/metadata",
-				".json"
-			)
-		)
-	);
+	try {
 
-	std::string usi = "1234";
-	std::string data("der");
-	std::string metadata_a = "lalala";
-	std::string metadata_b = "lblblb";
+		gorage::ItemStorage<CertificateMetadata> storage(
+			std::make_shared<gorage::MemoryStorage<gorage::Bytes>>(),
+			std::make_shared<gorage::MemoryStorage<CertificateMetadata>>()
+		);
 
-	storage.save(
-		usi,
-		gorage::Item<CertificateMetadata>(
-			data,
-			CertificateMetadata(metadata_a, metadata_b)
-		)
-	);
+		gorage::Bytes data{'1', '2', '3'};
 
-	assert(
-		storage.load(usi).metadata.toJson() ==
-		gorage::Json::create<CertificateMetadata>(
-			storage.load(usi).metadata.toJson()
-		).toJson()
-	);
+		CertificateMetadata metadata("lalala", {"la", "la", "la"});
+		std::cout << metadata.toJson();
+		assert(metadata.toJson() == "{\"s\":\"lalala\",\"v\":[\"la\",\"la\",\"la\"]}");
 
-	assert(storage.load(usi).data == data);
-	assert(storage.load(usi).metadata.a == metadata_a);
-	assert(storage.load(usi).metadata.b == metadata_b);
+		// CertificateMetadata metadata("aaa", "bbb");
+		// assert(metadata.toJson() == "{\"a\":\"aaa\",\"b\":\"bbb\"}");
+		// gorage::Item<CertificateMetadata> item(data, metadata);
 
-	assert(storage.data_storage.load(usi) == data);
-	assert(storage.metadata_storage.load(usi).a == metadata_a);
-	assert(storage.metadata_storage.load(usi).b == metadata_b);
+		// storage.save("lalala", item);
 
+		// assert(storage.get("lalala").metadata.a == metadata.a);
+		// assert(storage.get("lalala").metadata.b == metadata.b);
 
-	assert(storage.load(usi).data == data);
-	assert(storage.load(usi).metadata.a == metadata_a);
-	assert(storage.load(usi).metadata.b == metadata_b);
+		std::cout << "ok" << std::endl;
 
-	assert(storage.data_storage.load(usi) == data);
-	assert(storage.metadata_storage.load(usi).a == metadata_a);
-	assert(storage.metadata_storage.load(usi).b == metadata_b);
-
-	std::cout << "Finished OK" << std::endl;
+	} catch (std::exception& e) {
+		std::cout << e.what() << std::endl;
+		return 1;
+	}
 
 	return 0;
 
