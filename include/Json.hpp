@@ -84,7 +84,7 @@ namespace gorage {
 			return std::to_string(d);
 		}
 
-		static std::string encode(const Json* j) {
+		static std::string encode(const std::shared_ptr<Json> j) {
 			return j->encoded();
 		}
 

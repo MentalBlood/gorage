@@ -13,15 +13,11 @@ add_library(${PROJECT_NAME}
 	include/gorage.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} -static-libstdc++ -std=c++17)
-
 
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME}
 	test/test_Json.cpp
 )
-
-target_link_libraries(${TEST_NAME} -static-libstdc++ -std=c++17)
 
 target_include_directories(${TEST_NAME} PRIVATE include)
