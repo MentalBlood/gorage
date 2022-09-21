@@ -88,26 +88,13 @@ namespace gorage {
 
 		}
 
-		/**
-		 * @brief Converts data to JSON using base64
-		 * 
-		 * @return std::string JSONed data
-		 */
-		std::string dataToJson() const {
-			return "\"" + cppcodec::base64_rfc4648::encode(this->data) + "\"";
-		}
+	protected:
 
-		/**
-		 * @brief Converts the whole item to JSON
-		 * 
-		 * @return std::string JSONed item
-		 */
-		std::string toJson() const {
-			return
-			"{"
-				"\"data\":" + this->dataToJson() + ","
-				"\"metadata\":" +  this->metadata.toJson() + ""
-			"}";
+		std::any _getStructure() const {
+			return Dict{
+				{"data", data},
+				{"metadata", metadata}
+			};
 		}
 
 	};

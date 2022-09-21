@@ -4,9 +4,7 @@
 #define __GORAGE__JSON__
 
 #include <any>
-#include <map>
 #include <vector>
-#include <variant>
 #include <iostream>
 #include <unordered_map>
 
@@ -38,7 +36,9 @@ namespace gorage {
 		 * 
 		 * @return std::string JSONed object
 		 */
-		virtual std::string toJson() const = 0;
+		std::string toJson() const {
+			return _toJson(_getStructure());
+		}
 
 		/**
 		 * @brief Converts JSON text to object of given type
@@ -54,11 +54,9 @@ namespace gorage {
 			return json;
 		}
 
-	protected:
+	private:
 
 		static std::string _toJson(const std::any& a) {
-
-			std::cout << "std::any" << std::endl;
 
 			try {
 				return _toJson(std::any_cast<const char*>(a));
@@ -80,6 +78,10 @@ namespace gorage {
 				return _toJson(std::any_cast<double>(a));
 			} catch (std::bad_any_cast& e) {}
 
+			try {
+				return _toJson(std::any_cast<std::shared_ptr<Json>>(a));
+			} catch (std::bad_any_cast& e) {}
+
 
 			try {
 				return _toJson(std::any_cast<List>(a));
@@ -93,34 +95,30 @@ namespace gorage {
 		}
 
 		static std::string _toJson(const char* s) {
-			std::cout << "char*" << std::endl;
 			return "\"" + std::string(s) + "\"";
 		}
 		static std::string _toJson(const std::string& s) {
-			std::cout << "std::string" << std::endl;
 			return "\"" + s + "\"";
 		}
 		static std::string _toJson(const gorage::Bytes& s) {
-			std::cout << "gorage::Bytes" << std::endl;
 			return "\"" + cppcodec::base64_rfc4648::encode(s) + "\"";
 		}
 
 		static std::string _toJson(const int& i) {
-			std::cout << "int" << std::endl;
 			return std::to_string(i);
 		}
 		static std::string _toJson(const float& f) {
-			std::cout << "float" << std::endl;
 			return std::to_string(f);
 		}
 		static std::string _toJson(const double& d) {
-			std::cout << "double" << std::endl;
 			return std::to_string(d);
 		}
 
-		static std::string _toJson(const List& v) {
+		static std::string _toJson(const Json* j) {
+			return j->toJson();
+		}
 
-			std::cout << "Json::List" << std::endl;
+		static std::string _toJson(const List& v) {
 
 			std::string result;
 
@@ -136,8 +134,6 @@ namespace gorage {
 
 		static std::string _toJson(const Dict& m) {
 
-			std::cout << "Json::Dict" << std::endl;
-
 			std::string result;
 
 			result += "{";
@@ -149,6 +145,8 @@ namespace gorage {
 			return result;
 
 		}
+
+		virtual std::any _getStructure() const = 0;
 
 	};
 

@@ -1,11 +1,7 @@
-#include <map>
+#include <any>
 #include <memory>
-#include <vector>
 #include <cassert>
 #include <iostream>
-#include <unordered_map>
-
-#include "modules/rapidjson/document.h"
 
 #include "include/gorage.hpp"
 
@@ -24,14 +20,13 @@ public:
 
 	void updateFromJson(const std::string& json_text) {}
 
-	std::string toJson() const {
-		std::cout << ".toJson()" << std::endl;
-		return _toJson(
-			Dict{
-				{"s", s},
-				{"v", v}
-			}
-		);
+protected:
+
+	std::any _getStructure() const {
+		return Dict{
+			{"s", s},
+			{"v", v}
+		};
 	}
 
 };
@@ -50,7 +45,7 @@ int main(void) {
 
 		CertificateMetadata metadata(
 			"lalala",
-			{
+			gorage::Json::List{
 				"la",
 				1,
 				1.1,
@@ -58,7 +53,8 @@ int main(void) {
 				gorage::Json::Dict{
 					{"a", 1},
 					{"b", 2}
-				}
+				},
+				std::make_shared<CertificateMetadata>("lololo", gorage::Json::List{1, 2, 3})
 			}
 		);
 		std::string correct_result = 
@@ -76,7 +72,7 @@ int main(void) {
 			"]"
 		"}";
 		std::string result = metadata.toJson();
-		std::cout << metadata.toJson() << std::endl;
+		std::cout << result << std::endl;
 		std::cout << correct_result << std::endl;
 		assert(result == correct_result);
 
