@@ -50,16 +50,37 @@ TEST_CASE("testing encoding to JSON") {
 	SUBCASE("testing strings encoding") {
 
 		SUBCASE("testing `char*` encoding") {
+
 			const char s[7] = "lalala";
-			testEncodedString(gorage::Json::encode(s));
+			const std::string encoded = gorage::Json::encode(s);
+
+			testEncodedString(encoded);
+			SUBCASE("hardcoded full comparison") {
+				CHECK(encoded == "\"lalala\"");
+			}
+
 		}
 		SUBCASE("testing `std::string` encoding") {
+
 			const std::string s("lalala");
-			testEncodedString(gorage::Json::encode(s));
+			const std::string encoded = gorage::Json::encode(s);
+
+			testEncodedString(encoded);
+			SUBCASE("hardcoded full comparison") {
+				CHECK(encoded == "\"lalala\"");
+			}
+
 		}
 		SUBCASE("testing `gorage::Bytes` encoding") {
+
 			const gorage::Bytes s{'l', 'a', 'l', 'a', 'l', 'a'};
-			testEncodedString(gorage::Json::encode(s));
+			const std::string encoded = gorage::Json::encode(s);
+
+			testEncodedString(encoded);
+			SUBCASE("hardcoded full comparison") {
+				CHECK(encoded == "\"bGFsYWxh\"");
+			}
+
 		}
 
 	}
@@ -95,6 +116,18 @@ TEST_CASE("testing encoding to JSON") {
 
 		}
 
+		SUBCASE("hardcoded full comparison") {
+			CHECK(
+				encoded
+				==
+				"["
+					"\"lalala\","
+					"1234,"
+					"1234.123400"
+				"]"
+			);
+		}
+
 	}
 
 	SUBCASE("testing dicts encoding") {
@@ -113,6 +146,18 @@ TEST_CASE("testing encoding to JSON") {
 			CHECK(encoded[0] == '{');
 			CHECK(encoded[encoded.length() - 1] == '}');
 
+		}
+
+		SUBCASE("hardcoded full comparison") {
+			CHECK(
+				encoded
+				==
+				"{"
+					"\"string\":" "\"lalala\","
+					"\"int\":" "1234,"
+					"\"float\":" "1234.123400"
+				"}"
+			);
 		}
 
 	}
