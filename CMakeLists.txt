@@ -1,16 +1,27 @@
 cmake_minimum_required(VERSION 3.0)
 
+set(CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_FLAGS "/std:c++17") 
+
 SET(PROJECT_NAME gorage)
+SET(TEST_NAME ${PROJECT_NAME}__test)
+
 
 project(${PROJECT_NAME})
 
-add_executable(${PROJECT_NAME} 
-
-	# include/gorage.cpp
-	example.cpp
-
+add_library(${PROJECT_NAME} 
+	include/gorage.cpp
 )
 
-set(CMAKE_CXX_STANDARD 17)
-set (CMAKE_CXX_FLAGS "/std:c++17") 
 target_link_libraries(${PROJECT_NAME} -static-libstdc++ -std=c++17)
+
+
+project(${TEST_NAME})
+
+add_executable(${TEST_NAME}
+	test/test_Json.cpp
+)
+
+target_link_libraries(${TEST_NAME} -static-libstdc++ -std=c++17)
+
+target_include_directories(${TEST_NAME} PRIVATE include)
