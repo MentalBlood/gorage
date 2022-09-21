@@ -17,7 +17,7 @@ add_library(${PROJECT_NAME}
 project(${TEST_NAME})
 
 add_executable(${TEST_NAME}
-	test/test_Json.cpp
+	test/main.cpp
 )
 
-target_include_directories(${TEST_NAME} PRIVATE include)
+target_include_directories(${TEST_NAME} PRIVATE include test)

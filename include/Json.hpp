@@ -26,6 +26,15 @@ namespace gorage {
 		using List = std::vector<std::any>;
 		using Dict = std::unordered_map<std::string, std::any>;
 
+		static std::any decode(const std::string& json_text) {
+
+			rapidjson::Document json;
+			json.Parse(json_text.c_str());
+
+			return _decode<rapidjson::Document>(json);
+
+		}
+
 		static std::string encode(const std::any& a) {
 
 			try {
@@ -126,7 +135,21 @@ namespace gorage {
 		template<typename T>
 		static T create(const std::string& json_text) {
 			T json;
-			json.updateFromJson(json_text);
+			json.update(encode(json_text));
+			return json;
+		}
+
+		/**
+		 * @brief Converts structure to object of given type
+		 * 
+		 * @tparam T Object type
+		 * @param structure structure
+		 * @return T Object corresponded to structure
+		 */
+		template<typename T>
+		static T create(const std::any& structure) {
+			T json;
+			json.update(structure);
 			return json;
 		}
 
@@ -135,7 +158,7 @@ namespace gorage {
 		 * 
 		 * @param json_text JSON text to update from
 		 */
-		virtual void updateFromJson(const std::string& json_text) {};
+		virtual void update(const std::any& json_text) {};
 		/**
 		 * @brief Converts object to JSON
 		 * 
@@ -146,6 +169,44 @@ namespace gorage {
 		}
 
 	private:
+
+		using RapidjsonValue = rapidjson::GenericValue<rapidjson::UTF8<char>, rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>>;
+
+		template<typename T>
+		static std::any _decode(const T& v) {
+
+			if (v.IsNumber()) {
+				if (v.IsInt()) {
+					return v.GetInt();
+				}
+				if (v.IsDouble()) {
+					return v.GetDouble();
+				}
+			}
+			if (v.IsString()) {
+				try {
+					return cppcodec::base64_rfc4648::decode(std::string(v.GetString()));
+				} catch (...) {}
+				return std::string(v.GetString());
+			}
+			if (v.IsArray()) {
+				List result;
+				for (const auto& e : v.GetArray()) {
+					result.push_back(_decode<RapidjsonValue>(e));
+				}
+				return result;
+			}
+			if (v.IsObject()) {
+				Dict result;
+				for (const auto& k_v : v.GetObjectA()) {
+					result[k_v.name.GetString()] = _decode<RapidjsonValue>(k_v.value);
+				}
+				return result;
+			}
+
+			throw std::runtime_error("Can not decode value of type indexed " + v.GetType());
+
+		}
 
 		static std::string _getEscaped(const std::string& s) {
 			return std::regex_replace(

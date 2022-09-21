@@ -3,6 +3,7 @@
 #ifndef __GORAGE__ITEM_STORAGE__
 #define __GORAGE__ITEM_STORAGE__
 
+#include <any>
 #include <memory>
 #include <vector>
 #include <iostream>
@@ -66,25 +67,18 @@ namespace gorage {
 			metadata(metadata) {}
 
 		/**
-		 * @brief Updates data and metadata from corresponding JSON text
+		 * @brief Updates data and metadata from corresponding structure
 		 * 
-		 * @param json_text JSON text to update from. Should be like {"data": <base64 string>, "metadata": <dict corresponding to T>}
+		 * @param structure structure to update from. JSON form should be like {"data": <base64 string>, "metadata": <dict corresponding to T>}
 		 */
-		void updateFromJson(const std::string& json_text) {
+		void update(const std::any& structure) {
 
-			std::cout << "json " << json_text << std::endl;
-
-			rapidjson::Document json;
-			json.Parse(json_text.c_str());
-
-			std::string data_base64 = json["data"].GetString();
-
-			this->data = cppcodec::base64_rfc4648::decode(data_base64);
-
-			rapidjson::StringBuffer buffer;
-			rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-			json["metadata"].Accept(writer);
-			this->metadata = Json::create<T>(std::string(buffer.GetString()));
+			data = std::any_cast<std::string>(
+				std::any_cast<Dict>(structure)["data"]
+			);
+			metadata = Json::create<T>(
+				std::any_cast<Dict>(structure)["metadata"]
+			);
 
 		}
 

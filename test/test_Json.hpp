@@ -1,11 +1,77 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#define DOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS
-#include "doctest.h"
-
-#include <gorage.hpp>
+#include <Json.hpp>
 
 #include <regex>
 
+
+
+TEST_CASE("testing decoding from JSON") {
+
+	SUBCASE("testing strings decoding") {
+
+		std::string s = "\"lalala\"";
+		std::any decoded = gorage::Json::decode(s);
+
+		CHECK(
+			std::any_cast<std::string>(decoded)
+			==
+			"lalala"
+		);
+
+	}
+
+	SUBCASE("testing numbers decoding") {
+
+		SUBCASE("testing integer decoding") {
+
+			std::string s = "1234";
+			std::any decoded = gorage::Json::decode(s);
+
+			CHECK(std::any_cast<int>(decoded) == 1234);
+
+		}
+
+		SUBCASE("testing floating point decoding") {
+
+			std::string s = "1234.1234";
+			std::any decoded = gorage::Json::decode(s);
+
+			CHECK(std::any_cast<double>(decoded) == 1234.1234);
+
+		}
+
+	}
+
+	SUBCASE("testing list decoding") {
+
+		std::string s = "["
+			"\"lalala\","
+			"1234,"
+			"1234.123400"
+		"]";
+		gorage::Json::List decoded = std::any_cast<gorage::Json::List>(gorage::Json::decode(s));
+
+		CHECK(std::any_cast<std::string>(decoded[0]) == "lalala");
+		CHECK(std::any_cast<int>		(decoded[1]) == 1234);
+		CHECK(std::any_cast<double>		(decoded[2]) == 1234.1234);
+
+	}
+
+	SUBCASE("testing dict decoding") {
+
+		std::string s = "{"
+			"\"double\":" "1234.123400,"
+			"\"string\":" "\"lalala\","
+			"\"int\":" "1234"
+		"}";
+		gorage::Json::Dict decoded = std::any_cast<gorage::Json::Dict>(gorage::Json::decode(s));
+
+		CHECK(std::any_cast<std::string>(decoded["string"]) == "lalala");
+		CHECK(std::any_cast<int>		(decoded["int"]) == 1234);
+		CHECK(std::any_cast<double>		(decoded["double"]) == 1234.1234);
+
+	}
+
+}
 
 
 void testEncodedString(const std::string& encoded) {
@@ -91,8 +157,8 @@ TEST_CASE("testing encoding to JSON") {
 			const int i = 1234;
 			testEncodedNumber(gorage::Json::encode(i));
 		}
-		SUBCASE("testing `float` encoding") {
-			const float f = 1234.1234;
+		SUBCASE("testing `double` encoding") {
+			const double f = 1234.1234;
 			testEncodedNumber(gorage::Json::encode(f));
 		}
 
@@ -135,7 +201,7 @@ TEST_CASE("testing encoding to JSON") {
 		const gorage::Json::Dict l{
 			{"string", "lalala"},
 			{"int", 1234},
-			{"float", 1234.1234}
+			{"double", 1234.1234}
 		};
 		const std::string encoded = gorage::Json::encode(l);
 
@@ -153,9 +219,9 @@ TEST_CASE("testing encoding to JSON") {
 				encoded
 				==
 				"{"
+					"\"double\":" "1234.123400,"
 					"\"string\":" "\"lalala\","
-					"\"int\":" "1234,"
-					"\"float\":" "1234.123400"
+					"\"int\":" "1234"
 				"}"
 			);
 		}
