@@ -54,7 +54,8 @@ int main(void) {
 					{"a", 1},
 					{"b", 2}
 				},
-				std::make_shared<CertificateMetadata>("lololo", gorage::Json::List{1, 2, 3})
+				// std::make_shared<CertificateMetadata>("lololo", gorage::Json::List{1, 2, 3}),
+				"\"\\escaping test\\\""
 			}
 		);
 		std::string correct_result = 
@@ -68,7 +69,8 @@ int main(void) {
 				"{"
 					"\"a\":" "1,"
 					"\"b\":" "2"
-				"}"
+				"},"
+				"\"\\\"\\\\escaping test\\\\\\\"\""
 			"]"
 		"}";
 		std::string result = metadata.toJson();

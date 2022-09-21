@@ -4,6 +4,7 @@
 #define __GORAGE__JSON__
 
 #include <any>
+#include <regex>
 #include <vector>
 #include <iostream>
 #include <unordered_map>
@@ -94,11 +95,19 @@ namespace gorage {
 
 		}
 
+		static std::string _getEscaped(const std::string& s) {
+			return std::regex_replace(
+				std::regex_replace(s, std::regex("\\\\"), "\\\\"),
+				std::regex("\""),
+				"\\\""
+			);
+		}
+
 		static std::string _toJson(const char* s) {
-			return "\"" + std::string(s) + "\"";
+			return "\"" + _getEscaped(s) + "\"";
 		}
 		static std::string _toJson(const std::string& s) {
-			return "\"" + s + "\"";
+			return "\"" + _getEscaped(s) + "\"";
 		}
 		static std::string _toJson(const gorage::Bytes& s) {
 			return "\"" + cppcodec::base64_rfc4648::encode(s) + "\"";
