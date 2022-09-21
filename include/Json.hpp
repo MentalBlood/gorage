@@ -24,6 +24,9 @@ namespace gorage {
 
 	public:
 
+		using List = std::vector<std::any>;
+		using Dict = std::unordered_map<std::string, std::any>;
+
 		/**
 		 * @brief Updates data and metadata from corresponding JSON text
 		 * 
@@ -53,73 +56,71 @@ namespace gorage {
 
 	protected:
 
-		using List = std::vector<std::any>;
-		using Dict = std::unordered_map<std::string, std::any>;
-		using String = std::variant<std::string, gorage::Bytes>;
-		using Number = std::variant<int, float, double>;
-
 		static std::string _toJson(const std::any& a) {
 
 			std::cout << "std::any" << std::endl;
 
 			try {
-				return _toJson(std::any_cast<String>(a));
+				return _toJson(std::any_cast<const char*>(a));
+			} catch (std::bad_any_cast& e) {}
+			try {
+				return _toJson(std::any_cast<std::string>(a));
+			} catch (std::bad_any_cast& e) {}
+			try {
+				return _toJson(std::any_cast<gorage::Bytes>(a));
+			} catch (std::bad_any_cast& e) {}
+
+			try {
+				return _toJson(std::any_cast<int>(a));
+			} catch (std::bad_any_cast& e) {}
+			try {
+				return _toJson(std::any_cast<float>(a));
+			} catch (std::bad_any_cast& e) {}
+			try {
+				return _toJson(std::any_cast<double>(a));
+			} catch (std::bad_any_cast& e) {}
+
+
+			try {
+				return _toJson(std::any_cast<List>(a));
 			} catch (const std::bad_any_cast& e) {};
 			try {
-				return _toJson(std::any_cast<Number>(a));
+				return _toJson(std::any_cast<Dict>(a));
 			} catch (const std::bad_any_cast& e) {};
 
 			throw std::runtime_error("Can not encode type " + std::string(a.type().name()) + " to JSON");
 
 		}
 
-		static std::string _toJson(const String& s) {
-
-			std::cout << "Json::String" << std::endl;
-
-			std::string std_string;
-
-			try {
-				std_string = std::get<std::string>(s);
-			} catch (std::bad_variant_access& e) {}
-			try {
-				std_string = cppcodec::base64_rfc4648::encode(std::get<gorage::Bytes>(s));
-			} catch (std::bad_variant_access& e) {}
-
-			if (std_string.length()) {
-				return "\"" + std_string + "\"";
-			}
-
-			throw std::runtime_error("Can not encode string variant type of index " + std::to_string(s.index()) + " to JSON");
-
+		static std::string _toJson(const char* s) {
+			std::cout << "char*" << std::endl;
+			return "\"" + std::string(s) + "\"";
 		}
-		static std::string _toJson(const Number& i) {
+		static std::string _toJson(const std::string& s) {
+			std::cout << "std::string" << std::endl;
+			return "\"" + s + "\"";
+		}
+		static std::string _toJson(const gorage::Bytes& s) {
+			std::cout << "gorage::Bytes" << std::endl;
+			return "\"" + cppcodec::base64_rfc4648::encode(s) + "\"";
+		}
 
-			std::cout << "Json::Number" << std::endl;
-
-			std::string number_string;
-
-			try {
-				number_string = std::to_string(std::get<int>(i));
-			} catch (std::bad_variant_access& e) {}
-			try {
-				number_string = std::to_string(std::get<float>(i));
-			} catch (std::bad_variant_access& e) {}
-			try {
-				number_string = std::to_string(std::get<double>(i));
-			} catch (std::bad_variant_access& e) {}
-
-			if (number_string.length()) {
-				return number_string;
-			}
-
-			throw std::runtime_error("Can not encode number variant type of index " + std::to_string(i.index()) + " to JSON");
-
+		static std::string _toJson(const int& i) {
+			std::cout << "int" << std::endl;
+			return std::to_string(i);
+		}
+		static std::string _toJson(const float& f) {
+			std::cout << "float" << std::endl;
+			return std::to_string(f);
+		}
+		static std::string _toJson(const double& d) {
+			std::cout << "double" << std::endl;
+			return std::to_string(d);
 		}
 
 		static std::string _toJson(const List& v) {
 
-			std::cout << "std::vector" << std::endl;
+			std::cout << "Json::List" << std::endl;
 
 			std::string result;
 
@@ -135,13 +136,13 @@ namespace gorage {
 
 		static std::string _toJson(const Dict& m) {
 
-			std::cout << "std::unordered_map" << std::endl;
+			std::cout << "Json::Dict" << std::endl;
 
 			std::string result;
 
 			result += "{";
 			for (const auto& pair : m) {
-				result += _toJson(pair.first) + ":" + _toJson(pair.second) + ",";
+				result += "\"" + pair.first + "\"" ":" + _toJson(pair.second) + ",";
 			}
 			result[result.length() - 1] = '}';
 

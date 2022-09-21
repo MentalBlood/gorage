@@ -15,11 +15,11 @@ class CertificateMetadata : public gorage::Json {
 public:
 
 	std::string s;
-	std::vector<std::string> v;
+	List v;
 
 	CertificateMetadata() {}
 
-	CertificateMetadata(const std::string& s, const std::vector<std::string>& v):
+	CertificateMetadata(const std::string& s, const List& v):
 		s(s), v(v) {}
 
 	void updateFromJson(const std::string& json_text) {}
@@ -48,9 +48,37 @@ int main(void) {
 
 		gorage::Bytes data{'1', '2', '3'};
 
-		CertificateMetadata metadata("lalala", {"la", "la", "la"});
-		std::cout << metadata.toJson();
-		assert(metadata.toJson() == "{\"s\":\"lalala\",\"v\":[\"la\",\"la\",\"la\"]}");
+		CertificateMetadata metadata(
+			"lalala",
+			{
+				"la",
+				1,
+				1.1,
+				gorage::Bytes{'b', 'y', 't', 'e', 's'},
+				gorage::Json::Dict{
+					{"a", 1},
+					{"b", 2}
+				}
+			}
+		);
+		std::string correct_result = 
+		"{"
+			"\"s\":" "\"lalala\","
+			"\"v\":" "["
+				"\"la\","
+				"1,"
+				"1.100000,"
+				"\"Ynl0ZXM=\","
+				"{"
+					"\"a\":" "1,"
+					"\"b\":" "2"
+				"}"
+			"]"
+		"}";
+		std::string result = metadata.toJson();
+		std::cout << metadata.toJson() << std::endl;
+		std::cout << correct_result << std::endl;
+		assert(result == correct_result);
 
 		// CertificateMetadata metadata("aaa", "bbb");
 		// assert(metadata.toJson() == "{\"a\":\"aaa\",\"b\":\"bbb\"}");
