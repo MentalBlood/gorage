@@ -86,8 +86,8 @@ void testEncodedString(const std::string& encoded) {
 	}
 
 	SUBCASE("encoded string `\\` characters must be escaped") {
-		CHECK(
-			!std::regex_match(
+		CHECK_FALSE(
+			std::regex_match(
 				encoded,
 				std::regex("[^\\\\]\\\\(?:[^\\\\]|$)")
 			)
@@ -100,8 +100,8 @@ void testEncodedString(const std::string& encoded) {
 void testEncodedNumber(const std::string& encoded) {
 
 	SUBCASE("encoded number must contain only `1234567890.` characters") {
-		CHECK(
-			!std::regex_match(
+		CHECK_FALSE(
+			std::regex_match(
 				encoded,
 				std::regex("[^1234567890.]")
 			)
