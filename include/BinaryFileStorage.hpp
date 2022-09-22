@@ -54,7 +54,7 @@ namespace gorage {
 		 */
 		void save(const std::string& usi, const Bytes& content) {
 
-			std::string file_path = this->FilePath(usi);
+			std::string file_path = _FilePath(usi);
 
 			std::ofstream file(file_path, std::ios::trunc | std::ios::binary);
 			if (!file.is_open()) {
@@ -77,7 +77,7 @@ namespace gorage {
 		 */
 		Bytes load(const std::string& usi) {
 
-			std::string file_path = this->FilePath(usi);
+			std::string file_path = _FilePath(usi);
 
 			// std::ifstream file(file_path, std::ios::binary);
 			std::basic_ifstream<unsigned char, std::char_traits<unsigned char>> file(file_path, std::ios::binary);
@@ -98,7 +98,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 */
 		void remove(const std::string& usi) {
-			std::filesystem::remove(this->folder_path + usi + this->extension);
+			std::filesystem::remove(folder_path + usi + extension);
 		}
 
 	private:
@@ -109,8 +109,8 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return const std::string File path
 		 */
-		const std::string FilePath(const std::string& usi) const {
-			return this->folder_path + "/" + usi + this->extension;
+		const std::string _FilePath(const std::string& usi) const {
+			return folder_path + "/" + usi + extension;
 		}
 
 		/**
@@ -118,10 +118,10 @@ namespace gorage {
 		 * 
 		 */
 		void loadUsis() {
-			this->usis.clear();
-			for (const auto & p : std::filesystem::directory_iterator(this->folder_path)) {
-				if (p.path().extension() == this->extension) {
-					this->usis.insert(p.path().stem().string());
+			_usis.clear();
+			for (const auto & p : std::filesystem::directory_iterator(folder_path)) {
+				if (p.path().extension() == extension) {
+					_usis.insert(p.path().stem().string());
 				}
 			}
 		}

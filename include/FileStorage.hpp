@@ -32,7 +32,7 @@ namespace gorage {
 		 * @param extension Extension to store files with
 		 */
 		FileStorage(const std::string& folder_path, const std::string& extension):
-			folder_path(folder_path), extension(extension) {}
+			_folder_path(folder_path), _extension(extension) {}
 
 	protected:
 
@@ -40,12 +40,12 @@ namespace gorage {
 		 * @brief Folder to store files in
 		 * 
 		 */
-		const std::string folder_path;
+		const std::string _folder_path;
 		/**
 		 * @brief Extension to store files with
 		 * 
 		 */
-		const std::string extension;
+		const std::string _extension;
 
 		/**
 		 * @brief Saves given object with given USI
@@ -57,7 +57,7 @@ namespace gorage {
 
 			const std::string content = object.toJson();
 
-			std::string file_path = this->FilePath(usi);
+			std::string file_path = _FilePath(usi);
 
 			std::ofstream file(file_path, std::ios::out | std::ios::trunc);
 			if (!file.is_open()) {
@@ -77,7 +77,7 @@ namespace gorage {
 		 */
 		T load(const std::string& usi) {
 
-			std::string file_path = this->FilePath(usi);
+			std::string file_path = _FilePath(usi);
 
 			std::ifstream file(file_path, std::ios::in);
 			if (!file.is_open()) {
@@ -99,7 +99,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 */
 		void remove(const std::string& usi) {
-			std::filesystem::remove(this->folder_path + usi + this->extension);
+			std::filesystem::remove(_folder_path + usi + _extension);
 		}
 
 	private:
@@ -110,8 +110,8 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return const std::string File path
 		 */
-		const std::string FilePath(const std::string& usi) const {
-			return this->folder_path + "/" + usi + this->extension;
+		const std::string _FilePath(const std::string& usi) const {
+			return _folder_path + "/" + usi + _extension;
 		}
 
 		/**
@@ -119,10 +119,10 @@ namespace gorage {
 		 * 
 		 */
 		void loadUsis() {
-			this->usis.clear();
-			for (const auto & p : std::filesystem::directory_iterator(this->folder_path)) {
-				if (p.path().extension() == this->extension) {
-					this->usis.insert(p.path().stem().string());
+			_usis.clear();
+			for (const auto & p : std::filesystem::directory_iterator(_folder_path)) {
+				if (p.path().extension() == _extension) {
+					_usis.insert(p.path().stem().string());
 				}
 			}
 		}

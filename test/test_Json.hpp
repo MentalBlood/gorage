@@ -4,9 +4,9 @@
 
 
 
-TEST_CASE("testing decoding from JSON") {
+TEST_CASE("decoding from JSON") {
 
-	SUBCASE("testing strings decoding") {
+	SUBCASE("strings") {
 
 		std::string s = "\"lalala\"";
 		std::any decoded = gorage::Json::decode(s);
@@ -19,9 +19,9 @@ TEST_CASE("testing decoding from JSON") {
 
 	}
 
-	SUBCASE("testing numbers decoding") {
+	SUBCASE("numbers") {
 
-		SUBCASE("testing integer decoding") {
+		SUBCASE("integer") {
 
 			std::string s = "1234";
 			std::any decoded = gorage::Json::decode(s);
@@ -30,7 +30,7 @@ TEST_CASE("testing decoding from JSON") {
 
 		}
 
-		SUBCASE("testing floating point decoding") {
+		SUBCASE("floating") {
 
 			std::string s = "1234.1234";
 			std::any decoded = gorage::Json::decode(s);
@@ -41,7 +41,7 @@ TEST_CASE("testing decoding from JSON") {
 
 	}
 
-	SUBCASE("testing list decoding") {
+	SUBCASE("list") {
 
 		std::string s = "["
 			"\"lalala\","
@@ -56,7 +56,7 @@ TEST_CASE("testing decoding from JSON") {
 
 	}
 
-	SUBCASE("testing dict decoding") {
+	SUBCASE("dict") {
 
 		std::string s = "{"
 			"\"double\":" "1234.123400,"
@@ -111,11 +111,11 @@ void testEncodedNumber(const std::string& encoded) {
 }
 
 
-TEST_CASE("testing encoding to JSON") {
+TEST_CASE("encoding to JSON") {
 
-	SUBCASE("testing strings encoding") {
+	SUBCASE("strings") {
 
-		SUBCASE("testing `char*` encoding") {
+		SUBCASE("`char*`") {
 
 			const char s[7] = "lalala";
 			const std::string encoded = gorage::Json::encode(s);
@@ -126,7 +126,7 @@ TEST_CASE("testing encoding to JSON") {
 			}
 
 		}
-		SUBCASE("testing `std::string` encoding") {
+		SUBCASE("`std::string`") {
 
 			const std::string s("lalala");
 			const std::string encoded = gorage::Json::encode(s);
@@ -137,7 +137,7 @@ TEST_CASE("testing encoding to JSON") {
 			}
 
 		}
-		SUBCASE("testing `gorage::Bytes` encoding") {
+		SUBCASE("`gorage::Bytes`") {
 
 			const gorage::Bytes s{'l', 'a', 'l', 'a', 'l', 'a'};
 			const std::string encoded = gorage::Json::encode(s);
@@ -151,20 +151,20 @@ TEST_CASE("testing encoding to JSON") {
 
 	}
 
-	SUBCASE("testing numbers encoding") {
+	SUBCASE("numbers") {
 
-		SUBCASE("testing `int` encoding") {
+		SUBCASE("testing `int`") {
 			const int i = 1234;
 			testEncodedNumber(gorage::Json::encode(i));
 		}
-		SUBCASE("testing `double` encoding") {
+		SUBCASE("testing `double`") {
 			const double f = 1234.1234;
 			testEncodedNumber(gorage::Json::encode(f));
 		}
 
 	}
 
-	SUBCASE("testing lists encoding") {
+	SUBCASE("testing lists") {
 
 		const gorage::Json::List l{
 			"lalala",
@@ -196,7 +196,7 @@ TEST_CASE("testing encoding to JSON") {
 
 	}
 
-	SUBCASE("testing dictionaries encoding") {
+	SUBCASE("dictionaries") {
 
 		const gorage::Json::Dict l{
 			{"string", "lalala"},

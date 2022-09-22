@@ -5,7 +5,7 @@
 #include <MemoryStorage.hpp>
 
 
-TEST_CASE("testing `ItemStorage`") {
+TEST_CASE("`ItemStorage`") {
 
 	gorage::ItemStorage<C> storage(
 		std::make_shared<gorage::MemoryStorage<gorage::Bytes>>(),
@@ -20,7 +20,7 @@ TEST_CASE("testing `ItemStorage`") {
 		gorage::Json::createFromJson<C>(json)
 	);
 
-	SUBCASE("testing saving") {
+	SUBCASE("saving") {
 
 		storage.save(usi, item);
 

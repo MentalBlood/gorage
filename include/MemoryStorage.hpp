@@ -38,7 +38,7 @@ namespace gorage {
 		 * @param object Arbitrary object
 		 */
 		virtual void save(const std::string& usi, const T& object) {
-			this->storage[usi] = object;
+			_storage[usi] = object;
 		}
 
 		/**
@@ -48,7 +48,7 @@ namespace gorage {
 		 * @return T Object type
 		 */
 		T load(const std::string& usi) {
-			return this->storage.at(usi);
+			return _storage.at(usi);
 		}
 
 		/**
@@ -57,8 +57,8 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 */
 		void remove(const std::string& usi) {
-			this->storage.at(usi);
-			this->storage.erase(usi);
+			_storage.at(usi);
+			_storage.erase(usi);
 		}
 
 	protected:
@@ -68,9 +68,9 @@ namespace gorage {
 		 * 
 		 */
 		void loadUsis() {
-			this->usis.clear();
-			for (const auto & k : this->storage) {
-				this->usis.insert(k.first);
+			_usis.clear();
+			for (const auto & k : _storage) {
+				_usis.insert(k.first);
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace gorage {
 		 * @brief Map to store objects in
 		 * 
 		 */
-		std::unordered_map<std::string, T> storage;
+		std::unordered_map<std::string, T> _storage;
 
 	};
 

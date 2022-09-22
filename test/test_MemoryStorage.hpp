@@ -2,7 +2,7 @@
 
 
 
-TEST_CASE("testing `MemoryStorage`") {
+TEST_CASE("`MemoryStorage`") {
 
 	gorage::MemoryStorage<std::string> storage;
 	REQUIRE(storage.size() == 0);
@@ -10,7 +10,7 @@ TEST_CASE("testing `MemoryStorage`") {
 	std::string s = "string";
 	std::string usi = "usi";
 
-	SUBCASE("testing saving") {
+	SUBCASE("saving") {
 
 		SUBCASE("testing saving with given USI") {
 			storage.save(usi, s);
@@ -28,7 +28,7 @@ TEST_CASE("testing `MemoryStorage`") {
 
 	}
 
-	SUBCASE("testing removing") {
+	SUBCASE("removing") {
 
 		storage.save(usi, s);
 		storage.remove(usi);
@@ -37,7 +37,7 @@ TEST_CASE("testing `MemoryStorage`") {
 
 	}
 
-	SUBCASE("testing iterating") {
+	SUBCASE("iterating") {
 
 		std::vector<std::string> usis = {"a", "b", "c"};
 		for (const auto& u : usis) {

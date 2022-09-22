@@ -66,8 +66,8 @@ namespace gorage {
 		 * @return auto USIs set begin iterator
 		 */
 		auto begin() {
-			this->loadUsis();
-			return this->usis.begin();
+			loadUsis();
+			return _usis.begin();
 		}
 
 		/**
@@ -76,12 +76,12 @@ namespace gorage {
 		 * @return auto USIs set end iterator
 		 */
 		auto end() {
-			return this->usis.end();
+			return _usis.end();
 		}
 
 		size_t size() {
 			loadUsis();
-			return usis.size();
+			return _usis.size();
 		}
 
 	protected:
@@ -90,7 +90,7 @@ namespace gorage {
 		 * @brief Set to which USIs will be loaded for iteration
 		 * 
 		 */
-		std::unordered_set<std::string> usis;
+		std::unordered_set<std::string> _usis;
 
 		/**
 		 * @brief Method to load USIs in usis set for iteration

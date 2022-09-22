@@ -170,8 +170,6 @@ namespace gorage {
 
 	private:
 
-		using RapidjsonValue = rapidjson::GenericValue<rapidjson::UTF8<char>, rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>>;
-
 		template<typename T>
 		static std::any _decode(const T& v) {
 
@@ -192,14 +190,14 @@ namespace gorage {
 			if (v.IsArray()) {
 				List result;
 				for (const auto& e : v.GetArray()) {
-					result.push_back(_decode<RapidjsonValue>(e));
+					result.push_back(_decode<rapidjson::Value>(e));
 				}
 				return result;
 			}
 			if (v.IsObject()) {
 				Dict result;
 				for (const auto& k_v : v.GetObjectA()) {
-					result[k_v.name.GetString()] = _decode<RapidjsonValue>(k_v.value);
+					result[k_v.name.GetString()] = _decode<rapidjson::Value>(k_v.value);
 				}
 				return result;
 			}

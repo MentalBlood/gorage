@@ -132,8 +132,8 @@ namespace gorage {
 		 * @param item Item to save
 		 */
 		void save(const std::string& usi, const Item<Metadata>& item) {
-			this->data_storage->save(usi, item.data);
-			this->metadata_storage->save(usi, item.metadata);
+			data_storage->save(usi, item.data);
+			metadata_storage->save(usi, item.metadata);
 		}
 
 		/**
@@ -144,8 +144,8 @@ namespace gorage {
 		 */
 		Item<Metadata> load(const std::string& usi) {
 			return Item<Metadata>(
-				this->data_storage->load(usi),
-				this->metadata_storage->load(usi)
+				data_storage->load(usi),
+				metadata_storage->load(usi)
 			);
 		}
 
@@ -155,8 +155,8 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 */
 		void remove(const std::string& usi) {
-			this->data_storage->remove(usi);
-			this->metadata_storage->remove(usi);
+			data_storage->remove(usi);
+			metadata_storage->remove(usi);
 		}
 
 	private:
@@ -166,9 +166,9 @@ namespace gorage {
 		 * 
 		 */
 		void loadUsis() {
-			this->usis.clear();
-			for (const auto & k : *this->data_storage) {
-				this->usis.insert(k);
+			_usis.clear();
+			for (const auto & k : *data_storage) {
+				_usis.insert(k);
 			}
 		}
 
