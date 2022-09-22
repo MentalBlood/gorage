@@ -31,15 +31,13 @@ namespace gorage {
 		 */
 		MemoryStorage() {}
 
-	protected:
-
 		/**
 		 * @brief Saves given object with given USI
 		 * 
 		 * @param usi Unique Storage Identifier
 		 * @param object Arbitrary object
 		 */
-		void save(const std::string& usi, const T& object) {
+		virtual void save(const std::string& usi, const T& object) {
 			this->storage[usi] = object;
 		}
 

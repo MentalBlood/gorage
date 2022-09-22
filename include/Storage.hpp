@@ -30,6 +30,12 @@ namespace gorage {
 		 */
 		virtual void save(const std::string& usi, const T& object) = 0;
 
+		/**
+		 * @brief Saves object of type T with random generated USI
+		 * 
+		 * @param object Object to store
+		 * @return std::string USI with wich object was saved
+		 */
 		std::string save(const T& object) {
 
 			std::string usi = this->Usi(32); // 62 ^ 32 variants
@@ -71,6 +77,11 @@ namespace gorage {
 		 */
 		auto end() {
 			return this->usis.end();
+		}
+
+		size_t size() {
+			loadUsis();
+			return usis.size();
 		}
 
 	protected:
