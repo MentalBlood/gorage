@@ -132,10 +132,10 @@ namespace gorage {
 		 * @param json_text JSON text
 		 * @return T Object corresponded to JSON text
 		 */
-		template<typename T>
-		static T create(const std::string& json_text) {
+		template<class T>
+		static T createFromJson(const std::string& json_text) {
 			T json;
-			json.update(encode(json_text));
+			json.update(decode(json_text));
 			return json;
 		}
 
@@ -146,7 +146,7 @@ namespace gorage {
 		 * @param structure structure
 		 * @return T Object corresponded to structure
 		 */
-		template<typename T>
+		template<class T>
 		static T create(const std::any& structure) {
 			T json;
 			json.update(structure);
@@ -158,7 +158,7 @@ namespace gorage {
 		 * 
 		 * @param json_text JSON text to update from
 		 */
-		virtual void update(const std::any& json_text) {};
+		virtual void update(const std::any& json_text) = 0;
 		/**
 		 * @brief Converts object to JSON
 		 * 
