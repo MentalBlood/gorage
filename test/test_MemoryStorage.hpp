@@ -14,7 +14,7 @@ TEST_CASE("`MemoryStorage`") {
 
 		SUBCASE("testing saving with given USI") {
 			storage.save(usi, s);
-			CHECK(storage.load(usi) == s);
+			CHECK_EQ(storage.load(usi), s);
 		}
 
 		// SUBCASE("testing saving with random generated USI") {
@@ -22,7 +22,7 @@ TEST_CASE("`MemoryStorage`") {
 		// 	std::string s = "string";
 
 		// 	std::string usi = storage.save(s);
-		// 	CHECK(storage.load(usi) == s);
+		// 	CHECK_EQ(storage.load(usi), s);
 
 		// }
 
@@ -33,7 +33,7 @@ TEST_CASE("`MemoryStorage`") {
 		storage.save(usi, s);
 		storage.remove(usi);
 
-		CHECK(storage.size() == 0);
+		CHECK_EQ(storage.size(), 0);
 
 	}
 
@@ -44,10 +44,10 @@ TEST_CASE("`MemoryStorage`") {
 			storage.save(u, u + "_value");
 		}
 
-		CHECK(storage.size() == usis.size());
+		CHECK_EQ(storage.size(), usis.size());
 
 		for (const auto& u : usis) {
-			CHECK(storage.load(u) == u + "_value");
+			CHECK_EQ(storage.load(u), u + "_value");
 		}
 
 	}

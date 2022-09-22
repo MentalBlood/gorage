@@ -11,9 +11,8 @@ TEST_CASE("decoding from JSON") {
 		std::string s = "\"lalala\"";
 		std::any decoded = gorage::Json::decode(s);
 
-		CHECK(
-			std::any_cast<std::string>(decoded)
-			==
+		CHECK_EQ(
+			std::any_cast<std::string>(decoded),
 			"lalala"
 		);
 
@@ -26,7 +25,7 @@ TEST_CASE("decoding from JSON") {
 			std::string s = "1234";
 			std::any decoded = gorage::Json::decode(s);
 
-			CHECK(std::any_cast<int>(decoded) == 1234);
+			CHECK_EQ(std::any_cast<int>(decoded), 1234);
 
 		}
 
@@ -35,7 +34,7 @@ TEST_CASE("decoding from JSON") {
 			std::string s = "1234.1234";
 			std::any decoded = gorage::Json::decode(s);
 
-			CHECK(std::any_cast<double>(decoded) == 1234.1234);
+			CHECK_EQ(std::any_cast<double>(decoded), 1234.1234);
 
 		}
 
@@ -50,9 +49,9 @@ TEST_CASE("decoding from JSON") {
 		"]";
 		gorage::Json::List decoded = std::any_cast<gorage::Json::List>(gorage::Json::decode(s));
 
-		CHECK(std::any_cast<std::string>(decoded[0]) == "lalala");
-		CHECK(std::any_cast<int>		(decoded[1]) == 1234);
-		CHECK(std::any_cast<double>		(decoded[2]) == 1234.1234);
+		CHECK_EQ(std::any_cast<std::string>	(decoded[0]), "lalala");
+		CHECK_EQ(std::any_cast<int>			(decoded[1]), 1234);
+		CHECK_EQ(std::any_cast<double>		(decoded[2]), 1234.1234);
 
 	}
 
@@ -65,9 +64,9 @@ TEST_CASE("decoding from JSON") {
 		"}";
 		gorage::Json::Dict decoded = std::any_cast<gorage::Json::Dict>(gorage::Json::decode(s));
 
-		CHECK(std::any_cast<std::string>(decoded["string"]) == "lalala");
-		CHECK(std::any_cast<int>		(decoded["int"]) == 1234);
-		CHECK(std::any_cast<double>		(decoded["double"]) == 1234.1234);
+		CHECK_EQ(std::any_cast<std::string>	(decoded["string"]),	"lalala");
+		CHECK_EQ(std::any_cast<int>			(decoded["int"]), 		1234);
+		CHECK_EQ(std::any_cast<double>		(decoded["double"]),	1234.1234);
 
 	}
 
@@ -80,8 +79,8 @@ void testEncodedString(const std::string& encoded) {
 
 		REQUIRE(encoded.length() > 0);
 
-		CHECK(encoded[0] == '\"');
-		CHECK(encoded[encoded.length()-1] == '\"');
+		CHECK_EQ(encoded[0], '\"');
+		CHECK_EQ(encoded[encoded.length()-1], '\"');
 
 	}
 
@@ -122,7 +121,7 @@ TEST_CASE("encoding to JSON") {
 
 			testEncodedString(encoded);
 			SUBCASE("hardcoded full comparison") {
-				CHECK(encoded == "\"lalala\"");
+				CHECK_EQ(encoded, "\"lalala\"");
 			}
 
 		}
@@ -133,7 +132,7 @@ TEST_CASE("encoding to JSON") {
 
 			testEncodedString(encoded);
 			SUBCASE("hardcoded full comparison") {
-				CHECK(encoded == "\"lalala\"");
+				CHECK_EQ(encoded, "\"lalala\"");
 			}
 
 		}
@@ -144,7 +143,7 @@ TEST_CASE("encoding to JSON") {
 
 			testEncodedString(encoded);
 			SUBCASE("hardcoded full comparison") {
-				CHECK(encoded == "\"bGFsYWxh\"");
+				CHECK_EQ(encoded, "\"bGFsYWxh\"");
 			}
 
 		}
@@ -177,15 +176,14 @@ TEST_CASE("encoding to JSON") {
 
 			REQUIRE(l.size() > 0);
 
-			CHECK(encoded[0] == '[');
-			CHECK(encoded[encoded.length() - 1] == ']');
+			CHECK_EQ(encoded[0], '[');
+			CHECK_EQ(encoded[encoded.length() - 1], ']');
 
 		}
 
 		SUBCASE("hardcoded full comparison") {
-			CHECK(
-				encoded
-				==
+			CHECK_EQ(
+				encoded,
 				"["
 					"\"lalala\","
 					"1234,"
@@ -209,15 +207,14 @@ TEST_CASE("encoding to JSON") {
 
 			REQUIRE(l.size() > 0);
 
-			CHECK(encoded[0] == '{');
-			CHECK(encoded[encoded.length() - 1] == '}');
+			CHECK_EQ(encoded[0], '{');
+			CHECK_EQ(encoded[encoded.length() - 1], '}');
 
 		}
 
 		SUBCASE("hardcoded full comparison") {
-			CHECK(
-				encoded
-				==
+			CHECK_EQ(
+				encoded,
 				"{"
 					"\"double\":" "1234.123400,"
 					"\"string\":" "\"lalala\","
@@ -237,20 +234,18 @@ TEST_CASE("JSON stability") {
 
 		SUBCASE("->decoding->encoding->") {
 			std::string s = "lalala";
-			CHECK(
+			CHECK_EQ(
 				std::any_cast<std::string>(
 					gorage::Json::decode(gorage::Json::encode(s))
-				)
-				==
+				),
 				s
 			);
 		}
 
 		SUBCASE("->encoding->decoding->") {
 			std::string json = "\"lalala\"";
-			CHECK(
-				gorage::Json::encode(gorage::Json::decode(json))
-				==
+			CHECK_EQ(
+				gorage::Json::encode(gorage::Json::decode(json)),
 				json
 			);
 		}
@@ -261,18 +256,17 @@ TEST_CASE("JSON stability") {
 
 		SUBCASE("->decoding->encoding->") {
 			int i = 1234;
-			CHECK(
+			CHECK_EQ(
 				std::any_cast<int>(
 					gorage::Json::decode(gorage::Json::encode(i))
-				)
-				==
+				),
 				i
 			);
 		}
 
 		SUBCASE("->encoding->decoding->") {
 			std::string json = "1234";
-			CHECK(gorage::Json::encode(gorage::Json::decode(json)) == json);
+			CHECK_EQ(gorage::Json::encode(gorage::Json::decode(json)), json);
 		}
 
 	}
@@ -281,18 +275,17 @@ TEST_CASE("JSON stability") {
 
 		SUBCASE("->decoding->encoding->") {
 			double i = 1234.1234;
-			CHECK(
+			CHECK_EQ(
 				std::any_cast<double>(
 					gorage::Json::decode(gorage::Json::encode(i))
-				)
-				==
+				),
 				i
 			);
 		}
 
 		SUBCASE("->encoding->decoding->") {
 			std::string json = "1234.123400";
-			CHECK(gorage::Json::encode(gorage::Json::decode(json)) == json);
+			CHECK_EQ(gorage::Json::encode(gorage::Json::decode(json)), json);
 		}
 
 	}
@@ -308,14 +301,14 @@ TEST_CASE("JSON stability") {
 			REQUIRE(l.size() == result.size());
 
 			for (size_t i = 0; i < l.size(); i++) {
-				CHECK(std::any_cast<int>(l[i]) == std::any_cast<int>(result[i]));
+				CHECK_EQ(std::any_cast<int>(l[i]), std::any_cast<int>(result[i]));
 			}
 
 		}
 
 		SUBCASE("->encoding->decoding->") {
 			std::string json = "[1,2,3]";
-			CHECK(gorage::Json::encode(gorage::Json::decode(json)) == json);
+			CHECK_EQ(gorage::Json::encode(gorage::Json::decode(json)), json);
 		}
 
 	}
@@ -335,17 +328,17 @@ TEST_CASE("JSON stability") {
 			REQUIRE(d.size() == result.size());
 
 			for (const auto& k_v : d) {
-				CHECK(std::any_cast<int>(d[k_v.first]) == std::any_cast<int>(result[k_v.first]));
+				CHECK_EQ(std::any_cast<int>(d[k_v.first]), std::any_cast<int>(result[k_v.first]));
 			}
 			for (const auto& k_v : result) {
-				CHECK(std::any_cast<int>(d[k_v.first]) == std::any_cast<int>(result[k_v.first]));
+				CHECK_EQ(std::any_cast<int>(d[k_v.first]), std::any_cast<int>(result[k_v.first]));
 			}
 
 		}
 
 		SUBCASE("->encoding->decoding->") {
 			std::string json = "{\"a\":1,\"b\":2,\"c\":3}";
-			CHECK(gorage::Json::encode(gorage::Json::decode(json)) == json);
+			CHECK_EQ(gorage::Json::encode(gorage::Json::decode(json)), json);
 		}
 
 	}

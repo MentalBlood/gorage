@@ -24,8 +24,8 @@ TEST_CASE("`ItemStorage`") {
 
 		storage.save(usi, item);
 
-		CHECK(storage.load(usi).data.size() == item.data.size());
-		CHECK(storage.load(usi).metadata.s == item.metadata.s);
+		CHECK_EQ(storage.load(usi).data.size(), item.data.size());
+		CHECK_EQ(storage.load(usi).metadata.s, item.metadata.s);
 
 	}
 
