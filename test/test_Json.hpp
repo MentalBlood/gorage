@@ -196,7 +196,7 @@ TEST_CASE("testing encoding to JSON") {
 
 	}
 
-	SUBCASE("testing dicts encoding") {
+	SUBCASE("testing dictionaries encoding") {
 
 		const gorage::Json::Dict l{
 			{"string", "lalala"},
@@ -224,6 +224,128 @@ TEST_CASE("testing encoding to JSON") {
 					"\"int\":" "1234"
 				"}"
 			);
+		}
+
+	}
+
+}
+
+
+TEST_CASE("JSON stability") {
+
+	SUBCASE("strings") {
+
+		SUBCASE("->decoding->encoding->") {
+			std::string s = "lalala";
+			CHECK(
+				std::any_cast<std::string>(
+					gorage::Json::decode(gorage::Json::encode(s))
+				)
+				==
+				s
+			);
+		}
+
+		SUBCASE("->encoding->decoding->") {
+			std::string json = "\"lalala\"";
+			CHECK(
+				gorage::Json::encode(gorage::Json::decode(json))
+				==
+				json
+			);
+		}
+
+	}
+
+	SUBCASE("integers") {
+
+		SUBCASE("->decoding->encoding->") {
+			int i = 1234;
+			CHECK(
+				std::any_cast<int>(
+					gorage::Json::decode(gorage::Json::encode(i))
+				)
+				==
+				i
+			);
+		}
+
+		SUBCASE("->encoding->decoding->") {
+			std::string json = "1234";
+			CHECK(gorage::Json::encode(gorage::Json::decode(json)) == json);
+		}
+
+	}
+
+	SUBCASE("floating numbers") {
+
+		SUBCASE("->decoding->encoding->") {
+			double i = 1234.1234;
+			CHECK(
+				std::any_cast<double>(
+					gorage::Json::decode(gorage::Json::encode(i))
+				)
+				==
+				i
+			);
+		}
+
+		SUBCASE("->encoding->decoding->") {
+			std::string json = "1234.123400";
+			CHECK(gorage::Json::encode(gorage::Json::decode(json)) == json);
+		}
+
+	}
+
+	SUBCASE("lists") {
+
+		SUBCASE("->decoding->encoding->") {
+
+			gorage::Json::List l{1, 2, 3};
+			gorage::Json::List result = std::any_cast<gorage::Json::List>(
+				gorage::Json::decode(gorage::Json::encode(l))
+			);
+			REQUIRE(l.size() == result.size());
+
+			for (size_t i = 0; i < l.size(); i++) {
+				CHECK(std::any_cast<int>(l[i]) == std::any_cast<int>(result[i]));
+			}
+
+		}
+
+		SUBCASE("->encoding->decoding->") {
+			std::string json = "[1,2,3]";
+			CHECK(gorage::Json::encode(gorage::Json::decode(json)) == json);
+		}
+
+	}
+
+	SUBCASE("dictionaries") {
+
+		SUBCASE("->decoding->encoding->") {
+
+			gorage::Json::Dict d{
+				{"a", 1},
+				{"b", 2},
+				{"c", 3}
+			};
+			gorage::Json::Dict result = std::any_cast<gorage::Json::Dict>(
+				gorage::Json::decode(gorage::Json::encode(d))
+			);
+			REQUIRE(d.size() == result.size());
+
+			for (const auto& k_v : d) {
+				CHECK(std::any_cast<int>(d[k_v.first]) == std::any_cast<int>(result[k_v.first]));
+			}
+			for (const auto& k_v : result) {
+				CHECK(std::any_cast<int>(d[k_v.first]) == std::any_cast<int>(result[k_v.first]));
+			}
+
+		}
+
+		SUBCASE("->encoding->decoding->") {
+			std::string json = "{\"a\":1,\"b\":2,\"c\":3}";
+			CHECK(gorage::Json::encode(gorage::Json::decode(json)) == json);
 		}
 
 	}
