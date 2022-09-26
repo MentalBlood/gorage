@@ -23,9 +23,23 @@ namespace gorage {
 
 	public:
 
+		/**
+		 * @brief Generic list
+		 * 
+		 */
 		using List = std::vector<std::any>;
+		/**
+		 * @brief Generic map
+		 * 
+		 */
 		using Dict = std::unordered_map<std::string, std::any>;
 
+		/**
+		 * @brief JSON text decoding to generic object
+		 * 
+		 * @param json_text 
+		 * @return std::any May be one of: `std::string`, `int`, `double`, `List`, `Dict`
+		 */
 		static std::any decode(const std::string& json_text) {
 
 			rapidjson::Document json;
@@ -35,6 +49,12 @@ namespace gorage {
 
 		}
 
+		/**
+		 * @brief Generic object encoding to JSON text
+		 * 
+		 * @param a May be one of: `std::string`, `char*`, `int`, `double`, `List`, `Dict`
+		 * @return std::string 
+		 */
 		static std::string encode(const std::any& a) {
 
 			try {
@@ -73,30 +93,78 @@ namespace gorage {
 
 		}
 
+		/**
+		 * @brief C string encoding to JSON text
+		 * 
+		 * @param s 
+		 * @return std::string 
+		 */
 		static std::string encode(const char* s) {
 			return "\"" + _getEscaped(s) + "\"";
 		}
+		/**
+		 * @brief C++ string encoding to JSON text
+		 * 
+		 * @param s 
+		 * @return std::string 
+		 */
 		static std::string encode(const std::string& s) {
 			return "\"" + _getEscaped(s) + "\"";
 		}
+		/**
+		 * @brief Bytes encoding to JSON text using base64 rfc4648
+		 * 
+		 * @param s 
+		 * @return std::string 
+		 */
 		static std::string encode(const gorage::Bytes& s) {
 			return "\"" + cppcodec::base64_rfc4648::encode(s) + "\"";
 		}
 
+		/**
+		 * @brief integer encoding to JSON text
+		 * 
+		 * @param i 
+		 * @return std::string 
+		 */
 		static std::string encode(const int& i) {
 			return std::to_string(i);
 		}
+		/**
+		 * @brief Floating number encoding to JSON text
+		 * 
+		 * @param f 
+		 * @return std::string 
+		 */
 		static std::string encode(const float& f) {
 			return std::to_string(f);
 		}
+		/**
+		 * @brief Floating number encoding to JSON text
+		 * 
+		 * @param d 
+		 * @return std::string 
+		 */
 		static std::string encode(const double& d) {
 			return std::to_string(d);
 		}
 
+		/**
+		 * @brief `Json` sibling encoding to JSON text
+		 * 
+		 * @param j 
+		 * @return std::string 
+		 */
 		static std::string encode(const std::shared_ptr<Json> j) {
 			return j->encoded();
 		}
 
+		/**
+		 * @brief Generic list encoding to JSON text
+		 * 
+		 * @param v 
+		 * @return std::string 
+		 */
 		static std::string encode(const List& v) {
 
 			std::string result;
@@ -111,6 +179,12 @@ namespace gorage {
 
 		}
 
+		/**
+		 * @brief Generic map encoding to JSON text
+		 * 
+		 * @param m 
+		 * @return std::string 
+		 */
 		static std::string encode(const Dict& m) {
 
 			std::string result;
