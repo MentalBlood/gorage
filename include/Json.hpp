@@ -33,6 +33,26 @@ namespace gorage {
 		 * 
 		 */
 		using Dict = std::unordered_map<std::string, std::any>;
+		/**
+		 * @brief Class for storing optionally base64-decodable string
+		 * 
+		 */
+		class String {
+
+		public:
+
+			const std::string s;
+
+			String() {}
+
+			String(const std::string& s):
+				s(s) {}
+
+			gorage::Bytes decoded() {
+				return cppcodec::base64_rfc4648::decode(s);
+			}
+
+		};
 
 		/**
 		 * @brief JSON text decoding to generic object
@@ -258,10 +278,7 @@ namespace gorage {
 				}
 			}
 			if (v.IsString()) {
-				try {
-					return cppcodec::base64_rfc4648::decode(std::string(v.GetString()));
-				} catch (...) {}
-				return std::string(v.GetString());
+				return String(std::string(v.GetString()));
 			}
 			if (v.IsArray()) {
 				List result;
@@ -273,6 +290,7 @@ namespace gorage {
 			if (v.IsObject()) {
 				Dict result;
 				for (const auto& k_v : v.GetObject()) {
+					std::cout << std::string(k_v.name.GetString()) << std::endl;
 					result[k_v.name.GetString()] = _decode<rapidjson::Value>(k_v.value);
 				}
 				return result;

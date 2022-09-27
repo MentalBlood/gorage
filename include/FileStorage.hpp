@@ -89,7 +89,7 @@ namespace gorage {
 
 			file.close();
 
-			return Json::create<T>(result_stream.str());
+			return Json::createFromJson<T>(result_stream.str());
 
 		}
 
