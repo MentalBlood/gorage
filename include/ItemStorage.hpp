@@ -73,9 +73,9 @@ namespace gorage {
 		 */
 		void update(const std::any& structure) {
 
-			data = std::any_cast<Bytes>(
+			data = std::any_cast<String>(
 				std::any_cast<Dict>(structure)["data"]
-			);
+			).decoded();
 			metadata = Json::create<T>(
 				std::any_cast<Dict>(structure)["metadata"]
 			);

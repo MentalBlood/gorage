@@ -13,7 +13,7 @@ TEST_CASE("decoding from JSON") {
 		std::any decoded = gorage::Json::decode(s);
 
 		CHECK_EQ(
-			std::any_cast<std::string>(decoded),
+			std::any_cast<gorage::Json::String>(decoded).s,
 			"lalala"
 		);
 
@@ -50,9 +50,9 @@ TEST_CASE("decoding from JSON") {
 		"]";
 		gorage::Json::List decoded = std::any_cast<gorage::Json::List>(gorage::Json::decode(s));
 
-		CHECK_EQ(std::any_cast<std::string>	(decoded[0]), "lalala");
-		CHECK_EQ(std::any_cast<int>			(decoded[1]), 1234);
-		CHECK_EQ(std::any_cast<double>		(decoded[2]), 1234.1234);
+		CHECK_EQ(std::any_cast<gorage::Json::String>(decoded[0]).s, "lalala");
+		CHECK_EQ(std::any_cast<int>					(decoded[1]), 1234);
+		CHECK_EQ(std::any_cast<double>				(decoded[2]), 1234.1234);
 
 	}
 
@@ -65,7 +65,7 @@ TEST_CASE("decoding from JSON") {
 		"}";
 		gorage::Json::Dict decoded = std::any_cast<gorage::Json::Dict>(gorage::Json::decode(s));
 
-		CHECK_EQ(std::any_cast<std::string>	(decoded["string"]),	"lalala");
+		CHECK_EQ(std::any_cast<gorage::Json::String>		(decoded["string"]).s,	"lalala");
 		CHECK_EQ(std::any_cast<int>			(decoded["int"]), 		1234);
 		CHECK_EQ(std::any_cast<double>		(decoded["double"]),	1234.1234);
 
@@ -226,29 +226,6 @@ TEST_CASE("encoding to JSON") {
 
 	}
 
-	SUBCASE("`Json` siblings") {
-
-		const C c("lalala");
-
-		try {
-
-			const std::string encoded = gorage::Json::encode(std::make_any<std::shared_ptr<C>>(std::make_shared<C>(c)));
-
-			SUBCASE("hardcoded full comparison") {
-				CHECK_EQ(
-					encoded,
-					"{"
-						"\"s\":" "\"lalala\""
-					"}"
-				);
-			}
-
-		} catch(const std::exception& e) {
-			std::cout << e.what() << std::endl;
-		}
-
-	}
-
 }
 
 
@@ -259,9 +236,9 @@ TEST_CASE("JSON stability") {
 		SUBCASE("->decoding->encoding->") {
 			std::string s = "lalala";
 			CHECK_EQ(
-				std::any_cast<std::string>(
+				std::any_cast<gorage::Json::String>(
 					gorage::Json::decode(gorage::Json::encode(s))
-				),
+				).s,
 				s
 			);
 		}

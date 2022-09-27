@@ -80,6 +80,9 @@ namespace gorage {
 			if (a.type() == typeid(const char*)) {
 				return encode(std::any_cast<const char*>(a));
 			}
+			if (a.type() == typeid(String)) {
+				return encode(std::any_cast<String>(a));
+			}
 			if (a.type() == typeid(std::string)) {
 				return encode(std::any_cast<std::string>(a));
 			}
@@ -121,6 +124,15 @@ namespace gorage {
 		 */
 		static std::string encode(const char* s) {
 			return "\"" + _getEscaped(s) + "\"";
+		}
+		/**
+		 * @brief `String` encoding to JSON text
+		 * 
+		 * @param s 
+		 * @return std::string 
+		 */
+		static std::string encode(const String& s) {
+			return "\"" + _getEscaped(s.s) + "\"";
 		}
 		/**
 		 * @brief C++ string encoding to JSON text
@@ -290,7 +302,6 @@ namespace gorage {
 			if (v.IsObject()) {
 				Dict result;
 				for (const auto& k_v : v.GetObject()) {
-					std::cout << std::string(k_v.name.GetString()) << std::endl;
 					result[k_v.name.GetString()] = _decode<rapidjson::Value>(k_v.value);
 				}
 				return result;
