@@ -82,9 +82,7 @@ namespace gorage {
 
 		}
 
-	protected:
-
-		std::any _getStructure() const {
+		std::any getStructure() const {
 			return Dict{
 				{"data", data},
 				{"metadata", metadata}

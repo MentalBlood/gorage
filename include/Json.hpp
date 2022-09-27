@@ -239,8 +239,10 @@ namespace gorage {
 		 * @return std::string JSONed object
 		 */
 		std::string encoded() const {
-			return encode(_getStructure());
+			return encode(getStructure());
 		}
+
+		virtual std::any getStructure() const = 0;
 
 	private:
 
@@ -270,7 +272,7 @@ namespace gorage {
 			}
 			if (v.IsObject()) {
 				Dict result;
-				for (const auto& k_v : v.GetObjectA()) {
+				for (const auto& k_v : v.GetObject()) {
 					result[k_v.name.GetString()] = _decode<rapidjson::Value>(k_v.value);
 				}
 				return result;
@@ -287,8 +289,6 @@ namespace gorage {
 				"\\\""
 			);
 		}
-
-		virtual std::any _getStructure() const = 0;
 
 	};
 

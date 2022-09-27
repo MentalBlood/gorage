@@ -55,7 +55,7 @@ namespace gorage {
 		 */
 		void save(const std::string& usi, const T& object) {
 
-			const std::string content = object.toJson();
+			const std::string content = object.encoded();
 
 			std::string file_path = _FilePath(usi);
 

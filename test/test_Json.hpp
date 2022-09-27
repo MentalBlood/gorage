@@ -1,6 +1,7 @@
 #include <Json.hpp>
 
 #include <regex>
+#include <common.hpp>
 
 
 
@@ -152,18 +153,18 @@ TEST_CASE("encoding to JSON") {
 
 	SUBCASE("numbers") {
 
-		SUBCASE("testing `int`") {
+		SUBCASE("`int`") {
 			const int i = 1234;
 			testEncodedNumber(gorage::Json::encode(i));
 		}
-		SUBCASE("testing `double`") {
+		SUBCASE("`double`") {
 			const double f = 1234.1234;
 			testEncodedNumber(gorage::Json::encode(f));
 		}
 
 	}
 
-	SUBCASE("testing lists") {
+	SUBCASE("lists") {
 
 		const gorage::Json::List l{
 			"lalala",
@@ -221,6 +222,29 @@ TEST_CASE("encoding to JSON") {
 					"\"int\":" "1234"
 				"}"
 			);
+		}
+
+	}
+
+	SUBCASE("`Json` siblings") {
+
+		const C c("lalala");
+
+		try {
+
+			const std::string encoded = gorage::Json::encode(std::make_any<std::shared_ptr<C>>(std::make_shared<C>(c)));
+
+			SUBCASE("hardcoded full comparison") {
+				CHECK_EQ(
+					encoded,
+					"{"
+						"\"s\":" "\"lalala\""
+					"}"
+				);
+			}
+
+		} catch(const std::exception& e) {
+			std::cout << e.what() << std::endl;
 		}
 
 	}
