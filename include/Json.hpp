@@ -57,37 +57,37 @@ namespace gorage {
 		 */
 		static std::string encode(const std::any& a) {
 
-			try {
+			if (a.type() == typeid(const char*)) {
 				return encode(std::any_cast<const char*>(a));
-			} catch (std::bad_any_cast& e) {}
-			try {
+			}
+			if (a.type() == typeid(std::string)) {
 				return encode(std::any_cast<std::string>(a));
-			} catch (std::bad_any_cast& e) {}
-			try {
+			}
+			if (a.type() == typeid(gorage::Bytes)) {
 				return encode(std::any_cast<gorage::Bytes>(a));
-			} catch (std::bad_any_cast& e) {}
+			}
 
-			try {
+			if (a.type() == typeid(int)) {
 				return encode(std::any_cast<int>(a));
-			} catch (std::bad_any_cast& e) {}
-			try {
+			}
+			if (a.type() == typeid(float)) {
 				return encode(std::any_cast<float>(a));
-			} catch (std::bad_any_cast& e) {}
-			try {
+			}
+			if (a.type() == typeid(double)) {
 				return encode(std::any_cast<double>(a));
-			} catch (std::bad_any_cast& e) {}
+			}
 
-			try {
+			if (a.type() == typeid(std::shared_ptr<Json>)) {
 				return encode(std::any_cast<std::shared_ptr<Json>>(a));
-			} catch (std::bad_any_cast& e) {}
+			}
 
 
-			try {
+			if (a.type() == typeid(List)) {
 				return encode(std::any_cast<List>(a));
-			} catch (const std::bad_any_cast& e) {};
-			try {
+			}
+			if (a.type() == typeid(Dict)) {
 				return encode(std::any_cast<Dict>(a));
-			} catch (const std::bad_any_cast& e) {};
+			}
 
 			throw std::runtime_error("Can not encode type " + std::string(a.type().name()) + " to JSON");
 
