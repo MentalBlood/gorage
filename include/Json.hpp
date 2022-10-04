@@ -199,6 +199,10 @@ namespace gorage {
 		 */
 		static std::string encode(const List& v) {
 
+			if (!v.size()) {
+				return "[]";
+			}
+
 			std::string result;
 
 			result += "[";
@@ -218,6 +222,10 @@ namespace gorage {
 		 * @return std::string 
 		 */
 		static std::string encode(const Dict& m) {
+
+			if (!m.size()) {
+				return "{}";
+			}
 
 			std::string result;
 

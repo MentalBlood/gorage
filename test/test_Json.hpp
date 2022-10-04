@@ -166,6 +166,10 @@ TEST_CASE("encoding to JSON") {
 
 	SUBCASE("lists") {
 
+		SUBCASE("empty list") {
+			CHECK_EQ(gorage::Json::encode(gorage::Json::List{}), "[]");
+		}
+
 		const gorage::Json::List l{
 			"lalala",
 			1234,
@@ -196,6 +200,10 @@ TEST_CASE("encoding to JSON") {
 	}
 
 	SUBCASE("dictionaries") {
+
+		SUBCASE("empty dict") {
+			CHECK_EQ(gorage::Json::encode(gorage::Json::Dict{}), "{}");
+		}
 
 		const gorage::Json::Dict l{
 			{"string", "lalala"},
