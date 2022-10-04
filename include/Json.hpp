@@ -100,10 +100,6 @@ namespace gorage {
 				return encode(std::any_cast<double>(a));
 			}
 
-			if (a.type() == typeid(std::shared_ptr<Json>)) {
-				return encode(std::any_cast<std::shared_ptr<Json>>(a));
-			}
-
 
 			if (a.type() == typeid(List)) {
 				return encode(std::any_cast<List>(a));
@@ -179,16 +175,6 @@ namespace gorage {
 		 */
 		static std::string encode(const double& d) {
 			return std::to_string(d);
-		}
-
-		/**
-		 * @brief `Json` sibling encoding to JSON text
-		 * 
-		 * @param j 
-		 * @return std::string 
-		 */
-		static std::string encode(const std::shared_ptr<Json> j) {
-			return j->encoded();
 		}
 
 		/**
