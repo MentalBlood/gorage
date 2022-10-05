@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <stdbool.h>
+#include <Windows.h>
 #include <unordered_set>
 #include <unordered_map>
 
@@ -107,7 +108,7 @@ namespace gorage {
 				"ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
 				"abcdefghijklmnopqrstuvwxyz";
 
-			std::srand(time(NULL));
+			std::srand(GetTickCount64());
 
 			std::string result;
 			result.reserve(length);
