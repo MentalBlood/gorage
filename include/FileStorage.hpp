@@ -55,8 +55,8 @@ namespace gorage {
 		 */
 		void save(const std::string& usi, const T& object) {
 
-			if (!std::filesystem::exists(folder_path)) {
-				std::filesystem::create_directories(folder_path);
+			if (!std::filesystem::exists(_folder_path)) {
+				std::filesystem::create_directories(_folder_path);
 			}
 
 			std::string file_path = _FilePath(usi);
