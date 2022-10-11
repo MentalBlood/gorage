@@ -55,7 +55,9 @@ namespace gorage {
 		 */
 		void save(const std::string& usi, const T& object) {
 
-			const std::string content = object.encoded();
+			if (!std::filesystem::exists(folder_path)) {
+				std::filesystem::create_directories(folder_path);
+			}
 
 			std::string file_path = _FilePath(usi);
 
@@ -64,7 +66,7 @@ namespace gorage {
 				throw std::runtime_error("Can not save file " + file_path);
 			}
 
-			file << content;
+			file << object.encoded();
 			file.close();
 
 		}

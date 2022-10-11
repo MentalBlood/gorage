@@ -54,6 +54,10 @@ namespace gorage {
 		 */
 		void save(const std::string& usi, const Bytes& content) {
 
+			if (!std::filesystem::exists(folder_path)) {
+				std::filesystem::create_directories(folder_path);
+			}
+
 			std::string file_path = _FilePath(usi);
 
 			std::ofstream file(file_path, std::ios::trunc | std::ios::binary);
@@ -61,10 +65,7 @@ namespace gorage {
 				throw std::runtime_error("Can not save file " + file_path);
 			}
 
-			size_t content_size = content.size();
-
 			file.write(reinterpret_cast<const char*>(&content[0]), content.size());
-
 			file.close();
 
 		}
