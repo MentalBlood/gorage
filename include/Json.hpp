@@ -52,20 +52,20 @@ namespace gorage {
 				return cppcodec::base64_rfc4648::decode(s);
 			}
 
-			std::string hex() {
+		};
 
-				std::stringstream result_stream;
+		static std::string hex(const Bytes& bytes) {
 
-				result_stream << std::hex << std::setw(2) << std::setfill('0');
-				for (const auto& b : decoded()) {
-					result_stream << ((unsigned char)b & 0xff);
-				}
+			std::stringstream result_stream;
 
-				return result_stream.str();
-
+			result_stream << std::hex << std::setw(2) << std::setfill('0');
+			for (const auto& b : bytes) {
+				result_stream << ((unsigned char)b & 0xff);
 			}
 
-		};
+			return result_stream.str();
+
+		}
 
 		/**
 		 * @brief JSON text decoding to generic object
