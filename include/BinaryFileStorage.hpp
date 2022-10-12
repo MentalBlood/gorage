@@ -31,7 +31,7 @@ namespace gorage {
 		 * @param extension Extension to store files with
 		 */
 		BinaryFileStorage(const std::string& folder_path, const std::string& extension):
-			folder_path(folder_path), extension(extension) {}
+			_folder_path(folder_path), _extension(extension) {}
 
 	protected:
 
@@ -39,12 +39,12 @@ namespace gorage {
 		 * @brief Folder to store files in
 		 * 
 		 */
-		const std::string folder_path;
+		const std::string _folder_path;
 		/**
 		 * @brief Extension to store files with
 		 * 
 		 */
-		const std::string extension;
+		const std::string _extension;
 
 		/**
 		 * @brief Saves given data with given USI
@@ -54,8 +54,8 @@ namespace gorage {
 		 */
 		void save(const std::string& usi, const Bytes& content) {
 
-			if (!std::filesystem::exists(folder_path)) {
-				std::filesystem::create_directories(folder_path);
+			if (!std::filesystem::exists(_folder_path)) {
+				std::filesystem::create_directories(_folder_path);
 			}
 
 			std::string file_path = _FilePath(usi);
@@ -99,7 +99,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 */
 		void remove(const std::string& usi) {
-			std::filesystem::remove(folder_path + usi + extension);
+			std::filesystem::remove(_folder_path + usi + _extension);
 		}
 
 	private:
@@ -111,7 +111,7 @@ namespace gorage {
 		 * @return const std::string File path
 		 */
 		const std::string _FilePath(const std::string& usi) const {
-			return folder_path + "/" + usi + extension;
+			return _folder_path + "/" + usi + _extension;
 		}
 
 		/**
@@ -120,9 +120,11 @@ namespace gorage {
 		 */
 		void loadUsis() {
 			_usis.clear();
-			for (const auto & p : std::filesystem::directory_iterator(folder_path)) {
-				if (p.path().extension() == extension) {
-					_usis.insert(p.path().stem().string());
+			if (std::filesystem::exists(_folder_path)) {
+				for (const auto & p : std::filesystem::directory_iterator(_folder_path)) {
+					if (p.path().extension() == _extension) {
+						_usis.insert(p.path().stem().string());
+					}
 				}
 			}
 		}
