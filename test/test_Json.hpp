@@ -199,6 +199,41 @@ TEST_CASE("encoding to JSON") {
 
 	}
 
+	SUBCASE("vectors of strings") {
+
+		SUBCASE("empty vector") {
+			CHECK_EQ(gorage::Json::encode(std::vector<std::string>{}), "[]");
+		}
+
+		const std::vector<std::string> l{
+			"lalala",
+			"1234",
+			"1234.1234"
+		};
+		const std::string encoded = gorage::Json::encode(l);
+
+		SUBCASE("encoded vector must be surrounded by square brackets `[]`") {
+
+			REQUIRE(l.size() > 0);
+
+			CHECK_EQ(encoded[0], '[');
+			CHECK_EQ(encoded[encoded.length() - 1], ']');
+
+		}
+
+		SUBCASE("hardcoded full comparison") {
+			CHECK_EQ(
+				encoded,
+				"["
+					"\"lalala\","
+					"\"1234\","
+					"\"1234.1234\""
+				"]"
+			);
+		}
+
+	}
+
 	SUBCASE("dictionaries") {
 
 		SUBCASE("empty dict") {

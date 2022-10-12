@@ -48,7 +48,7 @@ namespace gorage {
 			String(const std::string& s):
 				s(s) {}
 
-			gorage::Bytes decoded() {
+			Bytes decoded() {
 				return cppcodec::base64_rfc4648::decode(s);
 			}
 
@@ -86,8 +86,8 @@ namespace gorage {
 			if (a.type() == typeid(std::string)) {
 				return encode(std::any_cast<std::string>(a));
 			}
-			if (a.type() == typeid(gorage::Bytes)) {
-				return encode(std::any_cast<gorage::Bytes>(a));
+			if (a.type() == typeid(Bytes)) {
+				return encode(std::any_cast<Bytes>(a));
 			}
 
 			if (a.type() == typeid(int)) {
@@ -102,8 +102,24 @@ namespace gorage {
 
 
 			if (a.type() == typeid(List)) {
-				return encode(std::any_cast<List>(a));
+				return encode<std::any>(std::any_cast<List>(a));
 			}
+			if (a.type() == typeid(std::vector<std::string>)) {
+				return encode<std::string>(std::any_cast<std::vector<std::string>>(a));
+			}
+			if (a.type() == typeid(std::vector<Bytes>)) {
+				return encode<Bytes>(std::any_cast<std::vector<Bytes>>(a));
+			}
+			if (a.type() == typeid(std::vector<int>)) {
+				return encode<int>(std::any_cast<std::vector<int>>(a));
+			}
+			if (a.type() == typeid(std::vector<float>)) {
+				return encode<float>(std::any_cast<std::vector<float>>(a));
+			}
+			if (a.type() == typeid(std::vector<double>)) {
+				return encode<double>(std::any_cast<std::vector<double>>(a));
+			}
+
 			if (a.type() == typeid(Dict)) {
 				return encode(std::any_cast<Dict>(a));
 			}
@@ -145,7 +161,7 @@ namespace gorage {
 		 * @param s 
 		 * @return std::string 
 		 */
-		static std::string encode(const gorage::Bytes& s) {
+		static std::string encode(const Bytes& s) {
 			return "\"" + cppcodec::base64_rfc4648::encode(s) + "\"";
 		}
 
@@ -183,7 +199,8 @@ namespace gorage {
 		 * @param v 
 		 * @return std::string 
 		 */
-		static std::string encode(const List& v) {
+		template<typename T>
+		static std::string encode(const std::vector<T>& v) {
 
 			if (!v.size()) {
 				return "[]";
