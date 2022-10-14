@@ -23,6 +23,8 @@ namespace gorage {
 
 	public:
 
+		using Bytes = Bytes;
+
 		/**
 		 * @brief Generic list
 		 * 
@@ -42,13 +44,27 @@ namespace gorage {
 		public:
 
 			const std::string s;
+			const Bytes b;
 
 			String() {}
 
 			String(const std::string& s):
 				s(s) {}
 
+			String(const Bytes& b):
+				b(b) {}
+
+			std::string encoded() {
+				if (s.length()) {
+					return s;
+				}
+				return cppcodec::base64_rfc4648::encode(b);
+			}
+
 			Bytes decoded() {
+				if (b.size()) {
+					return b;
+				}
 				return cppcodec::base64_rfc4648::decode(s);
 			}
 
