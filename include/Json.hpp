@@ -83,6 +83,22 @@ namespace gorage {
 
 		}
 
+		template<typename T>
+		static T get(const Dict& d, const std::string& key, const T& _default) {
+			if (d.count(key)) {
+				return std::any_cast<T>(d.at(key));
+			}
+			return _default;
+		}
+
+		template<typename T>
+		static T getObject(const Dict& d, const std::string& key, const T& _default) {
+			if (d.count(key)) {
+				return create<T>(d.at(key));
+			}
+			return _default;
+		}
+
 		/**
 		 * @brief JSON text decoding to generic object
 		 * 
