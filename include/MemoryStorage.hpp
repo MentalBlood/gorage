@@ -57,7 +57,6 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 */
 		void remove(const std::string& usi) {
-			_storage.at(usi);
 			_storage.erase(usi);
 		}
 
