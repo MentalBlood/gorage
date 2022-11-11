@@ -6,6 +6,7 @@
 #include <any>
 #include <memory>
 #include <vector>
+#include <optional>
 #include <iostream>
 
 #include "../modules/rapidjson/writer.h"
@@ -138,7 +139,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return Item<Metadata> Loaded item
 		 */
-		Item<Metadata> load(const std::string& usi) {
+		Item<Metadata> load(const std::string& usi) const {
 			return Item<Metadata>(
 				data_storage->load(usi),
 				metadata_storage->load(usi)
@@ -153,6 +154,25 @@ namespace gorage {
 		void remove(const std::string& usi) {
 			data_storage->remove(usi);
 			metadata_storage->remove(usi);
+		}
+
+		std::optional<Item<Metadata>> find(const std::string& key, const std::any& structure) const {
+			for (const auto& usi : *this) {
+				Item<Metadata> item = load(usi);
+				if (item.contains(key, structure)) {
+					return item;
+				}
+			}
+			return {};
+		}
+
+		std::optional<Item<Metadata>> metadata_find(const std::string& key, const std::any& structure) const {
+			for (const auto& usi : *metadata_storage) {
+				if (metadata_storage->load(usi).contains(key, structure)) {
+					return load(usi);
+				}
+			}
+			return {};
 		}
 
 	private:

@@ -47,7 +47,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return T Object type
 		 */
-		T load(const std::string& usi) {
+		T load(const std::string& usi) const {
 			return _storage.at(usi);
 		}
 

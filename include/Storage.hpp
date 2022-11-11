@@ -52,7 +52,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return T Found object
 		 */
-		virtual T load(const std::string& usi) = 0;
+		virtual T load(const std::string& usi) const = 0;
 
 		/**
 		 * @brief Removes object stored with USI usi
@@ -80,7 +80,7 @@ namespace gorage {
 			return _usis.end();
 		}
 
-		size_t size() {
+		size_t size() const {
 			loadUsis();
 			return _usis.size();
 		}
