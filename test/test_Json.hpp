@@ -261,8 +261,8 @@ TEST_CASE("encoding to JSON") {
 				encoded,
 				"{"
 					"\"double\":" "1234.123400,"
-					"\"string\":" "\"lalala\","
-					"\"int\":" "1234"
+					"\"int\":" "1234,"
+					"\"string\":" "\"lalala\""
 				"}"
 			);
 		}
@@ -390,32 +390,52 @@ TEST_CASE("JSON stability") {
 }
 
 
+void testJsonSearchingSimpleDict(const std::any& value) {
+	CHECK_EQ(
+		gorage::Json::contains(
+			gorage::Json::Dict{
+				{"key", value}
+			},
+			"key",
+			value
+		),
+		true
+	);
+}
+
+
 TEST_CASE("JSON searching") {
 
 	SUBCASE("strings") {
+		testJsonSearchingSimpleDict("");
+		testJsonSearchingSimpleDict("value");
+		testJsonSearchingSimpleDict(gorage::Bytes{});
+		testJsonSearchingSimpleDict(gorage::Bytes{'v', 'a', 'l', 'u', 'e'});
+	}
 
-		CHECK_EQ(
-			gorage::Json::contains(
-				gorage::Json::Dict{
-					{"key", "value"}
-				},
-				"key",
-				"value"
-			),
-			true
-		);
+	SUBCASE("integers") {
+		testJsonSearchingSimpleDict(0);
+		testJsonSearchingSimpleDict(1234);
+	}
 
-		CHECK_EQ(
-			gorage::Json::contains(
-				gorage::Json::Dict{
-					{"key", gorage::Bytes{'v', 'a', 'l', 'u', 'e'}}
-				},
-				"key",
-				gorage::Bytes{'v', 'a', 'l', 'u', 'e'}
-			),
-			true
-		);
+	SUBCASE("floating numbers") {
+		testJsonSearchingSimpleDict(0.0);
+		testJsonSearchingSimpleDict(1.234);
+	}
 
+	SUBCASE("lists") {
+		testJsonSearchingSimpleDict(gorage::Json::List{});
+		testJsonSearchingSimpleDict(gorage::Json::List{"", "1", 2, 3.4});
+	}
+
+	SUBCASE("dictionaries") {
+		testJsonSearchingSimpleDict(gorage::Json::Dict{});
+		testJsonSearchingSimpleDict(gorage::Json::Dict{
+			{"", ""},
+			{"1", "1"},
+			{"2", 2},
+			{"3.4", 3.4}
+		});
 	}
 
 }
