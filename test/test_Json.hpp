@@ -388,3 +388,34 @@ TEST_CASE("JSON stability") {
 	}
 
 }
+
+
+TEST_CASE("JSON searching") {
+
+	SUBCASE("strings") {
+
+		CHECK_EQ(
+			gorage::Json::contains(
+				gorage::Json::Dict{
+					{"key", "value"}
+				},
+				"key",
+				"value"
+			),
+			true
+		);
+
+		CHECK_EQ(
+			gorage::Json::contains(
+				gorage::Json::Dict{
+					{"key", gorage::Bytes{'v', 'a', 'l', 'u', 'e'}}
+				},
+				"key",
+				gorage::Bytes{'v', 'a', 'l', 'u', 'e'}
+			),
+			true
+		);
+
+	}
+
+}

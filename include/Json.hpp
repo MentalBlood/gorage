@@ -330,6 +330,34 @@ namespace gorage {
 			return encode(getStructure());
 		}
 
+		/**
+		 * @brief Check if corresponding structure contains given structure at given key
+		 * 
+		 * @param key Direct key on which given structure contained
+		 * @param structure Structure to search
+		 * @return true `structure` found on direct key `key`
+		 * @return false `structure` not found on direct key `key`
+		 */
+		bool contains(const std::string& key, const std::any& structure) const {
+			return contains(getStructure(), key, structure);
+		}
+
+		/**
+		 * @brief Check if given structure contains other given structure at given key
+		 * 
+		 * @param haystack Structure to search in
+		 * @param key Direct key at which given structure contained
+		 * @param needle Structure to search for
+		 * @return true `needle` found in `haystack` at direct key `key`
+		 * @return false `needle` not found in `haystack` at direct key `key`
+		 */
+		static bool contains(const std::any& haystack, const std::string& key, const std::any& needle) {
+			return std::regex_search(
+				encode(haystack),
+				std::regex("\"" + key + "\" *: *" + encode(needle) + "(?:\\n| )*(?:,|\\})")
+			);
+		}
+
 		virtual std::any getStructure() const = 0;
 
 	private:
