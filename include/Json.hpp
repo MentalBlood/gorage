@@ -3,11 +3,11 @@
 #ifndef __GORAGE__JSON__
 #define __GORAGE__JSON__
 
+#include <map>
 #include <any>
 #include <regex>
 #include <vector>
 #include <iostream>
-#include <unordered_map>
 
 #include "gorage.hpp"
 
@@ -34,7 +34,7 @@ namespace gorage {
 		 * @brief Generic map
 		 * 
 		 */
-		using Dict = std::unordered_map<std::string, std::any>;
+		using Dict = std::map<std::string, std::any>;
 		/**
 		 * @brief Class for storing optionally base64-decodable string
 		 * 
@@ -352,9 +352,12 @@ namespace gorage {
 		 * @return false `needle` not found in `haystack` at direct key `key`
 		 */
 		static bool contains(const std::any& haystack, const std::string& key, const std::any& needle) {
+			const std::string haystack_string = encode(haystack);
+			const std::string regex_string = _getEscapedForRegex("\"" + key + "\" *: *" + encode(needle) + "(?:\\n| )*(?:,|})");
+			std::cout << haystack_string << " contains " << regex_string << std::endl;
 			return std::regex_search(
-				encode(haystack),
-				std::regex("\"" + key + "\" *: *" + encode(needle) + "(?:\\n| )*(?:,|\\})")
+				haystack_string,
+				std::regex(regex_string)
 			);
 		}
 
@@ -403,7 +406,19 @@ namespace gorage {
 			);
 		}
 
+		static const std::vector<std::string> characters_to_escape_for_regex;
+
+		static std::string _getEscapedForRegex(const std::string& s) {
+			std::string result = s;
+			for (const auto& c : characters_to_escape_for_regex) {
+				result = std::regex_replace(result, std::regex("\\" + c), "\\" + c);
+			}
+			return result;
+		}
+
 	};
+
+	const std::vector<std::string> Json::characters_to_escape_for_regex = {"[", "]", "{", "}"};
 
 } // gorage
 
