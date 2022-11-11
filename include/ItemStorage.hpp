@@ -60,9 +60,7 @@ namespace gorage {
 
 		Item(std::string data_base64, T metadata):
 			data(
-				cppcodec::base64_rfc4648::decode(
-					data_base64
-				)
+				Json::String(data_base64).decoded()
 			),
 			metadata(metadata) {}
 
