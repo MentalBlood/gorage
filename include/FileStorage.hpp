@@ -77,7 +77,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return T Loaded object
 		 */
-		T load(const std::string& usi) const {
+		T load(const std::string& usi) {
 
 			std::string file_path = _FilePath(usi);
 

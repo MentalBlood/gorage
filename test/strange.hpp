@@ -1,4 +1,3 @@
-#include <any>
 #include <iostream>
 
 
@@ -7,17 +6,22 @@ class A {
 
 public:
 
-	template<class T>
-	static T f(const std::string& s) {return T();};
+	void f(const int i) {return;}
 
-	template<class T>
-	static T f(const std::any& i) {return T();};
+};
+
+
+class B: public A {
+
+public:
+
+	void f(const std::string& s, const int i) {}
 
 };
 
 
 TEST_CASE("testing some strange things") {
 
-	A::f<A>("lalala");
+	B().A::f(1);
 
 }

@@ -139,7 +139,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return Item<Metadata> Loaded item
 		 */
-		Item<Metadata> load(const std::string& usi) const {
+		Item<Metadata> load(const std::string& usi) {
 			return Item<Metadata>(
 				data_storage->load(usi),
 				metadata_storage->load(usi)
@@ -156,7 +156,7 @@ namespace gorage {
 			metadata_storage->remove(usi);
 		}
 
-		std::optional<Item<Metadata>> find(const std::string& key, const std::any& structure) const {
+		std::optional<Item<Metadata>> find(const std::string& key, const std::any& structure) {
 			for (const auto& usi : *this) {
 				Item<Metadata> item = load(usi);
 				if (item.contains(key, structure)) {
@@ -166,7 +166,7 @@ namespace gorage {
 			return {};
 		}
 
-		std::optional<Item<Metadata>> metadata_find(const std::string& key, const std::any& structure) const {
+		std::optional<Item<Metadata>> metadata_find(const std::string& key, const std::any& structure) {
 			for (const auto& usi : *metadata_storage) {
 				if (metadata_storage->load(usi).contains(key, structure)) {
 					return load(usi);

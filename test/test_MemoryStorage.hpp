@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <MemoryStorage.hpp>
 
 
@@ -12,19 +14,24 @@ TEST_CASE("`MemoryStorage`") {
 
 	SUBCASE("saving") {
 
-		SUBCASE("testing saving with given USI") {
+		SUBCASE("with given USI") {
 			storage.save(usi, s);
 			CHECK_EQ(storage.load(usi), s);
 		}
 
-		// SUBCASE("testing saving with random generated USI") {
+		SUBCASE("with random generated USI") {
 
-		// 	std::string s = "string";
+			std::string usi = storage.Storage::save(s);
+			CHECK_EQ(storage.load(usi), s);
 
-		// 	std::string usi = storage.save(s);
-		// 	CHECK_EQ(storage.load(usi), s);
+		}
 
-		// }
+		SUBCASE("with USI generated from Bytes") {
+
+			std::string usi = storage.Storage::save(gorage::Bytes{'l', 'a'}, s);
+			CHECK_EQ(storage.load(usi), s);
+
+		}
 
 	}
 

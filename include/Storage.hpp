@@ -3,15 +3,15 @@
 #ifndef __GORAGE__STORAGE__
 #define __GORAGE__STORAGE__
 
+#include <regex>
 #include <iostream>
-#include <stdbool.h>
-// #include <Windows.h>
 #include <unordered_set>
-#include <unordered_map>
 
 
 
 namespace gorage {
+
+	using Bytes = std::vector<unsigned char>;
 
 	/**
 	 * @brief Abstract class base for all storages
@@ -24,7 +24,7 @@ namespace gorage {
 	public:
 
 		/**
-		 * @brief Saves object of type T with USI usi
+		 * @brief Saves object of type `T` with USI `usi`
 		 * 
 		 * @param usi Unique Storage Identifier
 		 * @param object Object to store
@@ -32,15 +32,31 @@ namespace gorage {
 		virtual void save(const std::string& usi, const T& object) = 0;
 
 		/**
+		 * @brief Saves object of type `T` with USI corresponding to `usi_source`
+		 * 
+		 * @param usi_source Some bytes to generate USI from
+		 * @param object Object to store
+		 * @return std::string USI with which object was saved
+		 */
+		std::string save(const Bytes& usi_source, const T& object) {
+
+			std::string usi = Usi(usi_source);
+			save(usi, object);
+
+			return usi;
+
+		}
+
+		/**
 		 * @brief Saves object of type T with random generated USI
 		 * 
 		 * @param object Object to store
-		 * @return std::string USI with wich object was saved
+		 * @return std::string USI with which object was saved
 		 */
 		std::string save(const T& object) {
 
-			std::string usi = this->Usi(32); // 62 ^ 32 variants
-			this->save(usi, object);
+			std::string usi = Usi(32); // 62 ^ 32 variants
+			save(usi, object);
 
 			return usi;
 
@@ -52,7 +68,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return T Found object
 		 */
-		virtual T load(const std::string& usi) const = 0;
+		virtual T load(const std::string& usi) = 0;
 
 		/**
 		 * @brief Removes object stored with USI usi
@@ -80,7 +96,7 @@ namespace gorage {
 			return _usis.end();
 		}
 
-		size_t size() const {
+		size_t size() {
 			loadUsis();
 			return _usis.size();
 		}
@@ -94,7 +110,7 @@ namespace gorage {
 		std::unordered_set<std::string> _usis;
 
 		/**
-		 * @brief Method to load USIs in usis set for iteration
+		 * @brief Method to load USIs in `usis` set for iteration
 		 * 
 		 */
 		virtual void loadUsis() = 0;
@@ -118,6 +134,14 @@ namespace gorage {
 
 			return result;
 
+		}
+
+		std::string Usi(const Bytes& source) {
+			return std::regex_replace(
+				Json::String(source).encoded(),
+				std::regex("[^\\w|\\d]"),
+				"_"
+			);
 		}
 
 	};
