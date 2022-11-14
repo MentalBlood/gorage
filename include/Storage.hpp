@@ -70,6 +70,12 @@ namespace gorage {
 		 */
 		virtual T load(const std::string& usi) = 0;
 
+		T load(const Bytes& usi_source) {
+			return load(
+				Usi(usi_source)
+			);
+		}
+
 		/**
 		 * @brief Removes object stored with USI usi
 		 * 

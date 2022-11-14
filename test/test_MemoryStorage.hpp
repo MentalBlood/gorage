@@ -28,8 +28,11 @@ TEST_CASE("`MemoryStorage`") {
 
 		SUBCASE("with USI generated from Bytes") {
 
-			std::string usi = storage.Storage::save(gorage::Bytes{'l', 'a'}, s);
+			gorage::Bytes usi_source{'l', 'a'};
+
+			std::string usi = storage.Storage::save(usi_source, s);
 			CHECK_EQ(storage.load(usi), s);
+			CHECK_EQ(storage.Storage::load(usi_source), s);
 
 		}
 
