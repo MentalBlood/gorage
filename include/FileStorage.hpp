@@ -8,8 +8,8 @@
 #include <iostream>
 #include <filesystem>
 
-#include "Json.hpp"
-#include "gorage.hpp"
+#include "Usi.hpp"
+#include "Bytes.hpp"
 #include "Storage.hpp"
 
 
@@ -53,7 +53,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @param object Object to save
 		 */
-		void save(const std::string& usi, const T& object) {
+		void save(const Usi& usi, const T& object) {
 
 			if (!std::filesystem::exists(_folder_path)) {
 				std::filesystem::create_directories(_folder_path);
@@ -77,7 +77,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return T Loaded object
 		 */
-		T load(const std::string& usi) {
+		T load(const Usi& usi) {
 
 			std::string file_path = _FilePath(usi);
 
@@ -100,8 +100,8 @@ namespace gorage {
 		 * 
 		 * @param usi Unique Storage Identifier
 		 */
-		void remove(const std::string& usi) {
-			std::filesystem::remove(_folder_path + usi + _extension);
+		void remove(const Usi& usi) {
+			std::filesystem::remove(_FilePath(usi));
 		}
 
 	private:
@@ -112,8 +112,8 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return const std::string File path
 		 */
-		const std::string _FilePath(const std::string& usi) const {
-			return _folder_path + "/" + usi + _extension;
+		const std::string _FilePath(const Usi& usi) const {
+			return _folder_path + "/" + usi() + _extension;
 		}
 
 		/**
@@ -125,7 +125,9 @@ namespace gorage {
 			if (std::filesystem::exists(_folder_path)) {
 				for (const auto & p : std::filesystem::directory_iterator(_folder_path)) {
 					if (p.path().extension() == _extension) {
-						_usis.insert(p.path().stem().string());
+						_usis.insert(
+							p.path().stem().string()
+						);
 					}
 				}
 			}

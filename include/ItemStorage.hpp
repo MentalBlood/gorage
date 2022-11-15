@@ -9,13 +9,9 @@
 #include <optional>
 #include <iostream>
 
-#include "../modules/rapidjson/writer.h"
-#include "../modules/rapidjson/document.h"
-#include "../modules/rapidjson/stringbuffer.h"
-#include "../modules/cppcodec/base64_rfc4648.hpp"
-
+#include "Usi.hpp"
 #include "Json.hpp"
-#include "gorage.hpp"
+#include "Bytes.hpp"
 #include "Storage.hpp"
 
 
@@ -128,7 +124,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @param item Item to save
 		 */
-		void save(const std::string& usi, const Item<Metadata>& item) {
+		void save(const Usi& usi, const Item<Metadata>& item) {
 			data_storage->save(usi, item.data);
 			metadata_storage->save(usi, item.metadata);
 		}
@@ -139,7 +135,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return Item<Metadata> Loaded item
 		 */
-		Item<Metadata> load(const std::string& usi) {
+		Item<Metadata> load(const Usi& usi) {
 			return Item<Metadata>(
 				data_storage->load(usi),
 				metadata_storage->load(usi)
@@ -151,7 +147,7 @@ namespace gorage {
 		 * 
 		 * @param usi Unique Storage Identifier
 		 */
-		void remove(const std::string& usi) {
+		void remove(const Usi& usi) {
 			data_storage->remove(usi);
 			metadata_storage->remove(usi);
 		}

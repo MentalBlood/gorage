@@ -9,7 +9,8 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "gorage.hpp"
+#include "Usi.hpp"
+#include "Bytes.hpp"
 #include "Storage.hpp"
 
 
@@ -37,8 +38,8 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @param object Arbitrary object
 		 */
-		virtual void save(const std::string& usi, const T& object) {
-			_storage[usi] = object;
+		virtual void save(const Usi& usi, const T& object) {
+			_storage[usi()] = object;
 		}
 
 		/**
@@ -47,8 +48,8 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return T Object type
 		 */
-		T load(const std::string& usi) {
-			return _storage.at(usi);
+		T load(const Usi& usi) {
+			return _storage.at(usi());
 		}
 
 		/**
@@ -56,9 +57,8 @@ namespace gorage {
 		 * 
 		 * @param usi Unique Storage Identifier
 		 */
-		void remove(const std::string& usi) {
-			_storage.at(usi);
-			_storage.erase(usi);
+		void remove(const Usi& usi) {
+			_storage.erase(usi());
 		}
 
 	protected:

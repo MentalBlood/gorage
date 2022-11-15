@@ -13,7 +13,7 @@ TEST_CASE("`ItemStorage`") {
 	);
 	REQUIRE(storage.size() == 0);
 
-	std::string usi = "usi";
+	gorage::Usi usi("usi");
 	std::string json = "{\"s\": \"string\"}";
 	gorage::Item item(
 		gorage::Bytes{'d', 'a', 't', 'a'},

@@ -3,15 +3,14 @@
 #ifndef __GORAGE__STORAGE__
 #define __GORAGE__STORAGE__
 
-#include <regex>
 #include <iostream>
 #include <unordered_set>
+
+#include "Usi.hpp"
 
 
 
 namespace gorage {
-
-	using Bytes = std::vector<unsigned char>;
 
 	/**
 	 * @brief Abstract class base for all storages
@@ -29,38 +28,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @param object Object to store
 		 */
-		virtual void save(const std::string& usi, const T& object) = 0;
-
-		/**
-		 * @brief Saves object of type `T` with USI corresponding to `usi_source`
-		 * 
-		 * @param usi_source Some bytes to generate USI from
-		 * @param object Object to store
-		 * @return std::string USI with which object was saved
-		 */
-		std::string save(const Bytes& usi_source, const T& object) {
-
-			std::string usi = Usi(usi_source);
-			save(usi, object);
-
-			return usi;
-
-		}
-
-		/**
-		 * @brief Saves object of type T with random generated USI
-		 * 
-		 * @param object Object to store
-		 * @return std::string USI with which object was saved
-		 */
-		std::string save(const T& object) {
-
-			std::string usi = Usi(32); // 62 ^ 32 variants
-			save(usi, object);
-
-			return usi;
-
-		}
+		virtual void save(const Usi& usi, const T& object) = 0;
 
 		/**
 		 * @brief Loads object stored with USI usi
@@ -68,20 +36,14 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return T Found object
 		 */
-		virtual T load(const std::string& usi) = 0;
-
-		T load(const Bytes& usi_source) {
-			return load(
-				Usi(usi_source)
-			);
-		}
+		virtual T load(const Usi& usi) = 0;
 
 		/**
 		 * @brief Removes object stored with USI usi
 		 * 
 		 * @param usi Unique Storage Identifier
 		 */
-		virtual void remove(const std::string& usi) = 0;
+		virtual void remove(const Usi& usi) = 0;
 
 		/**
 		 * @brief Iteration begin related method
@@ -120,35 +82,6 @@ namespace gorage {
 		 * 
 		 */
 		virtual void loadUsis() = 0;
-
-	private:
-
-		std::string Usi(size_t length) {
-
-			static std::string symbols = 
-				"0123456789" 
-				"ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
-				"abcdefghijklmnopqrstuvwxyz";
-
-			std::srand(GetTickCount64());
-
-			std::string result;
-			result.reserve(length);
-			for (size_t i = 0; i < length; i++) {
-				result += symbols[rand() % (symbols.length() - 1)];
-			}
-
-			return result;
-
-		}
-
-		std::string Usi(const Bytes& source) {
-			return std::regex_replace(
-				Json::String(source).encoded(),
-				std::regex("[^\\w|\\d]"),
-				"_"
-			);
-		}
 
 	};
 

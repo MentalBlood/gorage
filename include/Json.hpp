@@ -7,9 +7,16 @@
 #include <any>
 #include <regex>
 #include <vector>
+#include <sstream>
+#include <iomanip>
 #include <iostream>
 
-#include "gorage.hpp"
+#include "../modules/rapidjson/writer.h"
+#include "../modules/rapidjson/document.h"
+#include "../modules/rapidjson/stringbuffer.h"
+#include "../modules/cppcodec/base64_rfc4648.hpp"
+
+#include "Bytes.hpp"
 
 
 
@@ -22,8 +29,6 @@ namespace gorage {
 	class Json {
 
 	public:
-
-		using Bytes = Bytes;
 
 		/**
 		 * @brief Generic list

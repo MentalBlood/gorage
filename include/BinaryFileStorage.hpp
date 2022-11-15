@@ -3,13 +3,13 @@
 #ifndef __GORAGE__BINARY_FILE_STORAGE__
 #define __GORAGE__BINARY_FILE_STORAGE__
 
-#include <vector>
 #include <sstream>
 #include <fstream>
 #include <iostream>
 #include <filesystem>
 
-#include "gorage.hpp"
+#include "Usi.hpp"
+#include "Bytes.hpp"
 #include "Storage.hpp"
 
 
@@ -52,7 +52,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @param content Arbitrary binary data
 		 */
-		void save(const std::string& usi, const Bytes& content) {
+		void save(const Usi& usi, const Bytes& content) {
 
 			if (!std::filesystem::exists(_folder_path)) {
 				std::filesystem::create_directories(_folder_path);
@@ -76,11 +76,10 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return std::string Loaded data
 		 */
-		Bytes load(const std::string& usi) {
+		Bytes load(const Usi& usi) {
 
 			std::string file_path = _FilePath(usi);
 
-			// std::ifstream file(file_path, std::ios::binary);
 			std::basic_ifstream<unsigned char, std::char_traits<unsigned char>> file(file_path, std::ios::binary);
 			if (!file.is_open()) {
 				throw std::runtime_error("Can not load file " + file_path);
@@ -98,8 +97,8 @@ namespace gorage {
 		 * 
 		 * @param usi Unique Storage Identifier
 		 */
-		void remove(const std::string& usi) {
-			std::filesystem::remove(_folder_path + usi + _extension);
+		void remove(const Usi& usi) {
+			std::filesystem::remove(_FilePath(usi));
 		}
 
 	private:
@@ -110,8 +109,8 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return const std::string File path
 		 */
-		const std::string _FilePath(const std::string& usi) const {
-			return _folder_path + "/" + usi + _extension;
+		const std::string _FilePath(const Usi& usi) const {
+			return _folder_path + "/" + usi() + _extension;
 		}
 
 		/**
@@ -123,7 +122,9 @@ namespace gorage {
 			if (std::filesystem::exists(_folder_path)) {
 				for (const auto & p : std::filesystem::directory_iterator(_folder_path)) {
 					if (p.path().extension() == _extension) {
-						_usis.insert(p.path().stem().string());
+						_usis.insert(
+							p.path().stem().string()
+						);
 					}
 				}
 			}
