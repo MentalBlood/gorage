@@ -2,9 +2,9 @@
 
 
 
-void checkUsi(gorage::MemoryStorage<std::string>& storage, const gorage::Usi& usi) {
-	storage.save(usi, "s");
-	CHECK_EQ(storage.load(usi), "s");
+void checkKey(gorage::MemoryStorage<std::string>& storage, const gorage::Key& key) {
+	storage.save(key, "s");
+	CHECK_EQ(storage.load(key), "s");
 }
 
 
@@ -15,43 +15,43 @@ TEST_CASE("`MemoryStorage`") {
 
 	SUBCASE("saving") {
 
-		SUBCASE("with given USI") {
-			checkUsi(storage, gorage::Usi("usi"));
+		SUBCASE("with given key") {
+			checkKey(storage, gorage::Key("key"));
 		}
-		SUBCASE("with random generated USI") {
-			checkUsi(storage, gorage::Usi(32));
+		SUBCASE("with random generated key") {
+			checkKey(storage, gorage::Key(32));
 		}
-		SUBCASE("with USI generated from Bytes") {
-			checkUsi(storage, gorage::Usi(gorage::Bytes{'l', 'a'}));
+		SUBCASE("with key generated from Bytes") {
+			checkKey(storage, gorage::Key(gorage::Bytes{'l', 'a'}));
 		}
 
 	}
 
 	SUBCASE("removing") {
 
-		gorage::Usi usi("usi");
+		gorage::Key key("key");
 
 		CHECK_EQ(storage.size(), 0);
 
-		storage.save(usi, "s");
+		storage.save(key, "s");
 		CHECK_EQ(storage.size(), 1);
 
-		storage.remove(usi);
+		storage.remove(key);
 		CHECK_EQ(storage.size(), 0);
 
 	}
 
 	SUBCASE("iterating") {
 
-		std::vector<std::string> usis_strings = {"a", "b", "c"};
-		for (const auto& u : usis_strings) {
-			storage.save(gorage::Usi(u), u + "_value");
+		std::vector<std::string> keys_strings = {"a", "b", "c"};
+		for (const auto& u : keys_strings) {
+			storage.save(gorage::Key(u), u + "_value");
 		}
 
-		CHECK_EQ(storage.size(), usis_strings.size());
+		CHECK_EQ(storage.size(), keys_strings.size());
 
-		for (const auto& u : usis_strings) {
-			CHECK_EQ(storage.load(gorage::Usi(u)), u + "_value");
+		for (const auto& u : keys_strings) {
+			CHECK_EQ(storage.load(gorage::Key(u)), u + "_value");
 		}
 
 	}

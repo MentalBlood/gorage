@@ -6,7 +6,7 @@
 #include <iostream>
 #include <unordered_set>
 
-#include "Usi.hpp"
+#include "Key.hpp"
 
 
 
@@ -23,65 +23,65 @@ namespace gorage {
 	public:
 
 		/**
-		 * @brief Saves object of type `T` with USI `usi`
+		 * @brief Saves object of type `T` with key `key`
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 * @param object Object to store
 		 */
-		virtual void save(const Usi& usi, const T& object) = 0;
+		virtual void save(const Key& key, const T& object) = 0;
 
 		/**
-		 * @brief Loads object stored with USI usi
+		 * @brief Loads object stored with key key
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 * @return T Found object
 		 */
-		virtual T load(const Usi& usi) = 0;
+		virtual T load(const Key& key) = 0;
 
 		/**
-		 * @brief Removes object stored with USI usi
+		 * @brief Removes object stored with key key
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 */
-		virtual void remove(const Usi& usi) = 0;
+		virtual void remove(const Key& key) = 0;
 
 		/**
 		 * @brief Iteration begin related method
 		 * 
-		 * @return auto USIs set begin iterator
+		 * @return auto keys set begin iterator
 		 */
 		auto begin() {
-			loadUsis();
-			return _usis.begin();
+			loadKeys();
+			return _keys.begin();
 		}
 
 		/**
 		 * @brief Iteration end related method
 		 * 
-		 * @return auto USIs set end iterator
+		 * @return auto keys set end iterator
 		 */
 		auto end() {
-			return _usis.end();
+			return _keys.end();
 		}
 
 		size_t size() {
-			loadUsis();
-			return _usis.size();
+			loadKeys();
+			return _keys.size();
 		}
 
 	protected:
 
 		/**
-		 * @brief Set to which USIs will be loaded for iteration
+		 * @brief Set to which keys will be loaded for iteration
 		 * 
 		 */
-		std::unordered_set<std::string> _usis;
+		std::unordered_set<std::string> _keys;
 
 		/**
-		 * @brief Method to load USIs in `usis` set for iteration
+		 * @brief Method to load keys in `keys` set for iteration
 		 * 
 		 */
-		virtual void loadUsis() = 0;
+		virtual void loadKeys() = 0;
 
 	};
 

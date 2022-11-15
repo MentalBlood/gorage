@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __GORAGE__USI__
-#define __GORAGE__USI__
+#ifndef __GORAGE__KEY__
+#define __GORAGE__KEY__
 
 #include <regex>
 #include <iostream>
@@ -14,14 +14,14 @@
 
 namespace gorage {
 
-	class Usi {
+	class Key {
 
 	public:
 
-		Usi():
-			Usi(32) {}
+		Key():
+			Key(32) {}
 
-		Usi(const std::string& s):
+		Key(const std::string& s):
 			_s(
 				std::regex_replace(
 					s,
@@ -30,13 +30,13 @@ namespace gorage {
 				)
 			) {}
 
-		Usi(const Bytes& b):
-			Usi(
+		Key(const Bytes& b):
+			Key(
 				Json::String(b).encoded()
 			) {}
 
-		Usi(const size_t& l):
-			Usi(
+		Key(const size_t& l):
+			Key(
 				_random(l)
 			) {}
 
@@ -65,7 +65,7 @@ namespace gorage {
 
 	};
 
-	const std::string Usi::_characters = 
+	const std::string Key::_characters = 
 		"0123456789" 
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
 		"abcdefghijklmnopqrstuvwxyz";

@@ -8,7 +8,7 @@
 #include <iostream>
 #include <filesystem>
 
-#include "Usi.hpp"
+#include "Key.hpp"
 #include "Bytes.hpp"
 #include "Storage.hpp"
 
@@ -48,18 +48,18 @@ namespace gorage {
 		const std::string _extension;
 
 		/**
-		 * @brief Saves given object with given USI
+		 * @brief Saves given object with given key
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 * @param object Object to save
 		 */
-		void save(const Usi& usi, const T& object) {
+		void save(const Key& key, const T& object) {
 
 			if (!std::filesystem::exists(_folder_path)) {
 				std::filesystem::create_directories(_folder_path);
 			}
 
-			std::string file_path = _FilePath(usi);
+			std::string file_path = _FilePath(key);
 
 			std::ofstream file(file_path, std::ios::out | std::ios::trunc);
 			if (!file.is_open()) {
@@ -72,14 +72,14 @@ namespace gorage {
 		}
 
 		/**
-		 * @brief Loads data with given USI
+		 * @brief Loads data with given key
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 * @return T Loaded object
 		 */
-		T load(const Usi& usi) {
+		T load(const Key& key) {
 
-			std::string file_path = _FilePath(usi);
+			std::string file_path = _FilePath(key);
 
 			std::ifstream file(file_path, std::ios::in);
 			if (!file.is_open()) {
@@ -96,36 +96,36 @@ namespace gorage {
 		}
 
 		/**
-		 * @brief Removes object with given USI
+		 * @brief Removes object with given key
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 */
-		void remove(const Usi& usi) {
-			std::filesystem::remove(_FilePath(usi));
+		void remove(const Key& key) {
+			std::filesystem::remove(_FilePath(key));
 		}
 
 	private:
 
 		/**
-		 * @brief Composes file path from USI and this storage properties
+		 * @brief Composes file path from key and this storage properties
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 * @return const std::string File path
 		 */
-		const std::string _FilePath(const Usi& usi) const {
-			return _folder_path + "/" + usi() + _extension;
+		const std::string _FilePath(const Key& key) const {
+			return _folder_path + "/" + key() + _extension;
 		}
 
 		/**
-		 * @brief Method to load USIs for iteration
+		 * @brief Method to load keys for iteration
 		 * 
 		 */
-		void loadUsis() {
-			_usis.clear();
+		void loadKeys() {
+			_keys.clear();
 			if (std::filesystem::exists(_folder_path)) {
 				for (const auto & p : std::filesystem::directory_iterator(_folder_path)) {
 					if (p.path().extension() == _extension) {
-						_usis.insert(
+						_keys.insert(
 							p.path().stem().string()
 						);
 					}

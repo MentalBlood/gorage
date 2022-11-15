@@ -9,7 +9,7 @@
 #include <optional>
 #include <iostream>
 
-#include "Usi.hpp"
+#include "Key.hpp"
 #include "Json.hpp"
 #include "Bytes.hpp"
 #include "Storage.hpp"
@@ -119,42 +119,42 @@ namespace gorage {
 			metadata_storage(metadata_storage) {}
 
 		/**
-		 * @brief Saves item with given USI
+		 * @brief Saves item with given key
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 * @param item Item to save
 		 */
-		void save(const Usi& usi, const Item<Metadata>& item) {
-			data_storage->save(usi, item.data);
-			metadata_storage->save(usi, item.metadata);
+		void save(const Key& key, const Item<Metadata>& item) {
+			data_storage->save(key, item.data);
+			metadata_storage->save(key, item.metadata);
 		}
 
 		/**
-		 * @brief Loads item with given USI
+		 * @brief Loads item with given key
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 * @return Item<Metadata> Loaded item
 		 */
-		Item<Metadata> load(const Usi& usi) {
+		Item<Metadata> load(const Key& key) {
 			return Item<Metadata>(
-				data_storage->load(usi),
-				metadata_storage->load(usi)
+				data_storage->load(key),
+				metadata_storage->load(key)
 			);
 		}
 
 		/**
-		 * @brief Removes item with given USI
+		 * @brief Removes item with given key
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 */
-		void remove(const Usi& usi) {
-			data_storage->remove(usi);
-			metadata_storage->remove(usi);
+		void remove(const Key& key) {
+			data_storage->remove(key);
+			metadata_storage->remove(key);
 		}
 
 		std::optional<Item<Metadata>> find(const std::string& key, const std::any& structure) {
-			for (const auto& usi : *this) {
-				Item<Metadata> item = load(usi);
+			for (const auto& key : *this) {
+				Item<Metadata> item = load(key);
 				if (item.contains(key, structure)) {
 					return item;
 				}
@@ -163,9 +163,9 @@ namespace gorage {
 		}
 
 		std::optional<Item<Metadata>> metadata_find(const std::string& key, const std::any& structure) {
-			for (const auto& usi : *metadata_storage) {
-				if (metadata_storage->load(usi).contains(key, structure)) {
-					return load(usi);
+			for (const auto& key : *metadata_storage) {
+				if (metadata_storage->load(key).contains(key, structure)) {
+					return load(key);
 				}
 			}
 			return {};
@@ -174,13 +174,13 @@ namespace gorage {
 	private:
 
 		/**
-		 * @brief Loads USIs for iteration
+		 * @brief Loads keys for iteration
 		 * 
 		 */
-		void loadUsis() {
-			_usis.clear();
+		void loadKeys() {
+			_keys.clear();
 			for (const auto & k : *data_storage) {
-				_usis.insert(k);
+				_keys.insert(k);
 			}
 		}
 

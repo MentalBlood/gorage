@@ -13,7 +13,7 @@ TEST_CASE("`ItemStorage`") {
 	);
 	REQUIRE(storage.size() == 0);
 
-	gorage::Usi usi("usi");
+	gorage::Key key("key");
 	std::string json = "{\"s\": \"string\"}";
 	gorage::Item item(
 		gorage::Bytes{'d', 'a', 't', 'a'},
@@ -22,10 +22,10 @@ TEST_CASE("`ItemStorage`") {
 
 	SUBCASE("saving") {
 
-		storage.save(usi, item);
+		storage.save(key, item);
 
-		CHECK_EQ(storage.load(usi).data.size(), item.data.size());
-		CHECK_EQ(storage.load(usi).metadata.s, item.metadata.s);
+		CHECK_EQ(storage.load(key).data.size(), item.data.size());
+		CHECK_EQ(storage.load(key).metadata.s, item.metadata.s);
 
 	}
 

@@ -9,7 +9,7 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "Usi.hpp"
+#include "Key.hpp"
 #include "Bytes.hpp"
 #include "Storage.hpp"
 
@@ -33,44 +33,44 @@ namespace gorage {
 		MemoryStorage() {}
 
 		/**
-		 * @brief Saves given object with given USI
+		 * @brief Saves given object with given key
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 * @param object Arbitrary object
 		 */
-		virtual void save(const Usi& usi, const T& object) {
-			_storage[usi()] = object;
+		virtual void save(const Key& key, const T& object) {
+			_storage[key()] = object;
 		}
 
 		/**
-		 * @brief Loads object with given USI
+		 * @brief Loads object with given key
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 * @return T Object type
 		 */
-		T load(const Usi& usi) {
-			return _storage.at(usi());
+		T load(const Key& key) {
+			return _storage.at(key());
 		}
 
 		/**
-		 * @brief Removes object with given USI
+		 * @brief Removes object with given key
 		 * 
-		 * @param usi Unique Storage Identifier
+		 * @param key unique storage identifier
 		 */
-		void remove(const Usi& usi) {
-			_storage.erase(usi());
+		void remove(const Key& key) {
+			_storage.erase(key());
 		}
 
 	protected:
 
 		/**
-		 * @brief Loads USIs for iteration
+		 * @brief Loads keys for iteration
 		 * 
 		 */
-		void loadUsis() {
-			_usis.clear();
+		void loadKeys() {
+			_keys.clear();
 			for (const auto & k : _storage) {
-				_usis.insert(k.first);
+				_keys.insert(k.first);
 			}
 		}
 
