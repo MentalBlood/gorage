@@ -1,7 +1,11 @@
-#include <memory>
-
 #include <MemoryStorage.hpp>
 
+
+
+void checkUsi(gorage::MemoryStorage<std::string>& storage, const gorage::Usi& usi) {
+	storage.save(usi, "s");
+	CHECK_EQ(storage.load(usi), "s");
+}
 
 
 TEST_CASE("`MemoryStorage`") {
@@ -9,47 +13,30 @@ TEST_CASE("`MemoryStorage`") {
 	gorage::MemoryStorage<std::string> storage;
 	REQUIRE(storage.size() == 0);
 
-	std::string s = "string";
-	gorage::Usi usi;
-
 	SUBCASE("saving") {
 
 		SUBCASE("with given USI") {
-
-			usi = gorage::Usi("usi");
-
-			storage.save(usi, s);
-			CHECK_EQ(storage.load(usi), s);
-
+			checkUsi(storage, gorage::Usi("usi"));
 		}
-
 		SUBCASE("with random generated USI") {
-
-			usi = gorage::Usi(32);
-
-			storage.save(usi, s);
-			CHECK_EQ(storage.load(usi), s);
-
+			checkUsi(storage, gorage::Usi(32));
 		}
-
 		SUBCASE("with USI generated from Bytes") {
-
-			usi = gorage::Usi(gorage::Bytes{'l', 'a'});
-
-			storage.save(usi, s);
-			CHECK_EQ(storage.load(usi), s);
-
+			checkUsi(storage, gorage::Usi(gorage::Bytes{'l', 'a'}));
 		}
 
 	}
 
 	SUBCASE("removing") {
 
-		usi = gorage::Usi("usi");
+		gorage::Usi usi("usi");
 
-		storage.save(usi, s);
+		CHECK_EQ(storage.size(), 0);
+
+		storage.save(usi, "s");
+		CHECK_EQ(storage.size(), 1);
+
 		storage.remove(usi);
-
 		CHECK_EQ(storage.size(), 0);
 
 	}
