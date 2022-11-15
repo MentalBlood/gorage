@@ -20,42 +20,43 @@ namespace gorage {
 
 		Usi():
 			Usi(32) {}
+
 		Usi(const std::string& s):
-			s(s) {}
-		Usi(const Bytes& b):
-			s(
+			_s(
 				std::regex_replace(
-					Json::String(b).encoded(),
+					s,
 					std::regex("[^\\w|\\d]"),
 					"_"
 				)
 			) {}
-		Usi(const size_t& length):
-			s(
-				_random(length)
+
+		Usi(const Bytes& b):
+			Usi(
+				Json::String(b).encoded()
+			) {}
+
+		Usi(const size_t& l):
+			Usi(
+				_random(l)
 			) {}
 
 		std::string operator()() const {
-			return s;
+			return _s;
 		}
 
 	private:
 
-		std::string s;
+		std::string _s;
 
-		static std::string _random(const size_t& length) {
+		static const std::string _characters;
 
-			static const std::string symbols = 
-				"0123456789" 
-				"ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
-				"abcdefghijklmnopqrstuvwxyz";
+		std::string _random(const size_t& length) {
 
 			std::srand(GetTickCount64());
 
 			std::string result;
-			result.reserve(length);
 			for (size_t i = 0; i < length; i++) {
-				result += symbols[rand() % (symbols.length() - 1)];
+				result.push_back(_characters[rand() % _characters.length()]);
 			}
 
 			return result;
@@ -63,6 +64,11 @@ namespace gorage {
 		}
 
 	};
+
+	const std::string Usi::_characters = 
+		"0123456789" 
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
+		"abcdefghijklmnopqrstuvwxyz";
 
 } // gorage
 
