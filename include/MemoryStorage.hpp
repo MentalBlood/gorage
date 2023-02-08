@@ -9,7 +9,6 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "gorage.hpp"
 #include "Storage.hpp"
 
 
@@ -17,7 +16,7 @@ namespace gorage {
 
 	/**
 	 * @brief Storage for arbitrary objects, uses std::unordered_map
-	 * 
+	 *
 	 * @tparam T Objects type
 	 */
 	template<class T>
@@ -27,13 +26,13 @@ namespace gorage {
 
 		/**
 		 * @brief Construct a new Memory Storage object
-		 * 
+		 *
 		 */
 		MemoryStorage() {}
 
 		/**
 		 * @brief Saves given object with given USI
-		 * 
+		 *
 		 * @param usi Unique Storage Identifier
 		 * @param object Arbitrary object
 		 */
@@ -43,7 +42,7 @@ namespace gorage {
 
 		/**
 		 * @brief Loads object with given USI
-		 * 
+		 *
 		 * @param usi Unique Storage Identifier
 		 * @return T Object type
 		 */
@@ -53,7 +52,7 @@ namespace gorage {
 
 		/**
 		 * @brief Removes object with given USI
-		 * 
+		 *
 		 * @param usi Unique Storage Identifier
 		 */
 		void remove(const std::string& usi) {
@@ -65,12 +64,12 @@ namespace gorage {
 
 		/**
 		 * @brief Loads USIs for iteration
-		 * 
+		 *
 		 */
 		void loadUsis() {
-			_usis.clear();
+			this->_usis.clear();
 			for (const auto & k : _storage) {
-				_usis.insert(k.first);
+				this->_usis.insert(k.first);
 			}
 		}
 
@@ -78,7 +77,7 @@ namespace gorage {
 
 		/**
 		 * @brief Map to store objects in
-		 * 
+		 *
 		 */
 		std::unordered_map<std::string, T> _storage;
 

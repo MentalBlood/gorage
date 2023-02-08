@@ -15,7 +15,7 @@
 #include "../modules/cppcodec/base64_rfc4648.hpp"
 
 #include "Json.hpp"
-#include "gorage.hpp"
+#include "Bytes.hpp"
 #include "Storage.hpp"
 
 
@@ -61,7 +61,7 @@ namespace gorage {
 
 		Item(std::string data_base64, T metadata):
 			data(
-				Json::String(data_base64).decoded()
+				gorage::Json::String(data_base64).decoded()
 			),
 			metadata(metadata) {}
 
@@ -75,7 +75,7 @@ namespace gorage {
 			data = std::any_cast<String>(
 				std::any_cast<Dict>(structure)["data"]
 			).decoded();
-			metadata = Json::create<T>(
+			metadata = gorage::Json::create<T>(
 				std::any_cast<Dict>(structure)["metadata"]
 			);
 
@@ -182,9 +182,9 @@ namespace gorage {
 		 *
 		 */
 		void loadUsis() {
-			_usis.clear();
+			this->_usis.clear();
 			for (const auto & k : *data_storage) {
-				_usis.insert(k);
+				this->_usis.insert(k);
 			}
 		}
 

@@ -7,6 +7,8 @@
 #include <iostream>
 #include <unordered_set>
 
+#include "Json.hpp"
+
 
 
 namespace gorage {
@@ -90,7 +92,7 @@ namespace gorage {
 		 */
 		auto begin() {
 			loadUsis();
-			return _usis.begin();
+			return this->_usis.begin();
 		}
 
 		/**
@@ -99,12 +101,12 @@ namespace gorage {
 		 * @return auto USIs set end iterator
 		 */
 		auto end() {
-			return _usis.end();
+			return this->_usis.end();
 		}
 
 		size_t size() {
 			loadUsis();
-			return _usis.size();
+			return this->_usis.size();
 		}
 
 	protected:
@@ -123,7 +125,7 @@ namespace gorage {
 
 	private:
 
-		unsigned __int64 _last_tick_count;
+		int _last_tick_count;
 
 		std::string Usi(size_t length) {
 
@@ -134,7 +136,7 @@ namespace gorage {
 
 			while (true) {
 
-				unsigned __int64 new_tick_count;
+				int new_tick_count;
 
 #ifdef WINDOWS
 				new_tick_count = GetTickCount64();

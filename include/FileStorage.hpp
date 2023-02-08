@@ -9,7 +9,7 @@
 #include <filesystem>
 
 #include "Json.hpp"
-#include "gorage.hpp"
+#include "Bytes.hpp"
 #include "Storage.hpp"
 
 
@@ -18,7 +18,7 @@ namespace gorage {
 
 	/**
 	 * @brief Storage for arbitrary structured, JSONable data. Stores data as files in given folder and with given extension
-	 * 
+	 *
 	 */
 	template<class T>
 	class FileStorage : public Storage<T> {
@@ -27,7 +27,7 @@ namespace gorage {
 
 		/**
 		 * @brief Construct a new File Storage object
-		 * 
+		 *
 		 * @param folder_path Folder to store files in
 		 * @param extension Extension to store files with
 		 */
@@ -38,18 +38,18 @@ namespace gorage {
 
 		/**
 		 * @brief Folder to store files in
-		 * 
+		 *
 		 */
 		const std::string _folder_path;
 		/**
 		 * @brief Extension to store files with
-		 * 
+		 *
 		 */
 		const std::string _extension;
 
 		/**
 		 * @brief Saves given object with given USI
-		 * 
+		 *
 		 * @param usi Unique Storage Identifier
 		 * @param object Object to save
 		 */
@@ -73,7 +73,7 @@ namespace gorage {
 
 		/**
 		 * @brief Loads data with given USI
-		 * 
+		 *
 		 * @param usi Unique Storage Identifier
 		 * @return T Loaded object
 		 */
@@ -97,7 +97,7 @@ namespace gorage {
 
 		/**
 		 * @brief Removes object with given USI
-		 * 
+		 *
 		 * @param usi Unique Storage Identifier
 		 */
 		void remove(const std::string& usi) {
@@ -108,7 +108,7 @@ namespace gorage {
 
 		/**
 		 * @brief Composes file path from USI and this storage properties
-		 * 
+		 *
 		 * @param usi Unique Storage Identifier
 		 * @return const std::string File path
 		 */
@@ -118,14 +118,14 @@ namespace gorage {
 
 		/**
 		 * @brief Method to load USIs for iteration
-		 * 
+		 *
 		 */
 		void loadUsis() {
-			_usis.clear();
+			this->_usis.clear();
 			if (std::filesystem::exists(_folder_path)) {
 				for (const auto & p : std::filesystem::directory_iterator(_folder_path)) {
 					if (p.path().extension() == _extension) {
-						_usis.insert(p.path().stem().string());
+						this->_usis.insert(p.path().stem().string());
 					}
 				}
 			}

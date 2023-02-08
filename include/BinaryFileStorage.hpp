@@ -9,7 +9,7 @@
 #include <iostream>
 #include <filesystem>
 
-#include "gorage.hpp"
+#include "Bytes.hpp"
 #include "Storage.hpp"
 
 
@@ -18,7 +18,7 @@ namespace gorage {
 
 	/**
 	 * @brief Storage for binary data. Stores data as files in given folder and with given extension
-	 * 
+	 *
 	 */
 	class BinaryFileStorage : public Storage<Bytes> {
 
@@ -26,7 +26,7 @@ namespace gorage {
 
 		/**
 		 * @brief Construct a new Binary File Storage object
-		 * 
+		 *
 		 * @param folder_path Folder to store files in
 		 * @param extension Extension to store files with
 		 */
@@ -37,18 +37,18 @@ namespace gorage {
 
 		/**
 		 * @brief Folder to store files in
-		 * 
+		 *
 		 */
 		const std::string _folder_path;
 		/**
 		 * @brief Extension to store files with
-		 * 
+		 *
 		 */
 		const std::string _extension;
 
 		/**
 		 * @brief Saves given data with given USI
-		 * 
+		 *
 		 * @param usi Unique Storage Identifier
 		 * @param content Arbitrary binary data
 		 */
@@ -72,7 +72,7 @@ namespace gorage {
 
 		/**
 		 * @brief Loads data with given USI
-		 * 
+		 *
 		 * @param usi Unique Storage Identifier
 		 * @return std::string Loaded data
 		 */
@@ -95,7 +95,7 @@ namespace gorage {
 
 		/**
 		 * @brief Removes data with given USI
-		 * 
+		 *
 		 * @param usi Unique Storage Identifier
 		 */
 		void remove(const std::string& usi) {
@@ -106,7 +106,7 @@ namespace gorage {
 
 		/**
 		 * @brief Composes file path from USI and this storage properties
-		 * 
+		 *
 		 * @param usi Unique Storage Identifier
 		 * @return const std::string File path
 		 */
@@ -116,14 +116,14 @@ namespace gorage {
 
 		/**
 		 * @brief Method to load USIs for iteration
-		 * 
+		 *
 		 */
 		void loadUsis() {
-			_usis.clear();
+			this->_usis.clear();
 			if (std::filesystem::exists(_folder_path)) {
 				for (const auto & p : std::filesystem::directory_iterator(_folder_path)) {
 					if (p.path().extension() == _extension) {
-						_usis.insert(p.path().stem().string());
+						this->_usis.insert(p.path().stem().string());
 					}
 				}
 			}
