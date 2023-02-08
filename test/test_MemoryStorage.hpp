@@ -17,14 +17,14 @@ TEST_CASE("`MemoryStorage`") {
 			CHECK_EQ(storage.load(usi), s);
 		}
 
-		// SUBCASE("testing saving with random generated USI") {
+		SUBCASE("testing saving with random generated USI") {
 
-		// 	std::string s = "string";
+			std::string s = "string";
 
-		// 	std::string usi = storage.save(s);
-		// 	CHECK_EQ(storage.load(usi), s);
+			std::string usi = storage.Storage::save(s);
+			CHECK_EQ(storage.load(usi), s);
 
-		// }
+		}
 
 	}
 
