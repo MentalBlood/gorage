@@ -138,7 +138,7 @@ namespace gorage {
 
 				int new_tick_count;
 
-#ifdef WINDOWS
+#ifdef _WIN32
 				new_tick_count = GetTickCount64();
 #else
 				struct timespec t;

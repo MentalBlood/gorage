@@ -9,6 +9,7 @@
 #include <regex>
 #include <vector>
 #include <iomanip>
+#include <sstream>
 #include <iostream>
 
 #include "../modules/rapidjson/document.h"
