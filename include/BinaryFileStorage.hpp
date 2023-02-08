@@ -3,13 +3,13 @@
 #ifndef __GORAGE__BINARY_FILE_STORAGE__
 #define __GORAGE__BINARY_FILE_STORAGE__
 
+#include <vector>
 #include <sstream>
 #include <fstream>
 #include <iostream>
 #include <filesystem>
 
-#include "Key.hpp"
-#include "Bytes.hpp"
+#include "gorage.hpp"
 #include "Storage.hpp"
 
 
@@ -47,18 +47,18 @@ namespace gorage {
 		const std::string _extension;
 
 		/**
-		 * @brief Saves given data with given key
+		 * @brief Saves given data with given USI
 		 * 
-		 * @param key unique storage identifier
+		 * @param usi Unique Storage Identifier
 		 * @param content Arbitrary binary data
 		 */
-		void save(const Key& key, const Bytes& content) {
+		void save(const std::string& usi, const Bytes& content) {
 
 			if (!std::filesystem::exists(_folder_path)) {
 				std::filesystem::create_directories(_folder_path);
 			}
 
-			std::string file_path = _FilePath(key);
+			std::string file_path = _FilePath(usi);
 
 			std::ofstream file(file_path, std::ios::trunc | std::ios::binary);
 			if (!file.is_open()) {
@@ -71,15 +71,16 @@ namespace gorage {
 		}
 
 		/**
-		 * @brief Loads data with given key
+		 * @brief Loads data with given USI
 		 * 
-		 * @param key unique storage identifier
+		 * @param usi Unique Storage Identifier
 		 * @return std::string Loaded data
 		 */
-		Bytes load(const Key& key) {
+		Bytes load(const std::string& usi) {
 
-			std::string file_path = _FilePath(key);
+			std::string file_path = _FilePath(usi);
 
+			// std::ifstream file(file_path, std::ios::binary);
 			std::basic_ifstream<unsigned char, std::char_traits<unsigned char>> file(file_path, std::ios::binary);
 			if (!file.is_open()) {
 				throw std::runtime_error("Can not load file " + file_path);
@@ -93,38 +94,36 @@ namespace gorage {
 		}
 
 		/**
-		 * @brief Removes data with given key
+		 * @brief Removes data with given USI
 		 * 
-		 * @param key unique storage identifier
+		 * @param usi Unique Storage Identifier
 		 */
-		void remove(const Key& key) {
-			std::filesystem::remove(_FilePath(key));
+		void remove(const std::string& usi) {
+			std::filesystem::remove(_folder_path + "/"+ usi + _extension);
 		}
 
 	private:
 
 		/**
-		 * @brief Composes file path from key and this storage properties
+		 * @brief Composes file path from USI and this storage properties
 		 * 
-		 * @param key unique storage identifier
+		 * @param usi Unique Storage Identifier
 		 * @return const std::string File path
 		 */
-		const std::string _FilePath(const Key& key) const {
-			return _folder_path + "/" + key() + _extension;
+		const std::string _FilePath(const std::string& usi) const {
+			return _folder_path + "/" + usi + _extension;
 		}
 
 		/**
-		 * @brief Method to load keys for iteration
+		 * @brief Method to load USIs for iteration
 		 * 
 		 */
-		void loadKeys() {
-			_keys.clear();
+		void loadUsis() {
+			_usis.clear();
 			if (std::filesystem::exists(_folder_path)) {
 				for (const auto & p : std::filesystem::directory_iterator(_folder_path)) {
 					if (p.path().extension() == _extension) {
-						_keys.insert(
-							p.path().stem().string()
-						);
+						_usis.insert(p.path().stem().string());
 					}
 				}
 			}

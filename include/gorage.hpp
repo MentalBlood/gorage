@@ -1,8 +1,15 @@
-#include "Bytes.hpp"
-#include "Key.hpp"
-#include "Json.hpp"
+#include <vector>
+
 #include "Storage.hpp"
 #include "ItemStorage.hpp"
 #include "FileStorage.hpp"
-#include "MemoryStorage.hpp"
 #include "BinaryFileStorage.hpp"
+#include "MemoryStorage.hpp"
+
+
+
+namespace gorage {
+
+	using Bytes = std::vector<unsigned char>;
+
+} // gorage

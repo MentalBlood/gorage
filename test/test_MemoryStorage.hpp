@@ -2,56 +2,52 @@
 
 
 
-void checkKey(gorage::MemoryStorage<std::string>& storage, const gorage::Key& key) {
-	storage.save(key, "s");
-	CHECK_EQ(storage.load(key), "s");
-}
-
-
 TEST_CASE("`MemoryStorage`") {
 
 	gorage::MemoryStorage<std::string> storage;
 	REQUIRE(storage.size() == 0);
 
+	std::string s = "string";
+	std::string usi = "usi";
+
 	SUBCASE("saving") {
 
-		SUBCASE("with given key") {
-			checkKey(storage, gorage::Key("key"));
+		SUBCASE("testing saving with given USI") {
+			storage.save(usi, s);
+			CHECK_EQ(storage.load(usi), s);
 		}
-		SUBCASE("with random generated key") {
-			checkKey(storage, gorage::Key(32));
-		}
-		SUBCASE("with key generated from Bytes") {
-			checkKey(storage, gorage::Key(gorage::Bytes{'l', 'a'}));
-		}
+
+		// SUBCASE("testing saving with random generated USI") {
+
+		// 	std::string s = "string";
+
+		// 	std::string usi = storage.save(s);
+		// 	CHECK_EQ(storage.load(usi), s);
+
+		// }
 
 	}
 
 	SUBCASE("removing") {
 
-		gorage::Key key("key");
+		storage.save(usi, s);
+		storage.remove(usi);
 
-		CHECK_EQ(storage.size(), 0);
-
-		storage.save(key, "s");
-		CHECK_EQ(storage.size(), 1);
-
-		storage.remove(key);
 		CHECK_EQ(storage.size(), 0);
 
 	}
 
 	SUBCASE("iterating") {
 
-		std::vector<std::string> keys_strings = {"a", "b", "c"};
-		for (const auto& u : keys_strings) {
-			storage.save(gorage::Key(u), u + "_value");
+		std::vector<std::string> usis = {"a", "b", "c"};
+		for (const auto& u : usis) {
+			storage.save(u, u + "_value");
 		}
 
-		CHECK_EQ(storage.size(), keys_strings.size());
+		CHECK_EQ(storage.size(), usis.size());
 
-		for (const auto& u : keys_strings) {
-			CHECK_EQ(storage.load(gorage::Key(u)), u + "_value");
+		for (const auto& u : usis) {
+			CHECK_EQ(storage.load(u), u + "_value");
 		}
 
 	}

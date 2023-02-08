@@ -3,20 +3,14 @@
 #ifndef __GORAGE__JSON__
 #define __GORAGE__JSON__
 
+#include <set>
 #include <map>
 #include <any>
 #include <regex>
 #include <vector>
-#include <sstream>
-#include <iomanip>
 #include <iostream>
 
-#include "../modules/rapidjson/writer.h"
-#include "../modules/rapidjson/document.h"
-#include "../modules/rapidjson/stringbuffer.h"
-#include "../modules/cppcodec/base64_rfc4648.hpp"
-
-#include "Bytes.hpp"
+#include "gorage.hpp"
 
 
 
@@ -24,25 +18,27 @@ namespace gorage {
 
 	/**
 	 * @brief Class for representing JSONable objects
-	 * 
+	 *
 	 */
 	class Json {
 
 	public:
 
+		using Bytes = Bytes;
+
 		/**
 		 * @brief Generic list
-		 * 
+		 *
 		 */
 		using List = std::vector<std::any>;
 		/**
 		 * @brief Generic map
-		 * 
+		 *
 		 */
 		using Dict = std::map<std::string, std::any>;
 		/**
 		 * @brief Class for storing optionally base64-decodable string
-		 * 
+		 *
 		 */
 		class String {
 
@@ -106,8 +102,8 @@ namespace gorage {
 
 		/**
 		 * @brief JSON text decoding to generic object
-		 * 
-		 * @param json_text 
+		 *
+		 * @param json_text
 		 * @return std::any May be one of: `std::string`, `int`, `double`, `List`, `Dict`
 		 */
 		static std::any decode(const std::string& json_text) {
@@ -121,9 +117,9 @@ namespace gorage {
 
 		/**
 		 * @brief Generic object encoding to JSON text
-		 * 
+		 *
 		 * @param a May be one of: `std::string`, `char*`, `int`, `double`, `List`, `Dict`
-		 * @return std::string 
+		 * @return std::string
 		 */
 		static std::string encode(const std::any& a) {
 
@@ -180,36 +176,36 @@ namespace gorage {
 
 		/**
 		 * @brief C string encoding to JSON text
-		 * 
-		 * @param s 
-		 * @return std::string 
+		 *
+		 * @param s
+		 * @return std::string
 		 */
 		static std::string encode(const char* s) {
 			return "\"" + _getEscaped(s) + "\"";
 		}
 		/**
 		 * @brief `String` encoding to JSON text
-		 * 
-		 * @param s 
-		 * @return std::string 
+		 *
+		 * @param s
+		 * @return std::string
 		 */
 		static std::string encode(const String& s) {
 			return "\"" + _getEscaped(s.s) + "\"";
 		}
 		/**
 		 * @brief C++ string encoding to JSON text
-		 * 
-		 * @param s 
-		 * @return std::string 
+		 *
+		 * @param s
+		 * @return std::string
 		 */
 		static std::string encode(const std::string& s) {
 			return "\"" + _getEscaped(s) + "\"";
 		}
 		/**
 		 * @brief Bytes encoding to JSON text using base64 rfc4648
-		 * 
-		 * @param s 
-		 * @return std::string 
+		 *
+		 * @param s
+		 * @return std::string
 		 */
 		static std::string encode(const Bytes& s) {
 			return "\"" + cppcodec::base64_rfc4648::encode(s) + "\"";
@@ -217,40 +213,40 @@ namespace gorage {
 
 		/**
 		 * @brief integer encoding to JSON text
-		 * 
-		 * @param i 
-		 * @return std::string 
+		 *
+		 * @param i
+		 * @return std::string
 		 */
 		static std::string encode(const int& i) {
 			return std::to_string(i);
 		}
 		/**
 		 * @brief Floating number encoding to JSON text
-		 * 
-		 * @param f 
-		 * @return std::string 
+		 *
+		 * @param f
+		 * @return std::string
 		 */
 		static std::string encode(const float& f) {
 			return std::to_string(f);
 		}
 		/**
 		 * @brief Floating number encoding to JSON text
-		 * 
-		 * @param d 
-		 * @return std::string 
+		 *
+		 * @param d
+		 * @return std::string
 		 */
 		static std::string encode(const double& d) {
 			return std::to_string(d);
 		}
 
 		/**
-		 * @brief Generic list encoding to JSON text
-		 * 
-		 * @param v 
-		 * @return std::string 
+		 * @brief Generic iterable (vector, set etc.) encoding to JSON text
+		 *
+		 * @param v
+		 * @return std::string
 		 */
 		template<typename T>
-		static std::string encode(const std::vector<T>& v) {
+		static std::string encodeIterable(const T& v) {
 
 			if (!v.size()) {
 				return "[]";
@@ -269,10 +265,32 @@ namespace gorage {
 		}
 
 		/**
+		 * @brief Generic list encoding to JSON text
+		 *
+		 * @param v
+		 * @return std::string
+		 */
+		template<typename T>
+		static std::string encode(const std::vector<T>& v) {
+			return encodeIterable<std::vector<T>>(v);
+		}
+
+		/**
+		 * @brief Generic set encoding to JSON text
+		 *
+		 * @param v
+		 * @return std::string
+		 */
+		template<typename T>
+		static std::string encode(const std::set<T>& v) {
+			return encodeIterable<std::set<T>>(v);
+		}
+
+		/**
 		 * @brief Generic map encoding to JSON text
-		 * 
-		 * @param m 
-		 * @return std::string 
+		 *
+		 * @param m
+		 * @return std::string
 		 */
 		static std::string encode(const Dict& m) {
 
@@ -294,7 +312,7 @@ namespace gorage {
 
 		/**
 		 * @brief Converts JSON text to object of given type
-		 * 
+		 *
 		 * @tparam T Object type
 		 * @param json_text JSON text
 		 * @return T Object corresponded to JSON text
@@ -308,7 +326,7 @@ namespace gorage {
 
 		/**
 		 * @brief Converts structure to object of given type
-		 * 
+		 *
 		 * @tparam T Object type
 		 * @param structure structure
 		 * @return T Object corresponded to structure
@@ -322,13 +340,13 @@ namespace gorage {
 
 		/**
 		 * @brief Updates data and metadata from corresponding JSON text
-		 * 
+		 *
 		 * @param json_text JSON text to update from
 		 */
 		virtual void update(const std::any& json_text) = 0;
 		/**
 		 * @brief Converts object to JSON
-		 * 
+		 *
 		 * @return std::string JSONed object
 		 */
 		std::string encoded() const {
@@ -337,7 +355,7 @@ namespace gorage {
 
 		/**
 		 * @brief Check if corresponding structure contains given structure at given key
-		 * 
+		 *
 		 * @param key Direct key on which given structure contained
 		 * @param structure Structure to search
 		 * @return true `structure` found on direct key `key`
@@ -349,7 +367,7 @@ namespace gorage {
 
 		/**
 		 * @brief Check if given structure contains other given structure at given key
-		 * 
+		 *
 		 * @param haystack Structure to search in
 		 * @param key Direct key at which given structure contained
 		 * @param needle Structure to search for

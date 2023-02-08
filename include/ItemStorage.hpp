@@ -9,9 +9,13 @@
 #include <optional>
 #include <iostream>
 
-#include "Key.hpp"
+#include "../modules/rapidjson/writer.h"
+#include "../modules/rapidjson/document.h"
+#include "../modules/rapidjson/stringbuffer.h"
+#include "../modules/cppcodec/base64_rfc4648.hpp"
+
 #include "Json.hpp"
-#include "Bytes.hpp"
+#include "gorage.hpp"
 #include "Storage.hpp"
 
 
@@ -20,7 +24,7 @@ namespace gorage {
 
 	/**
 	 * @brief Abstract class for arbitrary objects to formalize storing
-	 * 
+	 *
 	 * @tparam T Metadata object type, should be inherited from Json
 	 */
 	template<class T>
@@ -30,25 +34,25 @@ namespace gorage {
 
 		/**
 		 * @brief Arbitrary bytes
-		 * 
+		 *
 		 */
 		Bytes data;
 		/**
 		 * @brief Arbitrary structured JSONable data
-		 * 
+		 *
 		 */
 		T metadata;
 
 		/**
 		 * @brief Construct a new Item object with empty data and metadata
-		 * 
+		 *
 		 */
 		Item():
 			data({}), metadata(T()) {}
 
 		/**
 		 * @brief Construct a new Item object
-		 * 
+		 *
 		 * @param data Arbitrary bytes
 		 * @param metadata Arbitrary structured JSONable data
 		 */
@@ -63,7 +67,7 @@ namespace gorage {
 
 		/**
 		 * @brief Updates data and metadata from corresponding structure
-		 * 
+		 *
 		 * @param structure structure to update from. JSON form should be like {"data": <base64 string>, "metadata": <dict corresponding to T>}
 		 */
 		void update(const std::any& structure) {
@@ -89,7 +93,7 @@ namespace gorage {
 
 	/**
 	 * @brief Items storage. Uses separate storages for data and metadata
-	 * 
+	 *
 	 * @tparam Metadata Items metadata type
 	 */
 	template<class Metadata>
@@ -99,18 +103,18 @@ namespace gorage {
 
 		/**
 		 * @brief Storage for items data
-		 * 
+		 *
 		 */
 		std::shared_ptr<Storage<Bytes>> data_storage;
 		/**
 		 * @brief Storage for items metadata
-		 * 
+		 *
 		 */
 		std::shared_ptr<Storage<Metadata>> metadata_storage;
 
 		/**
 		 * @brief Construct a new ItemStorage object
-		 * 
+		 *
 		 * @param data_storage Storage for items data
 		 * @param metadata_storage Storage for items metadata
 		 */
@@ -119,42 +123,42 @@ namespace gorage {
 			metadata_storage(metadata_storage) {}
 
 		/**
-		 * @brief Saves item with given key
-		 * 
-		 * @param key unique storage identifier
+		 * @brief Saves item with given USI
+		 *
+		 * @param usi Unique Storage Identifier
 		 * @param item Item to save
 		 */
-		void save(const Key& key, const Item<Metadata>& item) {
-			data_storage->save(key, item.data);
-			metadata_storage->save(key, item.metadata);
+		void save(const std::string& usi, const Item<Metadata>& item) {
+			data_storage->save(usi, item.data);
+			metadata_storage->save(usi, item.metadata);
 		}
 
 		/**
-		 * @brief Loads item with given key
-		 * 
-		 * @param key unique storage identifier
+		 * @brief Loads item with given USI
+		 *
+		 * @param usi Unique Storage Identifier
 		 * @return Item<Metadata> Loaded item
 		 */
-		Item<Metadata> load(const Key& key) {
+		Item<Metadata> load(const std::string& usi) {
 			return Item<Metadata>(
-				data_storage->load(key),
-				metadata_storage->load(key)
+				data_storage->load(usi),
+				metadata_storage->load(usi)
 			);
 		}
 
 		/**
-		 * @brief Removes item with given key
-		 * 
-		 * @param key unique storage identifier
+		 * @brief Removes item with given USI
+		 *
+		 * @param usi Unique Storage Identifier
 		 */
-		void remove(const Key& key) {
-			data_storage->remove(key);
-			metadata_storage->remove(key);
+		void remove(const std::string& usi) {
+			data_storage->remove(usi);
+			metadata_storage->remove(usi);
 		}
 
 		std::optional<Item<Metadata>> find(const std::string& key, const std::any& structure) {
-			for (const auto& key : *this) {
-				Item<Metadata> item = load(key);
+			for (const auto& usi : *this) {
+				Item<Metadata> item = load(usi);
 				if (item.contains(key, structure)) {
 					return item;
 				}
@@ -163,9 +167,9 @@ namespace gorage {
 		}
 
 		std::optional<Item<Metadata>> metadata_find(const std::string& key, const std::any& structure) {
-			for (const auto& key : *metadata_storage) {
-				if (metadata_storage->load(key).contains(key, structure)) {
-					return load(key);
+			for (const auto& usi : *metadata_storage) {
+				if (metadata_storage->load(usi).contains(key, structure)) {
+					return load(usi);
 				}
 			}
 			return {};
@@ -174,13 +178,13 @@ namespace gorage {
 	private:
 
 		/**
-		 * @brief Loads keys for iteration
-		 * 
+		 * @brief Loads USIs for iteration
+		 *
 		 */
-		void loadKeys() {
-			_keys.clear();
+		void loadUsis() {
+			_usis.clear();
 			for (const auto & k : *data_storage) {
-				_keys.insert(k);
+				_usis.insert(k);
 			}
 		}
 

@@ -3,18 +3,19 @@
 #ifndef __GORAGE__STORAGE__
 #define __GORAGE__STORAGE__
 
+#include <regex>
 #include <iostream>
 #include <unordered_set>
-
-#include "Key.hpp"
 
 
 
 namespace gorage {
 
+	using Bytes = std::vector<unsigned char>;
+
 	/**
 	 * @brief Abstract class base for all storages
-	 * 
+	 *
 	 * @tparam T Type of stored objects
 	 */
 	template<class T>
@@ -23,65 +24,149 @@ namespace gorage {
 	public:
 
 		/**
-		 * @brief Saves object of type `T` with key `key`
-		 * 
-		 * @param key unique storage identifier
+		 * @brief Saves object of type `T` with USI `usi`
+		 *
+		 * @param usi Unique Storage Identifier
 		 * @param object Object to store
 		 */
-		virtual void save(const Key& key, const T& object) = 0;
+		virtual void save(const std::string& usi, const T& object) = 0;
 
 		/**
-		 * @brief Loads object stored with key key
-		 * 
-		 * @param key unique storage identifier
+		 * @brief Saves object of type `T` with USI corresponding to `usi_source`
+		 *
+		 * @param usi_source Some bytes to generate USI from
+		 * @param object Object to store
+		 * @return std::string USI with which object was saved
+		 */
+		std::string save(const Bytes& usi_source, const T& object) {
+
+			std::string usi = Usi(usi_source);
+			save(usi, object);
+
+			return usi;
+
+		}
+
+		/**
+		 * @brief Saves object of type T with random generated USI
+		 *
+		 * @param object Object to store
+		 * @return std::string USI with which object was saved
+		 */
+		std::string save(const T& object) {
+
+			std::string usi = Usi(32); // 62 ^ 32 variants
+			save(usi, object);
+
+			return usi;
+
+		}
+
+		/**
+		 * @brief Loads object stored with USI usi
+		 *
+		 * @param usi Unique Storage Identifier
 		 * @return T Found object
 		 */
-		virtual T load(const Key& key) = 0;
+		virtual T load(const std::string& usi) = 0;
+
+		T load(const Bytes& usi_source) {
+			return load(
+				Usi(usi_source)
+			);
+		}
 
 		/**
-		 * @brief Removes object stored with key key
-		 * 
-		 * @param key unique storage identifier
+		 * @brief Removes object stored with USI usi
+		 *
+		 * @param usi Unique Storage Identifier
 		 */
-		virtual void remove(const Key& key) = 0;
+		virtual void remove(const std::string& usi) = 0;
 
 		/**
 		 * @brief Iteration begin related method
-		 * 
-		 * @return auto keys set begin iterator
+		 *
+		 * @return auto USIs set begin iterator
 		 */
 		auto begin() {
-			loadKeys();
-			return _keys.begin();
+			loadUsis();
+			return _usis.begin();
 		}
 
 		/**
 		 * @brief Iteration end related method
-		 * 
-		 * @return auto keys set end iterator
+		 *
+		 * @return auto USIs set end iterator
 		 */
 		auto end() {
-			return _keys.end();
+			return _usis.end();
 		}
 
 		size_t size() {
-			loadKeys();
-			return _keys.size();
+			loadUsis();
+			return _usis.size();
 		}
 
 	protected:
 
 		/**
-		 * @brief Set to which keys will be loaded for iteration
-		 * 
+		 * @brief Set to which USIs will be loaded for iteration
+		 *
 		 */
-		std::unordered_set<std::string> _keys;
+		std::unordered_set<std::string> _usis;
 
 		/**
-		 * @brief Method to load keys in `keys` set for iteration
-		 * 
+		 * @brief Method to load USIs in `usis` set for iteration
+		 *
 		 */
-		virtual void loadKeys() = 0;
+		virtual void loadUsis() = 0;
+
+	private:
+
+		unsigned __int64 _last_tick_count;
+
+		std::string Usi(size_t length) {
+
+			static std::string symbols =
+				"0123456789"
+				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+				"abcdefghijklmnopqrstuvwxyz";
+
+			while (true) {
+
+				unsigned __int64 new_tick_count;
+
+#ifdef WINDOWS
+				new_tick_count = GetTickCount64();
+#else
+				struct timespec t;
+				new_tick_count = clock_gettime(CLOCK_MONOTONIC, &t);
+#endif
+
+				if (_last_tick_count != new_tick_count) {
+					_last_tick_count = new_tick_count;
+					break;
+				}
+			}
+			std::srand(_last_tick_count);
+
+			std::string result;
+			result.reserve(length);
+			for (size_t i = 0; i < length; i++) {
+				result += symbols[rand() % (symbols.length() - 1)];
+			}
+
+			return result;
+
+		}
+
+		std::string Usi(const Bytes& source) {
+			return std::regex_replace(
+				Json::String(source).encoded(),
+				std::regex("[^\\w|\\d]"),
+				"_"
+			);
+		}
 
 	};
 
