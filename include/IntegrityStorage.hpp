@@ -16,13 +16,10 @@ namespace gorage {
 	class IntegrityStorage : public Storage<T> {
 
 	public:
+
 		IntegrityStorage(std::shared_ptr<Storage<T>> base, std::shared_ptr<Storage<I>> integrity):
 			_base(base),
 			_integrity(integrity) {}
-
-	protected:
-
-		virtual I digest(const T& content) = 0;
 
 		void save(const std::string& usi, const T& content) {
 			_integrity->save(usi, digest(content));
@@ -36,11 +33,20 @@ namespace gorage {
 			if (result_digest != stated_digest) {
 				throw std::runtime_error("Can not load object with usi `" + usi + "`: integrity check failed");
 			}
+			return result;
 		}
 
-		T remove(const std::string& usi) {
+		void remove(const std::string& usi) {
 			_base->remove(usi);
 			_integrity->remove(usi);
+		}
+
+	protected:
+
+		virtual I digest(const T& content) = 0;
+
+		void loadUsis() {
+			_usis = std::unordered_set<std::string>(_base->begin(), _base->end());
 		}
 
 	private:
@@ -48,7 +54,6 @@ namespace gorage {
 		std::shared_ptr<Storage<T>> _base;
 		std::shared_ptr<Storage<I>> _integrity;
 
-		void loadUsis() {}
 
 	};
 
