@@ -8,6 +8,7 @@
 #include <unordered_set>
 
 #include "Json.hpp"
+#include "RandomName.hpp"
 
 
 
@@ -125,41 +126,8 @@ namespace gorage {
 
 	private:
 
-		int _last_tick_count;
-
 		std::string Usi(size_t length) {
-
-			static std::string symbols =
-				"0123456789"
-				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-				"abcdefghijklmnopqrstuvwxyz";
-
-			while (true) {
-
-				int new_tick_count;
-
-#ifdef _WIN32
-				new_tick_count = GetTickCount64();
-#else
-				struct timespec t;
-				new_tick_count = clock_gettime(CLOCK_MONOTONIC, &t);
-#endif
-
-				if (_last_tick_count != new_tick_count) {
-					_last_tick_count = new_tick_count;
-					break;
-				}
-			}
-			std::srand(_last_tick_count);
-
-			std::string result;
-			result.reserve(length);
-			for (size_t i = 0; i < length; i++) {
-				result += symbols[rand() % (symbols.length() - 1)];
-			}
-
-			return result;
-
+			return gorage::RandomName(length).str();
 		}
 
 		std::string Usi(const Bytes& source) {

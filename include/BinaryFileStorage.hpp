@@ -78,18 +78,18 @@ namespace gorage {
 		 */
 		Bytes load(const std::string& usi) {
 
-			std::string file_path = _FilePath(usi);
+			std::string path = _FilePath(usi);
 
-			// std::ifstream file(file_path, std::ios::binary);
-			std::basic_ifstream<unsigned char, std::char_traits<unsigned char>> file(file_path, std::ios::binary);
-			if (!file.is_open()) {
-				throw std::runtime_error("Can not load file " + file_path);
+			std::ifstream file(path, std::ios::binary | std::ios::ate);
+			std::ifstream::pos_type length = file.tellg();
+			if (length == 0) {
+				return Bytes();
 			}
 
-			return Bytes(
-				std::istreambuf_iterator<unsigned char>(file),
-				std::istreambuf_iterator<unsigned char>()
-			);
+			Bytes result(length);
+			file.seekg(0, std::ios::beg);
+			file.read(reinterpret_cast<char*>(&result[0]), length);
+			return result;
 
 		}
 
