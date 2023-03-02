@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __GORAGE__BINARY_FILE_STORAGE__
-#define __GORAGE__BINARY_FILE_STORAGE__
+#ifndef __GORAGE__INTEGRITY_STORAGE__
+#define __GORAGE__INTEGRITY_STORAGE__
 
 #include <vector>
 #include <memory>
@@ -53,7 +53,6 @@ namespace gorage {
 
 		std::shared_ptr<Storage<T>> _base;
 		std::shared_ptr<Storage<I>> _integrity;
-
 
 	};
 

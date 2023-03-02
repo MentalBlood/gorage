@@ -24,10 +24,10 @@ protected:
 
 TEST_CASE("`IntegrityStorage`") {
 
-	Sample storage(
-		std::make_shared<gorage::MemoryStorage<gorage::Bytes>>(),
-		std::make_shared<gorage::MemoryStorage<gorage::Bytes>>()
-	);
+	std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> base      = std::make_shared<gorage::MemoryStorage<gorage::Bytes>>();
+	std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> integrity = std::make_shared<gorage::MemoryStorage<gorage::Bytes>>();
+
+	Sample storage(base, integrity);
 	REQUIRE(storage.size() == 0);
 
 	std::string usi = "usi";
@@ -36,6 +36,29 @@ TEST_CASE("`IntegrityStorage`") {
 	SUBCASE("saving") {
 		storage.save(usi, content);
 		CHECK_EQ(storage.load(usi), content);
+		CHECK_EQ(storage.load(usi), base->load(usi));
+	}
+
+	SUBCASE("removing") {
+
+		storage.save(usi, content);
+		storage.remove(usi);
+
+		try {
+			storage.load(usi);
+			CHECK_EQ(1, 0);
+		} catch(const std::exception& e) {}
+
+		try {
+			base->load(usi);
+			CHECK_EQ(1, 0);
+		} catch(const std::exception& e) {}
+
+		try {
+			integrity->load(usi);
+			CHECK_EQ(1, 0);
+		} catch(const std::exception& e) {}
+
 	}
 
 }
