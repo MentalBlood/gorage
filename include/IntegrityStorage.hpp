@@ -22,14 +22,14 @@ namespace gorage {
 			_integrity(integrity) {}
 
 		void save(const std::string& usi, const T& content) {
-			_integrity->save(usi, digest(content));
+			_integrity->save(digest_usi(usi), digest(content));
 			_base->save(usi, content);
 		}
 
 		T load(const std::string& usi) {
 			const T result = _base->load(usi);
 			const I result_digest = digest(result);
-			const I stated_digest = _integrity->load(usi);
+			const I stated_digest = _integrity->load(digest_usi(usi));
 			if (result_digest != stated_digest) {
 				throw std::runtime_error("Can not load object with usi `" + usi + "`: integrity check failed");
 			}
@@ -38,7 +38,7 @@ namespace gorage {
 
 		void remove(const std::string& usi) {
 			_base->remove(usi);
-			_integrity->remove(usi);
+			_integrity->remove(digest_usi(usi));
 		}
 
 	protected:
@@ -47,6 +47,10 @@ namespace gorage {
 
 		void loadUsis() {
 			_usis = std::unordered_set<std::string>(_base->begin(), _base->end());
+		}
+
+		std::string digest_usi(const std::string& usi) {
+			return usi + "_digest";
 		}
 
 	private:

@@ -22,10 +22,7 @@ protected:
 };
 
 
-TEST_CASE("`IntegrityStorage`") {
-
-	std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> base      = std::make_shared<gorage::MemoryStorage<gorage::Bytes>>();
-	std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> integrity = std::make_shared<gorage::MemoryStorage<gorage::Bytes>>();
+void test(std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> base, std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> integrity) {
 
 	Sample storage(base, integrity);
 	REQUIRE(storage.size() == 0);
@@ -60,5 +57,23 @@ TEST_CASE("`IntegrityStorage`") {
 		} catch(const std::exception& e) {}
 
 	}
+
+}
+
+
+TEST_CASE("separate storages") {
+
+	std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> base      = std::make_shared<gorage::MemoryStorage<gorage::Bytes>>();
+	std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> integrity = std::make_shared<gorage::MemoryStorage<gorage::Bytes>>();
+
+	test(base, integrity);
+
+}
+
+TEST_CASE("same storage") {
+
+	std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> base      = std::make_shared<gorage::MemoryStorage<gorage::Bytes>>();
+
+	test(base, base);
 
 }
