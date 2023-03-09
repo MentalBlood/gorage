@@ -18,29 +18,55 @@
 
 namespace gorage {
 
+	class Seed {
+
+	public:
+
+		Seed() {}
+
+		unsigned int operator()() {
+			_last_tick_count = _tick_count();
+			while (true) {
+				const unsigned int tick_count = _tick_count();
+				if (tick_count != _last_tick_count) {
+					_last_tick_count = tick_count;
+					return tick_count;
+				}
+			}
+		}
+
+	private:
+
+		unsigned int _last_tick_count;
+
+		static unsigned int _tick_count() {
+			#ifdef _WIN32
+				return (unsigned int)GetTickCount64();
+			#else
+				struct timespec t;
+				clock_gettime(CLOCK_MONOTONIC, &t);
+				return (unsigned int)t.tv_nsec;
+			#endif
+		}
+
+	};
+
 	class RandomName {
 
 	public:
 
-		RandomName(size_t length) {
-
-			const std::string symbols =
+		RandomName(const size_t length):
+			_alphabet(
 				"0123456789"
 				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-				"abcdefghijklmnopqrstuvwxyz";
+				"abcdefghijklmnopqrstuvwxyz"
+			) {
 
-			#ifdef _WIN32
-				std::srand((unsigned int)GetTickCount64());
-			#else
-				struct timespec t;
-				clock_gettime(CLOCK_MONOTONIC, &t);
-				std::srand((unsigned int)t.tv_nsec);
-			#endif
+			srand(Seed()());
 
 			_s.reserve(length);
 			for (size_t i = 0; i < length; i++) {
-				int r = std::rand();
-				_s += symbols[r % (symbols.length() - 1)];
+				_s += _alphabet[std::rand() % (_alphabet.length() - 1)];
 			}
 
 		}
@@ -52,6 +78,8 @@ namespace gorage {
 	private:
 
 		std::string _s;
+
+		const std::string _alphabet;
 
 	};
 
