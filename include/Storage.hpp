@@ -71,9 +71,9 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return T Found object
 		 */
-		virtual T load(const std::string& usi) = 0;
+		virtual T load(const std::string& usi) const = 0;
 
-		T load(const Bytes& usi_source) {
+		T load(const Bytes& usi_source) const {
 			return load(
 				Usi(usi_source)
 			);

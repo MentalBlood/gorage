@@ -15,7 +15,7 @@ public:
 
 
 protected:
-	gorage::Bytes digest(const gorage::Bytes& content) {
+	gorage::Bytes digest(const gorage::Bytes& content) const {
 		return gorage::Bytes(content.begin(), content.begin() + int(content.size() / 2));
 	}
 

@@ -139,7 +139,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return Item<Metadata> Loaded item
 		 */
-		Item<Metadata> load(const std::string& usi) {
+		Item<Metadata> load(const std::string& usi) const {
 			return Item<Metadata>(
 				data_storage->load(usi),
 				metadata_storage->load(usi)

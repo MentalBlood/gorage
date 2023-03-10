@@ -26,7 +26,7 @@ namespace gorage {
 			_base->save(usi, content);
 		}
 
-		T load(const std::string& usi) {
+		T load(const std::string& usi) const {
 			const T result = _base->load(usi);
 			const I result_digest = digest(result);
 			const I stated_digest = _integrity->load(digest_usi(usi));
@@ -43,13 +43,13 @@ namespace gorage {
 
 	protected:
 
-		virtual I digest(const T& content) = 0;
+		virtual I digest(const T& content) const = 0;
 
 		void loadUsis() {
 			_usis = std::unordered_set<std::string>(_base->begin(), _base->end());
 		}
 
-		std::string digest_usi(const std::string& usi) {
+		static std::string digest_usi(const std::string& usi) {
 			return usi + "_digest";
 		}
 
