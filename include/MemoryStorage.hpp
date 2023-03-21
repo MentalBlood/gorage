@@ -46,7 +46,7 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 * @return T Object type
 		 */
-		T load(const std::string& usi) const {
+		T load(const std::string& usi) {
 			return _storage.at(usi);
 		}
 
@@ -56,7 +56,9 @@ namespace gorage {
 		 * @param usi Unique Storage Identifier
 		 */
 		void remove(const std::string& usi) {
-			_storage.at(usi);
+			if (!_storage.count(usi)) {
+				throw std::runtime_error("No object with usi '" + usi + "' to remove");
+			}
 			_storage.erase(usi);
 		}
 
