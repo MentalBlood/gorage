@@ -73,6 +73,15 @@ namespace gorage {
 		 */
 		virtual T load(const std::string& usi) const = 0;
 
+		virtual T load(const std::string& usi, T default) {
+			try {
+				return load(usi);
+			} catch(const std::runtime_error& e) {
+				save(usi, default);
+				return load(usi);
+			}
+		}
+
 		T load(const Bytes& usi_source) const {
 			return load(
 				Usi(usi_source)
