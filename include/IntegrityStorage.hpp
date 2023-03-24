@@ -31,7 +31,7 @@ namespace gorage {
 			const I result_digest = digest(result);
 			const I stated_digest = _integrity->load(digest_usi(usi));
 			if (result_digest != stated_digest) {
-				throw std::runtime_error("Can not load object with usi `" + usi + "`: integrity check failed");
+				throw OperationalError("Can not load object with usi `" + usi + "`: integrity check failed");
 			}
 			return result;
 		}
@@ -49,7 +49,7 @@ namespace gorage {
 			_usis = std::unordered_set<std::string>(_base->begin(), _base->end());
 		}
 
-		static std::string digest_usi(const std::string& usi) {
+		virtual std::string digest_usi(const std::string usi) const {
 			return usi + "_digest";
 		}
 

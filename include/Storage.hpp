@@ -26,6 +26,12 @@ namespace gorage {
 
 	public:
 
+		class OperationalError : public std::exception {
+		public:
+			OperationalError(const std::string message):
+				std::exception(message.c_str()) {}
+		};
+
 		/**
 		 * @brief Saves object of type `T` with USI `usi`
 		 *
@@ -73,19 +79,21 @@ namespace gorage {
 		 */
 		virtual T load(const std::string& usi) const = 0;
 
-		virtual T load(const std::string& usi, T default) {
-			try {
-				return load(usi);
-			} catch(const std::runtime_error& e) {
-				save(usi, default);
-				return load(usi);
-			}
-		}
-
 		T load(const Bytes& usi_source) const {
 			return load(
 				Usi(usi_source)
 			);
+		}
+
+		T load(const std::string& usi, T default_) {
+			try {
+				return load(usi);
+			} catch(const OperationalError& e) {
+				throw e;
+			} catch(const std::exception& e) {
+				save(usi, default_);
+				return default_;
+			}
 		}
 
 		/**
@@ -135,11 +143,11 @@ namespace gorage {
 
 	private:
 
-		std::string Usi(size_t length) {
+		static std::string Usi(size_t length){
 			return gorage::RandomName(length).str();
 		}
 
-		std::string Usi(const Bytes& source) {
+		static std::string Usi(const Bytes& source){
 			return std::regex_replace(
 				Json::String(source).encoded(),
 				std::regex("[^\\w|\\d]"),
