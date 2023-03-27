@@ -385,7 +385,7 @@ namespace gorage {
 				std::regex(
 					std::regex_replace(
 						"\"" + key + "\" *: *" + encode(needle) + "(?:\\n| )*(?:,|})",
-						std::regex("\\[|\\]|\\{|\\}|\\/|\\+"),
+						std::regex("\\[|\\]|\\{|\\}|\\/|\\+|\\.|\\\""),
 						"\\$&"
 					)
 				)
