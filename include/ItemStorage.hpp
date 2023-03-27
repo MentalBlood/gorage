@@ -168,8 +168,12 @@ namespace gorage {
 
 		std::optional<Item<Metadata>> metadata_find(const std::string& key, const std::any& structure) {
 			for (const auto& usi : *metadata_storage) {
-				if (metadata_storage->load(usi).contains(key, structure)) {
-					return load(usi);
+				Metadata metadata(metadata_storage->load(usi));
+				if (metadata.contains(key, structure)) {
+					return Item<Metadata>(
+						data_storage->load(usi),
+						metadata
+					);
 				}
 			}
 			return {};
