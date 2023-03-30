@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef __GORAGE__ITEM_STORAGE__
-#define __GORAGE__ITEM_STORAGE__
-
 #include <any>
 #include <memory>
 #include <vector>
@@ -93,7 +90,7 @@ namespace gorage {
 		}
 
 		std::optional<Item<Metadata>> find(const std::string key, const std::any structure) const {
-			for (const auto& usi : *this) {
+			for (const auto& usi : usis()) {
 				Item<Metadata> item = load(usi);
 				if (item.contains(key, structure)) {
 					return item;
@@ -103,7 +100,7 @@ namespace gorage {
 		}
 
 		std::optional<Item<Metadata>> metadata_find(const std::string key, const std::any structure) const {
-			for (const auto& usi : *metadata_storage) {
+			for (const auto& usi : usis()) {
 				Metadata metadata(metadata_storage->load(usi));
 				if (metadata.contains(key, structure)) {
 					return Item<Metadata>(
@@ -122,5 +119,3 @@ namespace gorage {
 	};
 
 } // gorage
-
-#endif
