@@ -1,11 +1,9 @@
 #pragma once
 
-#ifndef __GORAGE__INTEGRITY_STORAGE__
-#define __GORAGE__INTEGRITY_STORAGE__
-
 #include <vector>
 #include <memory>
 
+#include "Usi.hpp"
 #include "Storage.hpp"
 
 
@@ -21,36 +19,36 @@ namespace gorage {
 			_base(base),
 			_integrity(integrity) {}
 
-		void save(const std::string& usi, const T& content) {
+		void save(const Usi usi, const T content) {
 			_integrity->save(digest_usi(usi), digest(content));
 			_base->save(usi, content);
 		}
 
-		T load(const std::string& usi) const {
+		T load(const Usi usi) const {
 			const T result = _base->load(usi);
 			const I result_digest = digest(result);
 			const I stated_digest = _integrity->load(digest_usi(usi));
 			if (result_digest != stated_digest) {
-				throw OperationalError("Can not load object with usi `" + usi + "`: integrity check failed");
+				throw OperationalError("Can not load object with usi `" + usi() + "`: integrity check failed");
 			}
 			return result;
 		}
 
-		void remove(const std::string& usi) {
+		void remove(const Usi usi) {
 			_base->remove(usi);
 			_integrity->remove(digest_usi(usi));
+		}
+
+		virtual std::vector<Usi> usis() const {
+			return _base->usis();
 		}
 
 	protected:
 
 		virtual I digest(const T& content) const = 0;
 
-		void loadUsis() {
-			_usis = std::unordered_set<std::string>(_base->begin(), _base->end());
-		}
-
-		virtual std::string digest_usi(const std::string usi) const {
-			return usi + "_digest";
+		virtual Usi digest_usi(const Usi usi) const {
+			return Usi(usi() + "_digest");
 		}
 
 	private:
@@ -61,5 +59,3 @@ namespace gorage {
 	};
 
 } // gorage
-
-#endif

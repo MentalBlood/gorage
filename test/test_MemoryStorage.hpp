@@ -5,27 +5,14 @@
 TEST_CASE("`MemoryStorage`") {
 
 	gorage::MemoryStorage<std::string> storage;
-	REQUIRE(storage.size() == 0);
+	REQUIRE(storage.usis().size() == 0);
 
-	std::string s = "string";
-	std::string usi = "usi";
+	const std::string s = "string";
+	const gorage::Usi usi = "usi";
 
 	SUBCASE("saving") {
-
-		SUBCASE("testing saving with given USI") {
-			storage.save(usi, s);
-			CHECK_EQ(storage.load(usi), s);
-		}
-
-		SUBCASE("testing saving with random generated USI") {
-
-			std::string s = "string";
-
-			std::string usi = storage.Storage::save(s);
-			CHECK_EQ(storage.load(usi), s);
-
-		}
-
+		storage.save(usi, s);
+		CHECK_EQ(storage.load(usi), s);
 	}
 
 	SUBCASE("removing") {
@@ -33,21 +20,27 @@ TEST_CASE("`MemoryStorage`") {
 		storage.save(usi, s);
 		storage.remove(usi);
 
-		CHECK_EQ(storage.size(), 0);
+		CHECK_EQ(storage.usis().size(), 0);
 
 	}
 
 	SUBCASE("iterating") {
 
-		std::vector<std::string> usis = {"a", "b", "c"};
+		REQUIRE(storage.usis().size() == 0);
+
+		const std::vector<gorage::Usi> usis = {
+			gorage::Usi("a"),
+			gorage::Usi("b"),
+			gorage::Usi("c")
+		};
 		for (const auto& u : usis) {
-			storage.save(u, u + "_value");
+			storage.save(u, u() + "_value");
 		}
 
-		CHECK_EQ(storage.size(), usis.size());
+		CHECK_EQ(storage.usis().size(), usis.size());
 
 		for (const auto& u : usis) {
-			CHECK_EQ(storage.load(u), u + "_value");
+			CHECK_EQ(storage.load(u), u() + "_value");
 		}
 
 	}

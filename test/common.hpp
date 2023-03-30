@@ -20,7 +20,7 @@ public:
 		).s;
 	}
 
-	virtual std::any getStructure() const {
+	virtual std::any structure() const {
 		return Dict{
 			{"s", s}
 		};

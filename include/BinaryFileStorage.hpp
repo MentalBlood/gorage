@@ -1,14 +1,12 @@
 #pragma once
 
-#ifndef __GORAGE__BINARY_FILE_STORAGE__
-#define __GORAGE__BINARY_FILE_STORAGE__
-
 #include <vector>
 #include <sstream>
 #include <fstream>
 #include <iostream>
 #include <filesystem>
 
+#include "Usi.hpp"
 #include "Bytes.hpp"
 #include "Storage.hpp"
 
@@ -16,53 +14,30 @@
 
 namespace gorage {
 
-	/**
-	 * @brief Storage for binary data. Stores data as files in given folder and with given extension
-	 *
-	 */
 	class BinaryFileStorage : public Storage<Bytes> {
 
 	public:
 
-		/**
-		 * @brief Construct a new Binary File Storage object
-		 *
-		 * @param folder_path Folder to store files in
-		 * @param extension Extension to store files with
-		 */
-		BinaryFileStorage(const std::string& folder_path, const std::string& extension):
-			_folder_path(folder_path), _extension(extension) {}
+		BinaryFileStorage(const std::filesystem::path folder, const std::string extension):
+			_folder(folder),
+			_extension(extension) {}
 
 	protected:
 
-		/**
-		 * @brief Folder to store files in
-		 *
-		 */
-		const std::string _folder_path;
-		/**
-		 * @brief Extension to store files with
-		 *
-		 */
-		const std::string _extension;
+		const std::filesystem::path _folder;
+		const std::string           _extension;
 
-		/**
-		 * @brief Saves given data with given USI
-		 *
-		 * @param usi Unique Storage Identifier
-		 * @param content Arbitrary binary data
-		 */
-		void save(const std::string& usi, const Bytes& content) {
+		void save(const Usi usi, const Bytes content) {
 
-			if (!std::filesystem::exists(_folder_path)) {
-				std::filesystem::create_directories(_folder_path);
+			if (!std::filesystem::exists(_folder)) {
+				std::filesystem::create_directories(_folder);
 			}
 
-			std::string file_path = _FilePath(usi);
+			const std::string path = _path(usi()).string();
 
-			std::ofstream file(file_path, std::ios::trunc | std::ios::binary);
+			std::ofstream file(path, std::ios::trunc | std::ios::binary);
 			if (!file.is_open()) {
-				throw std::runtime_error("Can not save file " + file_path);
+				throw std::runtime_error("Can not save file " + path);
 			}
 
 			file.write(reinterpret_cast<const char*>(&content[0]), content.size());
@@ -70,15 +45,9 @@ namespace gorage {
 
 		}
 
-		/**
-		 * @brief Loads data with given USI
-		 *
-		 * @param usi Unique Storage Identifier
-		 * @return std::string Loaded data
-		 */
-		Bytes load(const std::string& usi) const {
+		Bytes load(const Usi usi) const {
 
-			std::string path = _FilePath(usi);
+			const std::string path = _path(usi()).string();
 
 			std::ifstream file(path, std::ios::binary | std::ios::ate);
 			std::ifstream::pos_type length = file.tellg();
@@ -93,44 +62,37 @@ namespace gorage {
 
 		}
 
-		/**
-		 * @brief Removes data with given USI
-		 *
-		 * @param usi Unique Storage Identifier
-		 */
-		void remove(const std::string& usi) {
-			std::filesystem::remove(_folder_path + "/"+ usi + _extension);
+		void remove(const Usi usi) {
+			std::filesystem::remove(_path(usi));
 		}
 
-	private:
+		virtual std::vector<Usi> usis() const {
 
-		/**
-		 * @brief Composes file path from USI and this storage properties
-		 *
-		 * @param usi Unique Storage Identifier
-		 * @return const std::string File path
-		 */
-		const std::string _FilePath(const std::string& usi) const {
-			return _folder_path + "/" + usi + _extension;
-		}
+			std::vector<Usi> result;
 
-		/**
-		 * @brief Method to load USIs for iteration
-		 *
-		 */
-		void loadUsis() {
-			this->_usis.clear();
-			if (std::filesystem::exists(_folder_path)) {
-				for (const auto & p : std::filesystem::directory_iterator(_folder_path)) {
+			if (std::filesystem::exists(_folder)) {
+				for (const auto & p : std::filesystem::directory_iterator(_folder)) {
 					if (p.path().extension() == _extension) {
-						this->_usis.insert(p.path().stem().string());
+						result.push_back(
+							Usi(
+								p.path().stem().string()
+							)
+						);
 					}
 				}
 			}
+
+			return result;
+
+		}
+
+	private:
+		std::filesystem::path _path(const Usi usi) const {
+			std::filesystem::path result = _folder / usi();
+			result.replace_extension(_extension);
+			return result;
 		}
 
 	};
 
 } // gorage
-
-#endif

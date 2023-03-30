@@ -1,13 +1,11 @@
 #pragma once
 
-#ifndef __GORAGE__FILE_STORAGE__
-#define __GORAGE__FILE_STORAGE__
-
 #include <sstream>
 #include <fstream>
 #include <iostream>
 #include <filesystem>
 
+#include "Usi.hpp"
 #include "Json.hpp"
 #include "Bytes.hpp"
 #include "Storage.hpp"
@@ -16,54 +14,31 @@
 
 namespace gorage {
 
-	/**
-	 * @brief Storage for arbitrary structured, JSONable data. Stores data as files in given folder and with given extension
-	 *
-	 */
 	template<class T>
 	class FileStorage : public Storage<T> {
 
 	public:
 
-		/**
-		 * @brief Construct a new File Storage object
-		 *
-		 * @param folder_path Folder to store files in
-		 * @param extension Extension to store files with
-		 */
-		FileStorage(const std::string& folder_path, const std::string& extension):
-			_folder_path(folder_path), _extension(extension) {}
+		FileStorage(const std::filesystem::path folder, const std::string extension):
+			_folder(folder_path),
+			_extension(extension) {}
 
 	protected:
 
-		/**
-		 * @brief Folder to store files in
-		 *
-		 */
-		const std::string _folder_path;
-		/**
-		 * @brief Extension to store files with
-		 *
-		 */
-		const std::string _extension;
+		const std::filesystem::path _folder;
+		const std::string           _extension;
 
-		/**
-		 * @brief Saves given object with given USI
-		 *
-		 * @param usi Unique Storage Identifier
-		 * @param object Object to save
-		 */
-		void save(const std::string& usi, const T& object) {
+		void save(const Usi usi, const T object) {
 
-			if (!std::filesystem::exists(_folder_path)) {
-				std::filesystem::create_directories(_folder_path);
+			if (!std::filesystem::exists(_folder)) {
+				std::filesystem::create_directories(_folder);
 			}
 
-			std::string file_path = _FilePath(usi);
+			const std::string path = _path(usi()).string();
 
-			std::ofstream file(file_path, std::ios::out | std::ios::trunc);
+			std::ofstream file(path, std::ios::out | std::ios::trunc);
 			if (!file.is_open()) {
-				throw std::runtime_error("Can not save file " + file_path);
+				throw std::runtime_error("Can not save file " + path);
 			}
 
 			file << object.encoded();
@@ -71,19 +46,13 @@ namespace gorage {
 
 		}
 
-		/**
-		 * @brief Loads data with given USI
-		 *
-		 * @param usi Unique Storage Identifier
-		 * @return T Loaded object
-		 */
-		T load(const std::string& usi) const {
+		T load(const Usi usi) const {
 
-			std::string file_path = _FilePath(usi);
+			const std::string path = _path(usi()).string();
 
-			std::ifstream file(file_path, std::ios::in);
+			std::ifstream file(path, std::ios::in);
 			if (!file.is_open()) {
-				throw std::runtime_error("Can not load file " + file_path);
+				throw std::runtime_error("Can not load file " + path);
 			}
 
 			std::stringstream result_stream;
@@ -91,48 +60,41 @@ namespace gorage {
 
 			file.close();
 
-			return Json::createFromJson<T>(result_stream.str());
+			return Json::from<T>(result_stream.str());
 
 		}
 
-		/**
-		 * @brief Removes object with given USI
-		 *
-		 * @param usi Unique Storage Identifier
-		 */
-		void remove(const std::string& usi) {
-			std::filesystem::remove(_folder_path +"/"+ usi + _extension);
+		void remove(const Usi usi) {
+			std::filesystem::remove(_path(usi));
 		}
 
-	private:
+		virtual std::vector<Usi> usis() const {
 
-		/**
-		 * @brief Composes file path from USI and this storage properties
-		 *
-		 * @param usi Unique Storage Identifier
-		 * @return const std::string File path
-		 */
-		const std::string _FilePath(const std::string& usi) const {
-			return _folder_path + "/" + usi + _extension;
-		}
+			std::vector<Usi> result;
 
-		/**
-		 * @brief Method to load USIs for iteration
-		 *
-		 */
-		void loadUsis() {
-			this->_usis.clear();
-			if (std::filesystem::exists(_folder_path)) {
-				for (const auto & p : std::filesystem::directory_iterator(_folder_path)) {
+			if (std::filesystem::exists(_folder)) {
+				for (const auto & p : std::filesystem::directory_iterator(_folder)) {
 					if (p.path().extension() == _extension) {
-						this->_usis.insert(p.path().stem().string());
+						result.push_back(
+							Usi(
+								p.path().stem().string()
+							)
+						);
 					}
 				}
 			}
+
+			return result;
+
+		}
+
+	private:
+		std::filesystem::path _path(const Usi usi) const {
+			std::filesystem::path result = _folder / usi();
+			result.replace_extension(_extension);
+			return result;
 		}
 
 	};
 
 } // gorage
-
-#endif

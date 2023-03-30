@@ -1,5 +1,6 @@
 #include <ItemStorage.hpp>
 
+#include <Usi.hpp>
 #include <Json.hpp>
 #include <common.hpp>
 #include <MemoryStorage.hpp>
@@ -11,13 +12,13 @@ TEST_CASE("`ItemStorage`") {
 		std::make_shared<gorage::MemoryStorage<gorage::Bytes>>(),
 		std::make_shared<gorage::MemoryStorage<C>>()
 	);
-	REQUIRE(storage.size() == 0);
+	REQUIRE(storage.usis().size() == 0);
 
-	std::string usi = "usi";
-	std::string json = "{\"s\": \"string\"}";
-	gorage::Item item(
+	const gorage::Usi  usi("usi");
+	const std::string  json = "{\"s\": \"string\"}";
+	const gorage::Item item(
 		gorage::Bytes{'d', 'a', 't', 'a'},
-		gorage::Json::createFromJson<C>(json)
+		gorage::Json::from<C>(json)
 	);
 
 	SUBCASE("saving") {
