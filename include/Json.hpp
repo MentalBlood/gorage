@@ -77,6 +77,14 @@ namespace gorage {
 			return _default;
 		}
 
+		template<typename T>
+		static T get_object(const Dict& d, const std::string& key, const T& _default) {
+			if (d.count(key)) {
+				return create<T>(d.at(key));
+			}
+			return _default;
+		}
+
 		static std::any decode(const std::string& json_text) {
 
 			rapidjson::Document json;

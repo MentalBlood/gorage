@@ -20,7 +20,7 @@ namespace gorage {
 	public:
 
 		FileStorage(const std::filesystem::path folder, const std::string extension):
-			_folder(folder_path),
+			_folder(folder),
 			_extension(extension) {}
 
 	protected:
