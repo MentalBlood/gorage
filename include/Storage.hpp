@@ -13,16 +13,16 @@
 
 namespace gorage {
 
+	class OperationalError : public std::runtime_error {
+	public:
+		OperationalError(const std::string message):
+			std::runtime_error(message.c_str()) {}
+	};
+
 	template<class T>
 	class Storage {
 
 	public:
-
-		class OperationalError : public std::runtime_error {
-		public:
-			OperationalError(const std::string message):
-				std::runtime_error(message.c_str()) {}
-		};
 
 		virtual void save(const Usi usi, const T object) = 0;
 
