@@ -118,6 +118,9 @@ namespace gorage {
 			if (a.type() == typeid(double)) {
 				return encode(std::any_cast<double>(a));
 			}
+			if (a.type() == typeid(bool)) {
+				return encode(std::any_cast<bool>(a));
+			}
 
 
 			if (a.type() == typeid(List)) {
@@ -168,6 +171,13 @@ namespace gorage {
 		}
 		static std::string encode(const double& d) {
 			return std::to_string(d);
+		}
+		static std::string encode(const bool& b) {
+			if (b) {
+				return "true";
+			} else {
+				return "false";
+			}
 		}
 
 		template<typename T>
