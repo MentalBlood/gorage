@@ -55,7 +55,7 @@ namespace gorage {
 
 	public:
 
-		RandomName(const size_t length):
+		explicit RandomName(const size_t& length):
 			_alphabet(
 				"0123456789"
 				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"

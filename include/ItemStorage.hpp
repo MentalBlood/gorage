@@ -31,10 +31,10 @@ namespace gorage {
 		Item():
 			data({}), metadata(T()) {}
 
-		Item(Bytes data, T metadata):
+		explicit Item(Bytes data, T metadata):
 			data(data), metadata(metadata) {}
 
-		Item(std::string data_base64, T metadata):
+		explicit Item(std::string data_base64, T metadata):
 			data(
 				gorage::Json::String(data_base64).decoded()
 			),
@@ -68,28 +68,28 @@ namespace gorage {
 		std::shared_ptr<Storage<Bytes>>    data_storage;
 		std::shared_ptr<Storage<Metadata>> metadata_storage;
 
-		ItemStorage(std::shared_ptr<Storage<Bytes>> data_storage, std::shared_ptr<Storage<Metadata>> metadata_storage):
+		explicit ItemStorage(std::shared_ptr<Storage<Bytes>> data_storage, std::shared_ptr<Storage<Metadata>> metadata_storage):
 			data_storage(data_storage),
 			metadata_storage(metadata_storage) {}
 
-		void save(const Usi usi, const Item<Metadata> item) {
+		void save(const Usi& usi, const Item<Metadata>& item) {
 			data_storage->save(usi, item.data);
 			metadata_storage->save(usi, item.metadata);
 		}
 
-		Item<Metadata> load(const Usi usi) const {
+		Item<Metadata> load(const Usi& usi) const {
 			return Item<Metadata>(
 				data_storage->load(usi),
 				metadata_storage->load(usi)
 			);
 		}
 
-		void remove(const Usi usi) {
+		void remove(const Usi& usi) {
 			data_storage->remove(usi);
 			metadata_storage->remove(usi);
 		}
 
-		std::optional<Item<Metadata>> find(const std::string key, const std::any structure) const {
+		std::optional<Item<Metadata>> find(const std::string& key, const std::any& structure) const {
 			for (const auto& usi : usis()) {
 				Item<Metadata> item = load(usi);
 				if (item.contains(key, structure)) {
@@ -99,7 +99,7 @@ namespace gorage {
 			return {};
 		}
 
-		std::optional<Item<Metadata>> metadata_find(const std::string key, const std::any structure) const {
+		std::optional<Item<Metadata>> metadata_find(const std::string& key, const std::any& structure) const {
 			for (const auto& usi : usis()) {
 				Metadata metadata(metadata_storage->load(usi));
 				if (metadata.contains(key, structure)) {

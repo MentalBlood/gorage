@@ -16,15 +16,15 @@ namespace gorage {
 
 		MemoryStorage() {}
 
-		virtual void save(const Usi usi, const T object) {
+		virtual void save(const Usi& usi, const T& object) {
 			_storage[usi()] = object;
 		}
 
-		virtual T load(const Usi usi) const {
+		virtual T load(const Usi& usi) const {
 			return _storage.at(usi());
 		}
 
-		virtual void remove(const Usi usi) {
+		virtual void remove(const Usi& usi) {
 			if (!_storage.count(usi())) {
 				throw OperationalError("No object with usi '" + usi() + "' to remove");
 			}

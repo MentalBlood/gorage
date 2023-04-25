@@ -27,7 +27,7 @@ void test(std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> base, std::share
 	Sample storage(base, integrity);
 	REQUIRE(storage.usis().size() == 0);
 
-	std::string usi = "usi";
+	gorage::Usi usi("usi");
 	gorage::Bytes content = {'d', 'a', 't', 'a'};
 
 	SUBCASE("saving") {

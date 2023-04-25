@@ -15,7 +15,7 @@ namespace gorage {
 
 	class OperationalError : public std::runtime_error {
 	public:
-		OperationalError(const std::string message):
+		explicit OperationalError(const std::string& message):
 			std::runtime_error(message.c_str()) {}
 	};
 
@@ -24,11 +24,11 @@ namespace gorage {
 
 	public:
 
-		virtual void save(const Usi usi, const T object) = 0;
+		virtual void save(const Usi& usi, const T& object) = 0;
 
-		virtual T load(const Usi usi) const = 0;
+		virtual T load(const Usi& usi) const = 0;
 
-		T load(const Usi usi, T default_) {
+		T load(const Usi& usi, T default_) {
 			try {
 				return load(usi);
 			} catch(const OperationalError& e) {
@@ -39,7 +39,7 @@ namespace gorage {
 			}
 		}
 
-		virtual void remove(const Usi usi) = 0;
+		virtual void remove(const Usi& usi) = 0;
 
 		virtual std::vector<Usi> usis() const = 0;
 

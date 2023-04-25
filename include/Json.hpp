@@ -34,10 +34,10 @@ namespace gorage {
 
 			String() {}
 
-			String(const std::string& s):
+			explicit String(const std::string& s):
 				s(s) {}
 
-			String(const Bytes& b):
+			explicit String(const Bytes& b):
 				b(b) {}
 
 			std::string encoded() {

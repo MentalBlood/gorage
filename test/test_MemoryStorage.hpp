@@ -8,7 +8,7 @@ TEST_CASE("`MemoryStorage`") {
 	REQUIRE(storage.usis().size() == 0);
 
 	const std::string s = "string";
-	const gorage::Usi usi = "usi";
+	const gorage::Usi usi("usi");
 
 	SUBCASE("saving") {
 		storage.save(usi, s);

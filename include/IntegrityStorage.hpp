@@ -15,16 +15,16 @@ namespace gorage {
 
 	public:
 
-		IntegrityStorage(std::shared_ptr<Storage<T>> base, std::shared_ptr<Storage<I>> integrity):
+		explicit IntegrityStorage(std::shared_ptr<Storage<T>> base, std::shared_ptr<Storage<I>> integrity):
 			_base(base),
 			_integrity(integrity) {}
 
-		void save(const Usi usi, const T content) {
+		void save(const Usi& usi, const T& content) {
 			_integrity->save(digest_usi(usi), digest(content));
 			_base->save(usi, content);
 		}
 
-		T load(const Usi usi) const {
+		T load(const Usi& usi) const {
 			const T result = _base->load(usi);
 			const I result_digest = digest(result);
 			const I stated_digest = _integrity->load(digest_usi(usi));
@@ -34,7 +34,7 @@ namespace gorage {
 			return result;
 		}
 
-		void remove(const Usi usi) {
+		void remove(const Usi& usi) {
 			_base->remove(usi);
 			_integrity->remove(digest_usi(usi));
 		}
@@ -47,7 +47,7 @@ namespace gorage {
 
 		virtual I digest(const T& content) const = 0;
 
-		virtual Usi digest_usi(const Usi usi) const {
+		virtual Usi digest_usi(const Usi& usi) const {
 			return Usi(usi() + "_digest");
 		}
 

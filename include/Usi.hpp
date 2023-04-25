@@ -18,15 +18,15 @@ namespace gorage {
 		Usi():
 			Usi(32) {}
 
-		Usi(const size_t length):
+		explicit Usi(const size_t& length):
 			Usi(
 				gorage::RandomName(length).str()
 			) {}
 
-		Usi(const std::string source):
+		explicit Usi(const std::string& source):
 			_value(source) {}
 
-		Usi(const gorage::Bytes source):
+		explicit Usi(const gorage::Bytes& source):
 			_value(
 				std::regex_replace(
 					Json::String(source).encoded(),
