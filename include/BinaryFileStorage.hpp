@@ -33,7 +33,7 @@ namespace gorage {
 				std::filesystem::create_directories(_folder);
 			}
 
-			const std::string path = _path(usi()).string();
+			const std::string path = _path(usi).string();
 
 			std::ofstream file(path, std::ios::trunc | std::ios::binary);
 			if (!file.is_open()) {
@@ -47,7 +47,7 @@ namespace gorage {
 
 		Bytes load(const Usi& usi) const {
 
-			const std::string path = _path(usi()).string();
+			const std::string path = _path(usi).string();
 
 			std::ifstream file(path, std::ios::binary | std::ios::ate);
 			std::ifstream::pos_type length = file.tellg();

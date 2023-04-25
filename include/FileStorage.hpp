@@ -34,7 +34,7 @@ namespace gorage {
 				std::filesystem::create_directories(_folder);
 			}
 
-			const std::string path = _path(usi()).string();
+			const std::string path = _path(usi).string();
 
 			std::ofstream file(path, std::ios::out | std::ios::trunc);
 			if (!file.is_open()) {
@@ -48,7 +48,7 @@ namespace gorage {
 
 		T load(const Usi& usi) const {
 
-			const std::string path = _path(usi()).string();
+			const std::string path = _path(usi).string();
 
 			std::ifstream file(path, std::ios::in);
 			if (!file.is_open()) {
