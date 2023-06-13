@@ -150,34 +150,30 @@ namespace gorage {
 
 		}
 
-		static std::string encode(const char* s) {
-			return "\"" + _escaped(s) + "\"";
+		static std::string encode(const char* s) { return
+			"\"" + _escaped(s) + "\"";
 		}
-		static std::string encode(const String& s) {
-			return "\"" + _escaped(s.s) + "\"";
+		static std::string encode(const String& s) { return
+			"\"" + _escaped(s.s) + "\"";
 		}
-		static std::string encode(const std::string& s) {
-			return "\"" + _escaped(s) + "\"";
+		static std::string encode(const std::string& s) { return
+			"\"" + _escaped(s) + "\"";
 		}
-		static std::string encode(const Bytes& s) {
-			return "\"" + cppcodec::base64_rfc4648::encode(s) + "\"";
+		static std::string encode(const Bytes& s) { return
+			"\"" + cppcodec::base64_rfc4648::encode(s) + "\"";
 		}
 
-		static std::string encode(const int& i) {
-			return std::to_string(i);
+		static std::string encode(const int& i) { return
+			std::to_string(i);
 		}
-		static std::string encode(const float& f) {
-			return std::to_string(f);
+		static std::string encode(const float& f) { return
+			std::to_string(f);
 		}
-		static std::string encode(const double& d) {
-			return std::to_string(d);
+		static std::string encode(const double& d) { return
+			std::to_string(d);
 		}
-		static std::string encode(const bool& b) {
-			if (b) {
-				return "true";
-			} else {
-				return "false";
-			}
+		static std::string encode(const bool& b) { return
+			b ? "true" : "false";
 		}
 
 		template<typename T>
@@ -200,13 +196,13 @@ namespace gorage {
 		}
 
 		template<typename T>
-		static std::string encode(const std::vector<T>& v) {
-			return encode_iterable<std::vector<T>>(v);
+		static std::string encode(const std::vector<T>& v) { return
+			encode_iterable<std::vector<T>>(v);
 		}
 
 		template<typename T>
-		static std::string encode(const std::set<T>& v) {
-			return encode_iterable<std::set<T>>(v);
+		static std::string encode(const std::set<T>& v) { return
+			encode_iterable<std::set<T>>(v);
 		}
 
 		static std::string encode(const Dict& m) {
@@ -228,30 +224,20 @@ namespace gorage {
 		}
 
 		template<class T>
-		static T from(const std::string& json_text) {
-			T json;
-			json.update(decode(json_text));
-			return json;
+		static T from(const std::string& json_text) { return
+			T(decode(json_text));
 		}
 
-		template<class T>
-		static T create(const std::any& structure) {
-			T json;
-			json.update(structure);
-			return json;
+		std::string encoded() const { return
+			encode(structure());
 		}
 
-		virtual void update(const std::any& json_text) = 0;
-		std::string encoded() const {
-			return encode(structure());
+		bool contains(const std::string& key, const std::any& structure) const { return
+			contains(structure, key, structure);
 		}
 
-		bool contains(const std::string& key, const std::any& structure) const {
-			return contains(structure, key, structure);
-		}
-
-		static bool contains(const std::any& haystack, const std::string& key, const std::any& needle) {
-			return std::regex_search(
+		static bool contains(const std::any& haystack, const std::string& key, const std::any& needle) { return
+			std::regex_search(
 				encode(haystack),
 				std::regex(
 					std::regex_replace(
@@ -300,8 +286,8 @@ namespace gorage {
 
 		}
 
-		static std::string _escaped(const std::string& s) {
-			return std::regex_replace(
+		static std::string _escaped(const std::string& s) { return
+			std::regex_replace(
 				std::regex_replace(s, std::regex("\\\\"), "\\\\"),
 				std::regex("\""),
 				"\\\""

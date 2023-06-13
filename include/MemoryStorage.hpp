@@ -17,11 +17,12 @@ namespace gorage {
 		MemoryStorage() {}
 
 		virtual void save(const Usi& usi, const T& object) {
-			_storage[usi()] = object;
+			_storage.erase(usi());
+			_storage.emplace(usi(), object);
 		}
 
-		virtual T load(const Usi& usi) const {
-			return _storage.at(usi());
+		virtual T load(const Usi& usi) const { return
+			_storage.at(usi());
 		}
 
 		virtual void remove(const Usi& usi) {

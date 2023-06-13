@@ -6,22 +6,20 @@ class C : public gorage::Json {
 
 public:
 
-	std::string s;
+	const std::string s;
 
 	C():
 		s("") {}
 
-	C(const std::string& s):
-		s(s) {}
+	C(const std::any& structure):
+		s(
+			std::any_cast<String>(
+				std::any_cast<Dict>(structure)["s"]
+			).s
+		) {}
 
-	virtual void update(const std::any& structure) {
-		s = std::any_cast<String>(
-			std::any_cast<Dict>(structure)["s"]
-		).s;
-	}
-
-	virtual std::any structure() const {
-		return Dict{
+	virtual std::any structure() const { return
+		Dict{
 			{"s", s}
 		};
 	}

@@ -25,34 +25,36 @@ namespace gorage {
 
 	public:
 
-		Bytes data;
-		T metadata;
+		const Bytes data;
+		const T metadata;
 
 		Item():
 			data({}), metadata(T()) {}
 
-		explicit Item(Bytes data, T metadata):
-			data(data), metadata(metadata) {}
-
-		explicit Item(std::string data_base64, T metadata):
-			data(
-				gorage::Json::String(data_base64).decoded()
-			),
+		explicit Item(const Bytes& data, const T& metadata):
+			data(data),
 			metadata(metadata) {}
 
-		void update(const std::any& structure) {
+		explicit Item(const std::string& data_base64, const T& metadata):
+			Item(
+				gorage::Json::String(data_base64).decoded(),
+				metadata
+			) {}
 
-			data = std::any_cast<String>(
-				std::any_cast<Dict>(structure)["data"]
-			).decoded();
-			metadata = gorage::Json::create<T>(
-				std::any_cast<Dict>(structure)["metadata"]
-			);
+		explicit Item(const std::any& structure):
+			data(
+				std::any_cast<String>(
+					std::any_cast<Dict>(structure)["data"]
+				).decoded()
+			),
+			metadata(
+				T(
+					std::any_cast<Dict>(structure)["metadata"]
+				)
+			) {}
 
-		}
-
-		std::any structure() const {
-			return Dict{
+		std::any structure() const { return
+			Dict{
 				{"data", data},
 				{"metadata", metadata}
 			};
@@ -89,24 +91,27 @@ namespace gorage {
 			metadata_storage->remove(usi);
 		}
 
-		std::optional<Item<Metadata>> find(const std::string& key, const std::any& structure) const {
+		std::optional<std::pair<Usi, Item<Metadata>>> find(const std::string& key, const std::any& structure) const {
 			for (const auto& usi : usis()) {
 				Item<Metadata> item = load(usi);
 				if (item.contains(key, structure)) {
-					return item;
+					return {{usi, item}};
 				}
 			}
 			return {};
 		}
 
-		std::optional<Item<Metadata>> metadata_find(const std::string& key, const std::any& structure) const {
+		std::optional<std::pair<Usi, Item<Metadata>>> metadata_find(const std::string& key, const std::any& structure) const {
 			for (const auto& usi : usis()) {
 				Metadata metadata(metadata_storage->load(usi));
 				if (metadata.contains(key, structure)) {
-					return Item<Metadata>(
-						data_storage->load(usi),
-						metadata
-					);
+					return {{
+						usi,
+						Item<Metadata>(
+							data_storage->load(usi),
+							metadata
+						)
+					}};
 				}
 			}
 			return {};
