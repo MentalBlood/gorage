@@ -40,7 +40,7 @@ namespace gorage {
 		}
 
 	private:
-		std::string _value;
+		const std::string _value;
 
 	};
 
