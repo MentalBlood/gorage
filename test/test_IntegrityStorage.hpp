@@ -44,17 +44,17 @@ void test(std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> base, std::share
 		try {
 			storage.load(usi);
 			CHECK_EQ(1, 0);
-		} catch(const std::exception& e) {}
+		} catch(const std::exception&) {}
 
 		try {
 			base->load(usi);
 			CHECK_EQ(1, 0);
-		} catch(const std::exception& e) {}
+		} catch(const std::exception&) {}
 
 		try {
 			integrity->load(usi);
 			CHECK_EQ(1, 0);
-		} catch(const std::exception& e) {}
+		} catch(const std::exception&) {}
 
 	}
 
