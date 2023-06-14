@@ -80,7 +80,7 @@ namespace gorage {
 		template<typename T>
 		static T get_object(const Dict& d, const std::string& key, const T& _default) {
 			if (d.count(key)) {
-				return create<T>(d.at(key));
+				return T(d.at(key));
 			}
 			return _default;
 		}
@@ -233,7 +233,7 @@ namespace gorage {
 		}
 
 		bool contains(const std::string& key, const std::any& structure) const { return
-			contains(structure, key, structure);
+			contains(this->structure(), key, structure);
 		}
 
 		static bool contains(const std::any& haystack, const std::string& key, const std::any& needle) { return
