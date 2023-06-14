@@ -25,6 +25,10 @@ namespace gorage {
 			_storage.at(usi());
 		}
 
+		virtual bool exists(const Usi& usi) const { return
+			_storage.count(usi());
+		}
+
 		virtual void remove(const Usi& usi) {
 			if (!_storage.count(usi())) {
 				throw OperationalError("No object with usi '" + usi() + "' to remove");

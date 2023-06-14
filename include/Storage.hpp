@@ -28,6 +28,8 @@ namespace gorage {
 
 		virtual T load(const Usi& usi) const = 0;
 
+		virtual bool exists(const Usi& usi) const = 0;
+
 		T load(const Usi& usi, T default_) {
 			try {
 				return load(usi);

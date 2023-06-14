@@ -34,6 +34,10 @@ namespace gorage {
 			return result;
 		}
 
+		virtual bool exists(const Usi& usi) const { return
+			_base->exists(usi) && _integrity->exists(digest_usi(usi));
+		}
+
 		void remove(const Usi& usi) {
 			_base->remove(usi);
 			_integrity->remove(digest_usi(usi));

@@ -86,6 +86,10 @@ namespace gorage {
 			);
 		}
 
+		virtual bool exists(const Usi& usi) const { return
+			data_storage->exists(usi) && metadata_storage->exists(usi);
+		}
+
 		void remove(const Usi& usi) {
 			data_storage->remove(usi);
 			metadata_storage->remove(usi);

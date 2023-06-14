@@ -62,6 +62,10 @@ namespace gorage {
 
 		}
 
+		virtual bool exists(const Usi& usi) const { return
+			std::filesystem::exists(_path(usi));
+		}
+
 		void remove(const Usi& usi) {
 			std::filesystem::remove(_path(usi));
 		}
