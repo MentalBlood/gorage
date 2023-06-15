@@ -56,6 +56,22 @@ namespace gorage {
 
 		};
 
+		class Structure {
+
+		public:
+
+			Structure(const std::any& value):
+				_value(value) {}
+
+			const std::any& value() const {
+				return _value;
+			}
+
+		private:
+			std::any _value;
+
+		};
+
 		static std::string hex(const Bytes& bytes) {
 
 			std::stringstream result_stream;

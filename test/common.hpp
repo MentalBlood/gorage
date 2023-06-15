@@ -11,10 +11,10 @@ public:
 	C():
 		s("") {}
 
-	C(const std::any& structure):
+	C(const Structure& structure):
 		s(
 			std::any_cast<String>(
-				std::any_cast<Dict>(structure)["s"]
+				std::any_cast<Dict>(structure.value())["s"]
 			).s
 		) {}
 
