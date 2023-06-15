@@ -79,8 +79,8 @@ namespace gorage {
 			metadata_storage->save(usi, item.metadata);
 		}
 
-		Item<Metadata> load(const Usi& usi) const {
-			return Item<Metadata>(
+		Item<Metadata> load(const Usi& usi) const { return
+			Item<Metadata>(
 				data_storage->load(usi),
 				metadata_storage->load(usi)
 			);
@@ -97,7 +97,7 @@ namespace gorage {
 
 		std::optional<std::pair<Usi, Item<Metadata>>> find(const std::string& key, const std::any& structure) const {
 			for (const auto& usi : usis()) {
-				Item<Metadata> item = load(usi);
+				const Item<Metadata> item = load(usi);
 				if (item.contains(key, structure)) {
 					return {{usi, item}};
 				}
@@ -107,7 +107,7 @@ namespace gorage {
 
 		std::optional<std::pair<Usi, Item<Metadata>>> metadata_find(const std::string& key, const std::any& structure) const {
 			for (const auto& usi : usis()) {
-				Metadata metadata(metadata_storage->load(usi));
+				const Metadata metadata(metadata_storage->load(usi));
 				if (metadata.contains(key, structure)) {
 					return {{
 						usi,
@@ -121,8 +121,8 @@ namespace gorage {
 			return {};
 		}
 
-		virtual std::vector<Usi> usis() const {
-			return metadata_storage->usis();
+		virtual std::vector<Usi> usis() const { return
+			metadata_storage->usis();
 		}
 
 	};
