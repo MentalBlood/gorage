@@ -27,7 +27,7 @@ namespace gorage {
 			_value(source) {}
 
 		explicit Usi(const gorage::Bytes& source):
-			_value(
+			Usi(
 				std::regex_replace(
 					Json::String(source).encoded(),
 					std::regex("[^\\w|\\d]"),
@@ -35,8 +35,8 @@ namespace gorage {
 				)
 			) {}
 
-		std::string operator()() const {
-			return _value;
+		std::string value() const { return
+			_value;
 		}
 
 	private:
