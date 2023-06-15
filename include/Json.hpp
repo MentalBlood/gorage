@@ -40,18 +40,31 @@ namespace gorage {
 			explicit String(const Bytes& b):
 				b(b) {}
 
-			std::string encoded() {
+			std::string encoded() const {
 				if (s.length()) {
 					return s;
 				}
 				return cppcodec::base64_rfc4648::encode(b);
 			}
 
-			Bytes decoded() {
+			Bytes decoded() const {
 				if (b.size()) {
 					return b;
 				}
 				return cppcodec::base64_rfc4648::decode(s);
+			}
+
+			std::string hex() const {
+
+				std::stringstream result_stream;
+
+				result_stream << std::hex << std::setw(2) << std::setfill('0');
+				for (const auto& b : decoded()) {
+					result_stream << ((unsigned char)b & 0xff);
+				}
+
+				return result_stream.str();
+
 			}
 
 		};
@@ -71,19 +84,6 @@ namespace gorage {
 			std::any _value;
 
 		};
-
-		static std::string hex(const Bytes& bytes) {
-
-			std::stringstream result_stream;
-
-			result_stream << std::hex << std::setw(2) << std::setfill('0');
-			for (const auto& b : bytes) {
-				result_stream << ((unsigned char)b & 0xff);
-			}
-
-			return result_stream.str();
-
-		}
 
 		template<typename T>
 		static T get(const Dict& d, const std::string& key, const T& _default) {
