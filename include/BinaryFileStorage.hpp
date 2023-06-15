@@ -92,7 +92,7 @@ namespace gorage {
 
 	private:
 		std::filesystem::path _path(const Usi& usi) const {
-			std::filesystem::path result = _folder / usi();
+			std::filesystem::path result = _folder / usi.value();
 			result.replace_extension(_extension);
 			return result;
 		}

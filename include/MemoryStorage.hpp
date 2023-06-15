@@ -17,23 +17,23 @@ namespace gorage {
 		MemoryStorage() {}
 
 		virtual void save(const Usi& usi, const T& object) {
-			_storage.erase(usi());
-			_storage.emplace(usi(), object);
+			_storage.erase(usi.value());
+			_storage.emplace(usi.value(), object);
 		}
 
 		virtual T load(const Usi& usi) const { return
-			_storage.at(usi());
+			_storage.at(usi.value());
 		}
 
 		virtual bool exists(const Usi& usi) const { return
-			_storage.count(usi());
+			_storage.count(usi.value());
 		}
 
 		virtual void remove(const Usi& usi) {
-			if (!_storage.count(usi())) {
-				throw OperationalError("No object with usi '" + usi() + "' to remove");
+			if (!_storage.count(usi.value())) {
+				throw OperationalError("No object with usi '" + usi.value() + "' to remove");
 			}
-			_storage.erase(usi());
+			_storage.erase(usi.value());
 		}
 
 		virtual std::vector<Usi> usis() const {
