@@ -34,13 +34,13 @@ TEST_CASE("`MemoryStorage`") {
 			gorage::Usi("c")
 		};
 		for (const auto& u : usis) {
-			storage.save(u, u() + "_value");
+			storage.save(u, u.value() + "_value");
 		}
 
 		CHECK_EQ(storage.usis().size(), usis.size());
 
 		for (const auto& u : usis) {
-			CHECK_EQ(storage.load(u), u() + "_value");
+			CHECK_EQ(storage.load(u), u.value() + "_value");
 		}
 
 	}
