@@ -50,6 +50,9 @@ namespace gorage {
 			const std::string path = _path(usi).string();
 
 			std::ifstream file(path, std::ios::binary | std::ios::ate);
+			if (!file.is_open()) {
+				throw std::runtime_error("Can not load file " + path);
+			}
 			std::ifstream::pos_type length = file.tellg();
 			if (length == 0) {
 				return Bytes();
