@@ -70,6 +70,31 @@ namespace gorage {
 		std::shared_ptr<Storage<Bytes>>    data_storage;
 		std::shared_ptr<Storage<Metadata>> metadata_storage;
 
+		class Query {
+
+		public:
+
+			const std::unordered_map<std::string, std::any> keys;
+
+			Query(const std::unordered_map<std::string, std::any>& keys):
+				keys(keys) {}
+
+			Query(const std::string& key, const std::any& structure):
+				keys({
+					{key, structure}
+				}) {}
+
+			bool match(const Metadata& metadata) const {
+				for (const auto& q : keys) {
+					if (!metadata.contains(q.first, q.second)) {
+						return false;
+					}
+				}
+				return true;
+			}
+
+		};
+
 		explicit ItemStorage(std::shared_ptr<Storage<Bytes>> data_storage, std::shared_ptr<Storage<Metadata>> metadata_storage):
 			data_storage(data_storage),
 			metadata_storage(metadata_storage) {}
@@ -95,20 +120,10 @@ namespace gorage {
 			metadata_storage->remove(usi);
 		}
 
-		std::optional<std::pair<Usi, Item<Metadata>>> find(const std::string& key, const std::any& structure) const {
-			for (const auto& usi : usis()) {
-				const Item<Metadata> item = load(usi);
-				if (item.contains(key, structure)) {
-					return {{usi, item}};
-				}
-			}
-			return {};
-		}
-
-		std::optional<std::pair<Usi, Item<Metadata>>> metadata_find(const std::string& key, const std::any& structure) const {
+		std::optional<std::pair<Usi, Item<Metadata>>> find(const Query& query) const {
 			for (const auto& usi : usis()) {
 				const Metadata metadata(metadata_storage->load(usi));
-				if (metadata.contains(key, structure)) {
+				if (query.match(metadata)) {
 					return {{
 						usi,
 						Item<Metadata>(
