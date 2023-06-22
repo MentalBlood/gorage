@@ -94,6 +94,7 @@ namespace gorage {
 			else if (type == typeid(Bytes))       { return "Bytes"; }
 			else if (type == typeid(bool))        { return "bool"; }
 			else if (type == typeid(List))        { return "List"; }
+			else if (type == typeid(Dict))        { return "Dict"; }
 			return "unknown";
 		}
 
@@ -121,7 +122,7 @@ namespace gorage {
 		template<typename T>
 		static T get(const Dict& d, const std::string& key, const std::optional<T>& _default = {}) {
 			if (d.count(key)) {
-				return cast<T>(d.at(key));
+				return cast<T>(d.at(key), key);
 			}
 			if (_default) {
 				return *_default;
