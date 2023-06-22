@@ -94,6 +94,7 @@ namespace gorage {
 			else if (type == typeid(Bytes))       { return "Bytes"; }
 			else if (type == typeid(bool))        { return "bool"; }
 			else if (type == typeid(List))        { return "List"; }
+			return "unknown";
 		}
 
 		class CastError : public std::runtime_error {
