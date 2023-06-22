@@ -49,11 +49,9 @@ namespace gorage {
 				).decoded()
 			),
 			metadata(
-				T(
-					get_object<T>(
-						cast<Dict>(structure),
-						"metadata"
-					)
+				get_object<T>(
+					cast<Dict>(structure),
+					"metadata"
 				)
 			) {}
 
