@@ -85,6 +85,31 @@ namespace gorage {
 
 		};
 
+		class CastError : public std::runtime_error {
+		public:
+			explicit CastError(const std::string& message):
+				std::runtime_error(message.c_str()) {}
+		};
+
+		static std::string type_name(const std::type_info& type) {
+			if      (type == typeid(String))      { return "String"; }
+			else if (type == typeid(std::string)) { return "std::string"; }
+			else if (type == typeid(int))         { return "int"; }
+			else if (type == typeid(double))      { return "double"; }
+			else if (type == typeid(Bytes))       { return "Bytes"; }
+			else if (type == typeid(bool))        { return "bool"; }
+			else if (type == typeid(List))        { return "List"; }
+		}
+
+		template<typename T>
+		static T cast(const std::any& a, const std::string& name = "something") {
+			try {
+				return std::any_cast<T>(a);
+			} catch (const std::exception&) {
+				throw CastError("Can not cast " + name + " to " + type_name(a.type()));
+			}
+		}
+
 		template<typename T>
 		static T get(const Dict& d, const std::string& key, const T& _default) {
 			if (d.count(key)) {

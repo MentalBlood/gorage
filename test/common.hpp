@@ -13,8 +13,8 @@ public:
 
 	C(const Structure& structure):
 		s(
-			std::any_cast<String>(
-				std::any_cast<Dict>(structure.value())["s"]
+			cast<String>(
+				cast<Dict>(structure.value())["s"]
 			).s
 		) {}
 
