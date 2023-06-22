@@ -13,8 +13,9 @@ public:
 
 	C(const Structure& structure):
 		s(
-			cast<String>(
-				cast<Dict>(structure.value())["s"]
+			get<String>(
+				cast<Dict>(structure.value()),
+				"s"
 			).s
 		) {}
 

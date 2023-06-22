@@ -5,6 +5,7 @@
 #include <any>
 #include <regex>
 #include <vector>
+#include <optional>
 #include <iomanip>
 #include <sstream>
 #include <iostream>
@@ -85,12 +86,6 @@ namespace gorage {
 
 		};
 
-		class CastError : public std::runtime_error {
-		public:
-			explicit CastError(const std::string& message):
-				std::runtime_error(message.c_str()) {}
-		};
-
 		static std::string type_name(const std::type_info& type) {
 			if      (type == typeid(String))      { return "String"; }
 			else if (type == typeid(std::string)) { return "std::string"; }
@@ -101,21 +96,36 @@ namespace gorage {
 			else if (type == typeid(List))        { return "List"; }
 		}
 
+		class CastError : public std::runtime_error {
+		public:
+			explicit CastError(const std::string& name, const std::any& a):
+				std::runtime_error(("Can not cast " + name + " to " + type_name(a.type())).c_str()) {}
+		};
+
+		class KeyError : public std::runtime_error {
+		public:
+			explicit KeyError(const std::string& key):
+				std::runtime_error(("No key \"" + key + "\" found").c_str()) {}
+		};
+
 		template<typename T>
 		static T cast(const std::any& a, const std::string& name = "something") {
 			try {
 				return std::any_cast<T>(a);
 			} catch (const std::exception&) {
-				throw CastError("Can not cast " + name + " to " + type_name(a.type()));
+				throw CastError(name, a);
 			}
 		}
 
 		template<typename T>
-		static T get(const Dict& d, const std::string& key, const T& _default) {
+		static T get(const Dict& d, const std::string& key, const std::optional<T>& _default = {}) {
 			if (d.count(key)) {
-				return std::any_cast<T>(d.at(key));
+				return cast<T>(d.at(key));
 			}
-			return _default;
+			if (_default) {
+				return *_default;
+			}
+			throw KeyError(key);
 		}
 
 		template<typename T>
