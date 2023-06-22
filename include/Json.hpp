@@ -130,11 +130,14 @@ namespace gorage {
 		}
 
 		template<typename T>
-		static T get_object(const Dict& d, const std::string& key, const T& _default) {
+		static T get_object(const Dict& d, const std::string& key, const std::optional<T>& _default = {}) {
 			if (d.count(key)) {
 				return T(d.at(key));
 			}
-			return _default;
+			if (_default) {
+				return *_default;
+			}
+			throw KeyError(key);
 		}
 
 		static std::any decode(const std::string& json_text) {
@@ -195,7 +198,7 @@ namespace gorage {
 			}
 
 			if (a.type() == typeid(Dict)) {
-				return encode(std::any_cast<Dict>(a));
+				return encode(cast<Dict>(a));
 			}
 
 			throw std::runtime_error("Can not encode type " + std::string(a.type().name()) + " to JSON");
