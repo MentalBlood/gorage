@@ -43,13 +43,17 @@ namespace gorage {
 
 		explicit Item(const std::any& structure):
 			data(
-				std::any_cast<String>(
-					std::any_cast<Dict>(structure)["data"]
+				get<String>(
+					cast<Dict>(structure),
+					"data"
 				).decoded()
 			),
 			metadata(
 				T(
-					std::any_cast<Dict>(structure)["metadata"]
+					get_object<T>(
+						cast<Dict>(structure),
+						"metadata"
+					)
 				)
 			) {}
 
