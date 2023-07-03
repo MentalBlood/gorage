@@ -34,6 +34,12 @@ namespace gorage {
 			return result;
 		}
 
+		T load_anyway(const Usi& usi) const {
+			const T result = _base->load(usi);
+			_integrity->save(digest_usi(usi), digest(result));
+			return result;
+		}
+
 		virtual bool exists(const Usi& usi) const { return
 			_base->exists(usi) && _integrity->exists(digest_usi(usi));
 		}
