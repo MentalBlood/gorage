@@ -57,14 +57,16 @@ namespace gorage {
 
 			std::string hex() const {
 
-				std::stringstream result_stream;
+				std::string result;
+				result.reserve(b.size() * 2 + 1);
 
-				result_stream << std::hex << std::setw(2) << std::setfill('0');
-				for (const auto& b : decoded()) {
-					result_stream << ((unsigned char)b & 0xff);
+				char buffer[3];
+				for (size_t i = 0; i < b.size(); i++) {
+					sprintf(buffer, "%02X", b[i]);
+					result += buffer;
 				}
 
-				return result_stream.str();
+				return result;
 
 			}
 
@@ -338,7 +340,7 @@ namespace gorage {
 				return result;
 			}
 
-			throw std::runtime_error("Can not decode value of type indexed " + v.GetType());
+			throw std::runtime_error("Can not decode JSON");
 
 		}
 
