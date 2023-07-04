@@ -5,6 +5,7 @@
 #include <vector>
 #include <optional>
 #include <iostream>
+#include <unordered_map>
 
 #include "../modules/rapidjson/writer.h"
 #include "../modules/rapidjson/document.h"
