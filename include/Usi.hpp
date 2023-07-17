@@ -7,6 +7,8 @@
 #include "Bytes.hpp"
 #include "RandomName.hpp"
 
+#include "../modules/cppcodec/base32_rfc4648.hpp"
+
 
 
 namespace gorage {
@@ -28,7 +30,7 @@ namespace gorage {
 			if (
 				std::regex_search(
 					_value,
-					std::regex("[^\\w|\\d]+")
+					std::regex("[^\\w|\\d|\=]+")
 				)
 			) {
 				throw std::runtime_error("Invalid usi \"" + _value + "\"");
@@ -37,11 +39,7 @@ namespace gorage {
 
 		explicit Usi(const gorage::Bytes& source):
 			Usi(
-				std::regex_replace(
-					Json::String(source).encoded(),
-					std::regex("[^\\w|\\d]"),
-					"_"
-				)
+				cppcodec::base32_rfc4648::encode(source)
 			) {}
 
 		std::string value() const { return
