@@ -24,7 +24,16 @@ namespace gorage {
 			) {}
 
 		explicit Usi(const std::string& source):
-			_value(source) {}
+			_value(source) {
+			if (
+				std::regex_search(
+					_value,
+					std::regex("[^\\w|\\d]+")
+				)
+			) {
+				throw std::runtime_error("Invalid usi \"" + _value + "\"");
+			}
+		}
 
 		explicit Usi(const gorage::Bytes& source):
 			Usi(
