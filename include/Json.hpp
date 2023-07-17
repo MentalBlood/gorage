@@ -11,7 +11,7 @@
 #include <iostream>
 
 #include "../modules/rapidjson/document.h"
-#include "../modules/cppcodec/base64_rfc4648.hpp"
+#include "../modules/cppcodec/base32_rfc4648.hpp"
 
 #include "Bytes.hpp"
 
@@ -45,14 +45,14 @@ namespace gorage {
 				if (s.length()) {
 					return s;
 				}
-				return cppcodec::base64_rfc4648::encode(b);
+				return cppcodec::base32_rfc4648::encode(b);
 			}
 
 			Bytes decoded() const {
 				if (b.size()) {
 					return b;
 				}
-				return cppcodec::base64_rfc4648::decode(s);
+				return cppcodec::base32_rfc4648::decode(s);
 			}
 
 			std::string hex() const {
@@ -218,7 +218,7 @@ namespace gorage {
 			"\"" + _escaped(s) + "\"";
 		}
 		static std::string encode(const Bytes& s) { return
-			"\"" + cppcodec::base64_rfc4648::encode(s) + "\"";
+			"\"" + cppcodec::base32_rfc4648::encode(s) + "\"";
 		}
 
 		static std::string encode(const int& i) { return
@@ -338,6 +338,9 @@ namespace gorage {
 					result[k_v.name.GetString()] = _decode<rapidjson::Value>(k_v.value);
 				}
 				return result;
+			}
+			if (v.IsBool()) {
+				return v.GetBool();
 			}
 
 			throw std::runtime_error("Can not decode JSON");
