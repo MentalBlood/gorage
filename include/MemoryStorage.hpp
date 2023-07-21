@@ -5,9 +5,21 @@
 
 #include "Usi.hpp"
 #include "Storage.hpp"
+#include "exceptions.hpp"
+
 
 
 namespace gorage {
+
+	namespace exceptions {
+
+		class KeyError : public Base {
+		public:
+			KeyError(const gorage::Usi& usi):
+				Base("No object with usi `" + usi.value() + "`") {}
+		};
+
+	}
 
 	template<class T>
 	class MemoryStorage : public Storage<T> {
@@ -31,7 +43,7 @@ namespace gorage {
 
 		virtual void remove(const Usi& usi) {
 			if (!_storage.count(usi.value())) {
-				throw OperationalError("No object with usi '" + usi.value() + "' to remove");
+				throw exceptions::KeyError(usi);
 			}
 			_storage.erase(usi.value());
 		}

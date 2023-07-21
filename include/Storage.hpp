@@ -7,17 +7,12 @@
 #include "Usi.hpp"
 #include "Json.hpp"
 #include "Bytes.hpp"
+#include "exceptions.hpp"
 #include "RandomName.hpp"
 
 
 
 namespace gorage {
-
-	class OperationalError : public std::runtime_error {
-	public:
-		explicit OperationalError(const std::string& message):
-			std::runtime_error(message.c_str()) {}
-	};
 
 	template<class T>
 	class Storage {
@@ -33,7 +28,7 @@ namespace gorage {
 		T load(const Usi& usi, T default_) {
 			try {
 				return load(usi);
-			} catch(const OperationalError& e) {
+			} catch(const exceptions::OperationalError& e) {
 				throw e;
 			} catch(const std::exception& e) {
 				save(usi, default_);

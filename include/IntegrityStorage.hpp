@@ -5,10 +5,21 @@
 
 #include "Usi.hpp"
 #include "Storage.hpp"
+#include "exceptions.hpp"
 
 
 
 namespace gorage {
+
+	namespace exceptions {
+
+		class IntegrityError : public Base {
+		public:
+			IntegrityError(const gorage::Usi& usi):
+				Base("Can not load object with usi `" + usi.value() + "`: integrity check failed") {}
+		};
+
+	}
 
 	template<class T, class I>
 	class IntegrityStorage : public Storage<T> {
@@ -29,15 +40,26 @@ namespace gorage {
 			const I result_digest = digest(result);
 			const I stated_digest = _integrity->load(digest_usi(usi));
 			if (result_digest != stated_digest) {
-				throw OperationalError("Can not load object with usi `" + usi.value() + "`: integrity check failed");
+				throw exceptions::IntegrityError(usi);
 			}
 			return result;
 		}
 
-		T load_anyway(const Usi& usi) const {
-			const T result = _base->load(usi);
-			_integrity->save(digest_usi(usi), digest(result));
-			return result;
+		T load(const Usi& usi, const bool check) const {
+			if (check) {
+				return load(usi);
+			} else {
+				return _base->load(usi);
+			}
+		}
+
+		void recalculate(const Usi& usi) const {
+			_integrity->save(
+				digest_usi(usi),
+				digest(
+					_base->load(usi)
+				)
+			);
 		}
 
 		virtual bool exists(const Usi& usi) const { return
@@ -58,7 +80,12 @@ namespace gorage {
 		virtual I digest(const T& content) const = 0;
 
 		virtual Usi digest_usi(const Usi& usi) const {
-			return Usi(usi.value() + "_digest");
+			if constexpr (std::is_same_v<T, I>) {
+				if (_base == _integrity) {
+					return Usi(usi.value() + "_digest");
+				}
+			}
+			return usi;
 		}
 
 	private:

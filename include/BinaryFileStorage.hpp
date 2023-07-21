@@ -7,6 +7,7 @@
 #include <filesystem>
 
 #include "Usi.hpp"
+#include "File.hpp"
 #include "Bytes.hpp"
 #include "Storage.hpp"
 
@@ -28,41 +29,11 @@ namespace gorage {
 		const std::string           _extension;
 
 		void save(const Usi& usi, const Bytes& content) {
-
-			if (!std::filesystem::exists(_folder)) {
-				std::filesystem::create_directories(_folder);
-			}
-
-			const std::string path = _path(usi).string();
-
-			std::ofstream file(path, std::ios::trunc | std::ios::binary);
-			if (!file.is_open()) {
-				throw std::runtime_error("Can not save file " + path);
-			}
-
-			file.write(reinterpret_cast<const char*>(&content[0]), content.size());
-			file.close();
-
+			File(_path(usi)).write<Bytes>(content);
 		}
 
-		Bytes load(const Usi& usi) const {
-
-			const std::string path = _path(usi).string();
-
-			std::ifstream file(path, std::ios::binary | std::ios::ate);
-			if (!file.is_open()) {
-				throw std::runtime_error("Can not load file " + path);
-			}
-			std::ifstream::pos_type length = file.tellg();
-			if (length == 0) {
-				return Bytes();
-			}
-
-			Bytes result(length);
-			file.seekg(0, std::ios::beg);
-			file.read(reinterpret_cast<char*>(&result[0]), length);
-			return result;
-
+		Bytes load(const Usi& usi) const { return
+			File(_path(usi)).read<Bytes>();
 		}
 
 		virtual bool exists(const Usi& usi) const { return

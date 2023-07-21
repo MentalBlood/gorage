@@ -7,6 +7,7 @@
 
 #include "Usi.hpp"
 #include "Json.hpp"
+#include "File.hpp"
 #include "Bytes.hpp"
 #include "Storage.hpp"
 
@@ -29,39 +30,11 @@ namespace gorage {
 		const std::string           _extension;
 
 		void save(const Usi& usi, const T& object) {
-
-			if (!std::filesystem::exists(_folder)) {
-				std::filesystem::create_directories(_folder);
-			}
-
-			const std::string path = _path(usi).string();
-
-			std::ofstream file(path, std::ios::out | std::ios::trunc);
-			if (!file.is_open()) {
-				throw std::runtime_error("Can not save file " + path);
-			}
-
-			file << object.encoded();
-			file.close();
-
+			File(_path(usi)).write<T>(object);
 		}
 
-		T load(const Usi& usi) const {
-
-			const std::string path = _path(usi).string();
-
-			std::ifstream file(path, std::ios::in);
-			if (!file.is_open()) {
-				throw std::runtime_error("Can not load file " + path);
-			}
-
-			std::stringstream result_stream;
-			result_stream << file.rdbuf();
-
-			file.close();
-
-			return Json::from<T>(result_stream.str());
-
+		T load(const Usi& usi) const { return
+			File(_path(usi)).read<T>();
 		}
 
 		virtual bool exists(const Usi& usi) const { return
