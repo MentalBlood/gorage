@@ -25,15 +25,15 @@ namespace gorage {
 				gorage::RandomName(length).str()
 			) {}
 
-		explicit Usi(const std::string& source):
+		explicit Usi(const std::string& source, const std::string& comment = ""):
 			_value(source) {
 			if (
 				std::regex_search(
 					_value,
-					std::regex("[^\\w|\\d|\=]+")
+					std::regex("[^\\w|\\d|\\=]+")
 				)
 			) {
-				throw std::runtime_error("Invalid usi \"" + _value + "\"");
+				throw std::runtime_error("Invalid usi \"" + _value + "\"" + (comment.length() ? (" " + comment) : ""));
 			}
 		}
 
@@ -42,8 +42,12 @@ namespace gorage {
 				cppcodec::base32_rfc4648::encode(source)
 			) {}
 
-		std::string value() const { return
+		const std::string& value() const { return
 			_value;
+		}
+
+		Bytes decoded() const { return
+			cppcodec::base32_rfc4648::decode(_value);
 		}
 
 	private:
