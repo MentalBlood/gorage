@@ -28,7 +28,7 @@ namespace gorage {
 		T load(const Usi& usi, T default_) {
 			try {
 				return load(usi);
-			} catch(const exceptions::OperationalError& e) {
+			} catch(const exceptions::Base& e) {
 				throw e;
 			} catch(const std::exception& e) {
 				save(usi, default_);
