@@ -21,13 +21,19 @@ namespace gorage {
 	public:
 
 		explicit Storage(const std::filesystem::path& folder, const std::string& extension):
-			_folder(folder),
-			_extension(extension) {}
+			folder(folder),
+			extension(extension) {}
 
 	protected:
 
-		const std::filesystem::path _folder;
-		const std::string           _extension;
+		const std::filesystem::path folder;
+		const std::string           extension;
+
+		File<T> file(const Usi& usi) const { return
+			File<T>(
+				(folder / usi.value()).replace_extension(extension)
+			);
+		}
 
 		void save(const Usi& usi, const T& object) {
 			file(usi).write(object);
@@ -49,9 +55,9 @@ namespace gorage {
 
 			std::vector<Usi> result;
 
-			if (std::filesystem::exists(_folder)) {
-				for (const auto& p : std::filesystem::directory_iterator(_folder)) {
-					if (p.path().extension() == _extension) {
+			if (std::filesystem::exists(folder)) {
+				for (const auto& p : std::filesystem::directory_iterator(folder)) {
+					if (p.path().extension() == extension) {
 						result.push_back(
 							Usi(
 								p.path().stem().string()
@@ -63,12 +69,6 @@ namespace gorage {
 
 			return result;
 
-		}
-
-		File<T> file(const Usi& usi) const { return
-			File<T>(
-				(_folder / usi.value()).replace_extension(_extension)
-			);
 		}
 
 	};
