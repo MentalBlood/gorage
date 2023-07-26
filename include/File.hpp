@@ -45,7 +45,7 @@ namespace gorage {
 			std::filesystem::exists(path);
 		}
 
-		void remove() {
+		void remove() const {
 			std::filesystem::remove(path);
 		}
 
