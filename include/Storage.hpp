@@ -31,7 +31,6 @@ namespace gorage {
 			} catch(const exceptions::Base& e) {
 				throw e;
 			} catch(const std::exception& e) {
-				save(usi, default_);
 				return default_;
 			}
 		}
