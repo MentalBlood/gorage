@@ -16,11 +16,11 @@
 namespace gorage {
 
 	template<class T>
-	class FileStorage : public Storage<T> {
+	class Storage<File<T>> : public Storage<T> {
 
 	public:
 
-		explicit FileStorage(const std::filesystem::path& folder, const std::string& extension):
+		explicit Storage(const std::filesystem::path& folder, const std::string& extension):
 			_folder(folder),
 			_extension(extension) {}
 
@@ -30,20 +30,19 @@ namespace gorage {
 		const std::string           _extension;
 
 		void save(const Usi& usi, const T& object) {
-			File(_path(usi)).write<T>(object);
+			file(usi).write(object);
 		}
 
 		T load(const Usi& usi) const { return
-			File(_path(usi)).read<T>();
+			file(usi).read();
 		}
 
 		virtual bool exists(const Usi& usi) const { return
-			std::filesystem::exists(_path(usi));
+			file(usi).exists();
 		}
 
-
 		void remove(const Usi& usi) {
-			std::filesystem::remove(_path(usi));
+			file(usi).remove();
 		}
 
 		virtual std::vector<Usi> usis() const {
@@ -66,11 +65,10 @@ namespace gorage {
 
 		}
 
-	private:
-		std::filesystem::path _path(const Usi& usi) const {
-			std::filesystem::path result = _folder / usi.value();
-			result.replace_extension(_extension);
-			return result;
+		File<T> file(const Usi& usi) const { return
+			File<T>(
+				(_folder / usi.value()).replace_extension(_extension)
+			);
 		}
 
 	};
