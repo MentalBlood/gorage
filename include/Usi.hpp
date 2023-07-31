@@ -1,6 +1,7 @@
 #pragma once
 
 #include <regex>
+#include <optional>
 #include <iostream>
 
 #include "Json.hpp"
@@ -25,7 +26,7 @@ namespace gorage {
 				gorage::RandomName(length).str()
 			) {}
 
-		explicit Usi(const std::string& source, const std::string& comment = ""):
+		explicit Usi(const std::string& source, const std::optional<std::string>& comment = {}):
 			_value(source) {
 			if (
 				std::regex_search(
@@ -33,7 +34,7 @@ namespace gorage {
 					std::regex("[^\\w|\\d|\\=]+")
 				)
 			) {
-				throw std::runtime_error("Invalid usi \"" + _value + "\"" + (comment.length() ? (" " + comment) : ""));
+				throw std::runtime_error("Invalid usi \"" + _value + "\"" + (comment.has_value() ? (" " + *comment) : ""));
 			}
 		}
 

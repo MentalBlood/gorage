@@ -27,7 +27,7 @@ namespace gorage {
 	public:
 
 		const Bytes data;
-		const T metadata;
+		const T     metadata;
 
 		Item():
 			data({}), metadata(T()) {}
@@ -36,20 +36,12 @@ namespace gorage {
 			data(data),
 			metadata(metadata) {}
 
-		explicit Item(const std::string& data_base64, const T& metadata):
-			Item(
-				gorage::Json::String(data_base64).decoded(),
-				metadata
-			) {}
-
 		explicit Item(const std::any& structure):
-			data(
+			Item(
 				get<String>(
 					cast<Dict>(structure),
 					"data"
-				).decoded()
-			),
-			metadata(
+				).decoded(),
 				get_object<T>(
 					cast<Dict>(structure),
 					"metadata"
@@ -58,7 +50,7 @@ namespace gorage {
 
 		std::any structure() const { return
 			Dict{
-				{"data", data},
+				{"data",     data},
 				{"metadata", metadata}
 			};
 		}
@@ -66,12 +58,9 @@ namespace gorage {
 	};
 
 	template<class Metadata>
-	class ItemStorage : public Storage<Item<Metadata>> {
+	class Storage<Item<Metadata>> {
 
 	public:
-
-		std::shared_ptr<Storage<Bytes>>    data_storage;
-		std::shared_ptr<Storage<Metadata>> metadata_storage;
 
 		class Query {
 
@@ -98,31 +87,6 @@ namespace gorage {
 
 		};
 
-		explicit ItemStorage(std::shared_ptr<Storage<Bytes>> data_storage, std::shared_ptr<Storage<Metadata>> metadata_storage):
-			data_storage(data_storage),
-			metadata_storage(metadata_storage) {}
-
-		void save(const Usi& usi, const Item<Metadata>& item) {
-			data_storage->save(usi, item.data);
-			metadata_storage->save(usi, item.metadata);
-		}
-
-		Item<Metadata> load(const Usi& usi) const { return
-			Item<Metadata>(
-				data_storage->load(usi),
-				metadata_storage->load(usi)
-			);
-		}
-
-		virtual bool exists(const Usi& usi) const { return
-			data_storage->exists(usi) && metadata_storage->exists(usi);
-		}
-
-		void remove(const Usi& usi) {
-			data_storage->remove(usi);
-			metadata_storage->remove(usi);
-		}
-
 		std::optional<std::pair<Usi, Item<Metadata>>> find(const Query& query) const {
 			for (const auto& usi : usis()) {
 				const Metadata metadata(metadata_storage->load(usi));
@@ -137,10 +101,6 @@ namespace gorage {
 				}
 			}
 			return {};
-		}
-
-		virtual std::vector<Usi> usis() const { return
-			metadata_storage->usis();
 		}
 
 	};

@@ -8,10 +8,7 @@
 
 TEST_CASE("`ItemStorage`") {
 
-	gorage::ItemStorage<C> storage(
-		std::make_shared<gorage::MemoryStorage<gorage::Bytes>>(),
-		std::make_shared<gorage::MemoryStorage<C>>()
-	);
+	gorage::MemoryStorage<gorage::Item<C>> storage;
 	REQUIRE(storage.usis().size() == 0);
 
 	const gorage::Usi  usi("usi");
