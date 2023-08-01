@@ -20,14 +20,12 @@ namespace gorage {
 
 	public:
 
+		const std::filesystem::path folder;
+		const std::string           extension;
+
 		explicit Storage(const std::filesystem::path& folder, const std::string& extension):
 			folder(folder),
 			extension(extension) {}
-
-	protected:
-
-		const std::filesystem::path folder;
-		const std::string           extension;
 
 		File<T> file(const Usi& usi) const { return
 			File<T>(

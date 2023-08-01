@@ -37,6 +37,12 @@ namespace gorage {
 
 		virtual void remove(const Usi& usi) = 0;
 
+		void clear() {
+			for (const Usi& usi : usis()) {
+				remove(usi);
+			}
+		}
+
 		virtual std::vector<Usi> usis() const = 0;
 
 	};

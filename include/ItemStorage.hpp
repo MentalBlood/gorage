@@ -51,53 +51,41 @@ namespace gorage {
 		std::any structure() const { return
 			Dict{
 				{"data",     data},
-				{"metadata", metadata}
+				{"metadata", metadata.structure()}
 			};
 		}
 
 	};
 
 	template<class Metadata>
-	class Storage<Item<Metadata>> {
+	class Query {
 
 	public:
 
-		class Query {
+		const std::unordered_map<std::string, std::any> keys;
 
-		public:
+		Query(const std::unordered_map<std::string, std::any>& keys):
+			keys(keys) {}
 
-			const std::unordered_map<std::string, std::any> keys;
+		Query(const std::string& key, const std::any& structure):
+			keys({
+				{key, structure}
+			}) {}
 
-			Query(const std::unordered_map<std::string, std::any>& keys):
-				keys(keys) {}
-
-			Query(const std::string& key, const std::any& structure):
-				keys({
-					{key, structure}
-				}) {}
-
-			bool match(const Metadata& metadata) const {
-				for (const auto& q : keys) {
-					if (!metadata.contains(q.first, q.second)) {
-						return false;
-					}
+		bool match(const Metadata& metadata) const {
+			for (const auto& q : keys) {
+				if (!metadata.contains(q.first, q.second)) {
+					return false;
 				}
-				return true;
 			}
+			return true;
+		}
 
-		};
-
-		std::optional<std::pair<Usi, Item<Metadata>>> find(const Query& query) const {
-			for (const auto& usi : usis()) {
-				const Metadata metadata(metadata_storage->load(usi));
-				if (query.match(metadata)) {
-					return {{
-						usi,
-						Item<Metadata>(
-							data_storage->load(usi),
-							metadata
-						)
-					}};
+		std::optional<std::pair<Usi, Item<Metadata>>> execute(const std::shared_ptr<Storage<Item<Metadata>>> storage) const {
+			for (const auto& usi : storage->usis()) {
+				const Item<Metadata> item(storage->load(usi));
+				if (match(item.metadata)) {
+					return {{usi, item}};
 				}
 			}
 			return {};

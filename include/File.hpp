@@ -72,7 +72,11 @@ namespace gorage {
 					throw exceptions::CanNotWriteFile(path);
 				}
 
-				file << object.encoded();
+				if constexpr (std::is_same_v<T, std::string>) {
+					file << object;
+				} else {
+					file << object.encoded();
+				}
 				file.close();
 
 			}
