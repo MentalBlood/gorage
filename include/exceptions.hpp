@@ -34,6 +34,13 @@ namespace gorage {
 
 		};
 
+		class NotImplemented : public Base {
+		public:
+			NotImplemented(const std::string& class_, const std::string& method):
+				Base("Method `" + method + "` not implemented for class `" + class_ + "`") {}
+		};
+
+
 	} // exceptions
 
 } // gorage
