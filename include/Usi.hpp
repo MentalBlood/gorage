@@ -40,7 +40,11 @@ namespace gorage {
 
 		explicit Usi(const gorage::Bytes& source):
 			Usi(
-				cppcodec::base32_rfc4648::encode(source)
+				std::regex_replace(
+					cppcodec::base32_rfc4648::encode(source),
+					std::regex("="),
+					""
+				)
 			) {}
 
 		const std::string& value() const { return
