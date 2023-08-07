@@ -36,7 +36,7 @@ namespace gorage {
 		}
 
 		T load(const Usi& usi) const {
-			const T result = _base->load(usi);
+			const T result        = _base->load(usi);
 			const I result_digest = digest(result);
 			const I stated_digest = _integrity->load(digest_usi(usi));
 			if (result_digest != stated_digest) {
@@ -44,13 +44,28 @@ namespace gorage {
 			}
 			return result;
 		}
-
-		T load(const Usi& usi, const bool check) const {
-			if (check) {
-				return load(usi);
-			} else {
-				return _base->load(usi);
+		Bytes raw(const Usi& usi) const {
+			const Bytes result    = _base->raw(usi);
+			const I result_digest = digest_raw(result);
+			const I stated_digest = _integrity->load(digest_usi(usi));
+			if (result_digest != stated_digest) {
+				throw exceptions::IntegrityError(usi);
 			}
+			return result;
+		}
+
+
+		bool check(const Usi& usi) const {
+			for (const Usi& usi : usis()) {
+				if (
+					digest_raw(_base->raw(usi))
+					!=
+					_integrity->load(digest_usi(usi))
+				) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		void recalculate(const Usi& usi) const {
@@ -78,6 +93,7 @@ namespace gorage {
 	protected:
 
 		virtual I digest(const T& content) const = 0;
+		virtual I digest_raw(const Bytes& content) const = 0;
 
 		virtual Usi digest_usi(const Usi& usi) const {
 			if constexpr (std::is_same_v<T, I>) {

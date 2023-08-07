@@ -27,10 +27,12 @@ namespace gorage {
 			folder(folder),
 			extension(extension) {}
 
+		std::filesystem::path path(const Usi& usi) const { return
+			(folder / usi.value()).replace_extension(extension);
+		}
+
 		File<T> file(const Usi& usi) const { return
-			File<T>(
-				(folder / usi.value()).replace_extension(extension)
-			);
+			File<T>(path(usi));
 		}
 
 		void save(const Usi& usi, const T& object) {
@@ -39,6 +41,9 @@ namespace gorage {
 
 		T load(const Usi& usi) const { return
 			file(usi).read();
+		}
+		Bytes raw(const Usi& usi) const { return
+			File<Bytes>(path(usi)).read();
 		}
 
 		virtual bool exists(const Usi& usi) const { return

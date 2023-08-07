@@ -36,6 +36,9 @@ namespace gorage {
 		virtual T load(const Usi& usi) const { return
 			_storage.at(usi.value());
 		}
+		virtual Bytes raw(const Usi& usi) const {
+			throw exceptions::NotImplemented("MemoryStorage", "raw");
+		}
 
 		virtual bool exists(const Usi& usi) const { return
 			_storage.count(usi.value());
