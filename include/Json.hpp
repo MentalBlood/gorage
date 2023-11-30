@@ -24,11 +24,10 @@ namespace gorage {
 
 		class String {
 		public:
-			const std::string s;
-			const Bytes       b;
+			std::string s;
+			Bytes b;
 
 			String() {}
-
 			explicit String(const std::string& s): s(s) {}
 			explicit String(const Bytes& b): b(b) {}
 
@@ -59,25 +58,23 @@ namespace gorage {
 			std::any _value;
 		};
 		static std::string type_name(const std::type_info& type) {
-			if      (type == typeid(String)) return "String";
+			if (type == typeid(String)) return "String";
 			if (type == typeid(std::string)) return "std::string";
-			if (type == typeid(int))         return "int";
-			if (type == typeid(double))      return "double";
-			if (type == typeid(Bytes))       return "Bytes";
-			if (type == typeid(bool))        return "bool";
-			if (type == typeid(List))        return "List";
-			if (type == typeid(Dict))        return "Dict";
+			if (type == typeid(int)) return "int";
+			if (type == typeid(double)) return "double";
+			if (type == typeid(Bytes)) return "Bytes";
+			if (type == typeid(bool)) return "bool";
+			if (type == typeid(List)) return "List";
+			if (type == typeid(Dict)) return "Dict";
 			return "unknown";
 		}
 		class CastError : public std::runtime_error {
 		public:
-			explicit CastError(const std::string& name, const std::any& a):
-				std::runtime_error(("Can not cast " + name + " to " + type_name(a.type())).c_str()) {}
+			explicit CastError(const std::string& name, const std::any& a): std::runtime_error(("Can not cast " + name + " to " + type_name(a.type())).c_str()) {}
 		};
 		class KeyError : public std::runtime_error {
 		public:
-			explicit KeyError(const std::string& key):
-				std::runtime_error(("No key \"" + key + "\" found").c_str()) {}
+			explicit KeyError(const std::string& key): std::runtime_error(("No key \"" + key + "\" found").c_str()) {}
 		};
 		template<typename T>
 		static T cast(const std::any& a, const std::string& name = "something") {
@@ -86,12 +83,8 @@ namespace gorage {
 		}
 		template<typename T>
 		static T get(const Dict& d, const std::string& key, const std::optional<T>& _default = {}) {
-			if (d.count(key)) {
-				return cast<T>(d.at(key), key);
-			}
-			if (_default) {
-				return *_default;
-			}
+			if (d.count(key)) return cast<T>(d.at(key), key);
+			if (_default) return *_default;
 			throw KeyError(key);
 		}
 		template<typename T>

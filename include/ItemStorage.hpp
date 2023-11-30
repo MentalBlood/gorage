@@ -24,8 +24,8 @@ namespace gorage {
 	template<class T>
 	class Item : public Json {
 	public:
-		const Bytes data;
-		const T     metadata;
+		Bytes data;
+		T metadata;
 
 		Item() {}
 		explicit Item(const Bytes& data, const T& metadata): data(data), metadata(metadata) {}

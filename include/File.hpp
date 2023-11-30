@@ -23,7 +23,6 @@ namespace gorage {
 			explicit CanNotWriteFile(const std::filesystem::path& path): Base("Can not write file `" + path.string() + "`") {}
 		};
 	}
-
 	template<class T>
 	class File {
 	public:
@@ -74,7 +73,8 @@ namespace gorage {
 				file.close();
 
 				const auto result = result_stream.str();
-				if constexpr (std::is_same_v<T, std::string>) return result; else return Json::from<T>(result);
+				if constexpr (std::is_same_v<T, std::string>) return result;
+				else return Json::from<T>(result);
 			}
 		}
 	};

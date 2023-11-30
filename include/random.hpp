@@ -28,9 +28,7 @@ namespace gorage {
 
 			explicit Name(const size_t& length) {
 				_value.reserve(length);
-				for (size_t i = 0; i < length; i++) {
-					_value += alphabet[generator() % (alphabet.length() - 1)];
-				}
+				for (size_t i = 0; i < length; i++) _value += alphabet[generator() % (alphabet.length() - 1)];
 			}
 			std::string value() const { return _value; }
 		private:

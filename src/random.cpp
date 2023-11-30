@@ -3,7 +3,6 @@
 #include "../include/random.hpp"
 
 
-
 namespace gorage {
 	namespace random {
 		const std::string Name::alphabet =	"0123456789"

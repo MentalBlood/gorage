@@ -7,7 +7,3 @@
 #include "FileStorage.hpp"
 #include "MemoryStorage.hpp"
 #include "IntegrityStorage.hpp"
-
-
-
-namespace gorage {} // gorage
