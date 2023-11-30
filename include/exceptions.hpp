@@ -8,7 +8,7 @@
 #include "Usi.hpp"
 #include "Json.hpp"
 #include "Bytes.hpp"
-#include "RandomName.hpp"
+#include "random.hpp"
 
 
 
@@ -26,7 +26,7 @@ namespace gorage {
 				_message(message) {}
 
 			const char* what() const noexcept override {
-				return &_message[0];
+				return _message.c_str();
 			}
 
 		private:

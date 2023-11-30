@@ -9,7 +9,7 @@
 #include "Json.hpp"
 #include "Bytes.hpp"
 #include "exceptions.hpp"
-#include "RandomName.hpp"
+#include "random.hpp"
 
 
 
@@ -37,6 +37,11 @@ namespace gorage {
 	public:
 
 		virtual void save(const Usi& usi, const T& object) = 0;
+		Usi save(const T& object) {
+			const Usi usi = this->usi();
+			save(usi, object);
+			return usi;
+		}
 
 		virtual T load(const Usi& usi) const = 0;
 		virtual P load(const Usi& usi, size_t part_number) const {
@@ -58,11 +63,20 @@ namespace gorage {
 
 		virtual bool exists(const Usi& usi) const = 0;
 
+		Usi usi() const {
+			while (true) {
+				const Usi result;
+				if (!exists(result)) {
+					return result;
+				}
+			}
+		}
+
 		T load(const Usi& usi, T default_) {
 			try {
 				return load(usi);
 			} catch(const exceptions::Base& e) {
-				throw e;
+				throw;
 			} catch(const std::exception& e) {
 				return default_;
 			}

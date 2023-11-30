@@ -54,18 +54,12 @@ namespace gorage {
 			return result;
 		}
 
-
 		bool check(const Usi& usi) const {
-			for (const Usi& usi : usis()) {
-				if (
-					digest_raw(_base->raw(usi))
-					!=
-					_integrity->load(digest_usi(usi))
-				) {
-					return false;
-				}
+			try {
+				return digest_raw(_base->raw(usi)) == _integrity->load(digest_usi(usi));
+			} catch(const exceptions::CanNotReadFile& e) {
+				return false;
 			}
-			return true;
 		}
 
 		void recalculate(const Usi& usi) const {
