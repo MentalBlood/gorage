@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "Usi.hpp"
+#include "File.hpp"
 #include "Storage.hpp"
 #include "exceptions.hpp"
 
@@ -47,7 +48,6 @@ namespace gorage {
 			_integrity->remove(digest_usi(usi));
 		}
 		virtual std::vector<Usi> usis() const { return _base->usis(); }
-
 	protected:
 		virtual I digest(const T& content) const = 0;
 		virtual I digest_raw(const Bytes& content) const = 0;

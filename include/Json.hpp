@@ -209,7 +209,6 @@ namespace gorage {
 
 			throw std::runtime_error("Can not decode JSON");
 		}
-
 		static std::string _escaped(const std::string& s) { return
 			std::regex_replace(
 				std::regex_replace(s, std::regex("\\\\"), "\\\\"),
