@@ -22,10 +22,10 @@ TEST_CASE("`MemoryStorage`") {
 		REQUIRE(storage.usis().size() == 0);
 
 		const auto usis = std::vector<gorage::Usi>({gorage::Usi("a"), gorage::Usi("b"), gorage::Usi("c")});
-		for (const auto& u : usis) storage.save(u, u.value() + "_value");
+		for (const auto& u : usis) storage.save(u, u.value + "_value");
 
 		CHECK_EQ(storage.usis().size(), usis.size());
 
-		for (const auto& u : usis) CHECK_EQ(storage.load(u), u.value() + "_value");
+		for (const auto& u : usis) CHECK_EQ(storage.load(u), u.value + "_value");
 	}
 }
