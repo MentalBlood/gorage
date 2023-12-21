@@ -3,12 +3,13 @@
 #include <regex>
 
 #include "Bytes.hpp"
+#include "Json.hpp"
 #include "random.hpp"
 
 #include "../modules/cppcodec/base32_rfc4648.hpp"
 
 namespace gorage {
-class Usi {
+class Usi : public Json {
 public:
   std::string value;
 
@@ -21,5 +22,9 @@ public:
                                std::regex("="), "")) {}
 
   Bytes decoded() const { return cppcodec::base32_rfc4648::decode(value); }
+
+  explicit Usi(const Json::Structure &structure)
+      : value(cast<String>(structure.value()).s) {}
+  std::any structure() const { return value; }
 };
 } // namespace gorage
