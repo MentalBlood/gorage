@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <set>
 
 #include "Bytes.hpp"
 #include "File.hpp"
@@ -31,14 +32,14 @@ public:
 
   Bytes raw(const Usi &usi) const { return File<Bytes>(path(usi)).read(); }
 
-  virtual std::vector<Usi> usis() const {
+  virtual std::set<Usi> usis() const {
     if (!std::filesystem::exists(root))
       return {};
 
-    std::vector<Usi> result;
+    std::set<Usi> result;
     for (const auto &p : std::filesystem::directory_iterator(root))
       if (p.path().extension() == extension)
-        result.push_back(Usi(p.path().stem().string()));
+        result.insert(Usi(p.path().stem().string()));
 
     return result;
   }

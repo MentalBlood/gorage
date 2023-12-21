@@ -2,3 +2,10 @@
 build
 example.exe
 example.obj
+.cache
+CMakeCache.txt
+*.cache
+CMakeFiles
+*.cmake
+Makefile
+

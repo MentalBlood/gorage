@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <set>
 
 #include "Bytes.hpp"
 #include "Json.hpp"
@@ -70,6 +70,6 @@ public:
       remove(usi);
   }
 
-  virtual std::vector<Usi> usis() const = 0;
+  virtual std::set<Usi> usis() const = 0;
 };
 } // namespace gorage

@@ -40,10 +40,10 @@ public:
     throw exceptions::NotImplemented("MemoryStorage", "raw");
   }
 
-  virtual std::vector<Usi> usis() const {
-    std::vector<Usi> result;
+  virtual std::set<Usi> usis() const {
+    std::set<Usi> result;
     for (const auto &pair : _storage)
-      result.push_back(Usi(pair.first));
+      result.insert(Usi(pair.first));
     return result;
   }
 

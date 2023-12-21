@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
 #include "File.hpp"
 #include "Storage.hpp"
@@ -58,7 +57,10 @@ public:
     _base->remove(usi);
     _integrity->remove(digest_usi(usi));
   }
-  virtual std::vector<Usi> usis() const { return _base->usis(); }
+  virtual std::set<Usi> usis() const {
+    const auto result = _base->usis();
+    return std::set<Usi>(result.begin(), result.end());
+  }
 
 protected:
   virtual I digest(const T &content) const = 0;
