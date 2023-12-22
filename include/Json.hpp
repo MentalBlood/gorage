@@ -233,29 +233,23 @@ public:
 private:
   template <typename T> static std::any _decode(const T &v) {
     if (v.IsNumber()) {
-      if (v.IsInt()) {
+      if (v.IsInt())
         return v.GetInt();
-      }
-      if (v.IsDouble()) {
+      else if (v.IsDouble())
         return v.GetDouble();
-      }
-    }
-    if (v.IsString()) {
+    } else if (v.IsString())
       return String(std::string(v.GetString()));
-    }
-    if (v.IsArray()) {
+    else if (v.IsArray()) {
       List result;
       for (const auto &e : v.GetArray())
         result.push_back(_decode<rapidjson::Value>(e));
       return result;
-    }
-    if (v.IsObject()) {
+    } else if (v.IsObject()) {
       Dict result;
       for (const auto &k_v : v.GetObject())
         result[k_v.name.GetString()] = _decode<rapidjson::Value>(k_v.value);
       return result;
-    }
-    if (v.IsBool())
+    } else if (v.IsBool())
       return v.GetBool();
 
     throw std::runtime_error("Can not decode JSON");

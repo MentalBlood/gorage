@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "Usi.hpp"
+
 namespace gorage {
 namespace exceptions {
 class Base : public std::exception {
@@ -18,6 +20,23 @@ public:
   NotImplemented(const std::string &class_, const std::string &method)
       : Base("Method `" + method + "` not implemented for class `" + class_ +
              "`") {}
+};
+class NoSuchPart : public Base {
+public:
+  explicit NoSuchPart(const Usi &usi, const size_t &number)
+      : Base("Object with USI " + usi.value + "have no part of number " +
+             std::to_string(number)) {}
+};
+class CanNotBuild : public Base {
+public:
+  explicit CanNotBuild(const size_t &number)
+      : Base("Can not build object from given " + std::to_string(number) +
+             " parts"){};
+};
+class KeyError : public Base {
+public:
+  KeyError(const gorage::Usi &usi)
+      : Base("No object with usi `" + usi.value + "`") {}
 };
 } // namespace exceptions
 } // namespace gorage

@@ -7,13 +7,6 @@
 #include "exceptions.hpp"
 
 namespace gorage {
-namespace exceptions {
-class KeyError : public Base {
-public:
-  KeyError(const gorage::Usi &usi)
-      : Base("No object with usi `" + usi.value + "`") {}
-};
-} // namespace exceptions
 template <class T> class MemoryStorage : public Storage<T> {
 public:
   MemoryStorage() {}
