@@ -1,14 +1,14 @@
 #include <ItemStorage.hpp>
 #include <Json.hpp>
 #include <MemoryStorage.hpp>
-#include <Id.hpp>
+#include <Key.hpp>
 #include <common.hpp>
 
 TEST_CASE("`ItemStorage`") {
   gorage::MemoryStorage<gorage::Item<C>> storage;
-  REQUIRE(storage.ids().size() == 0);
+  REQUIRE(storage.keys().size() == 0);
 
-  const auto usi = gorage::Id("usi");
+  const auto usi = gorage::Key("usi");
   const auto json = std::string("{\"s\": \"string\"}");
   const auto item = gorage::Item(gorage::Bytes{'d', 'a', 't', 'a'},
                                  gorage::Json::from<C>(json));

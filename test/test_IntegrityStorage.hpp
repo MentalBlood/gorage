@@ -23,9 +23,9 @@ protected:
 void test(std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> base,
           std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> integrity) {
   Sample storage(base, integrity);
-  REQUIRE(storage.ids().size() == 0);
+  REQUIRE(storage.keys().size() == 0);
 
-  gorage::Id usi("usi");
+  gorage::Key usi("usi");
   gorage::Bytes content = {'d', 'a', 't', 'a'};
 
   SUBCASE("saving") {
