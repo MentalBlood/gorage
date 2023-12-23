@@ -23,8 +23,8 @@ public:
 };
 class NoSuchPart : public Base {
 public:
-  explicit NoSuchPart(const Key &id, const size_t &number)
-      : Base("Object with USI " + id.value + "have no part of number " +
+  explicit NoSuchPart(const Key &key, const size_t &number)
+      : Base("Object with USI " + key.value + "have no part of number " +
              std::to_string(number)) {}
 };
 class CanNotBuild : public Base {
@@ -35,8 +35,8 @@ public:
 };
 class KeyError : public Base {
 public:
-  KeyError(const gorage::Key &id)
-      : Base("No object with id `" + id.value + "`") {}
+  KeyError(const gorage::Key &key)
+      : Base("No object with key `" + key.value + "`") {}
 };
 } // namespace exceptions
 } // namespace gorage

@@ -12,22 +12,22 @@
 namespace gorage {
 template <class T, class P = T> class Storage {
 public:
-  void save(const Key &id, const T &object) {
+  void save(const Key &key, const T &object) {
     for (auto &i : _indexes)
-      i.second.save(id, object);
-    _save(id, object);
+      i.second.save(key, object);
+    _save(key, object);
   }
   Key save(const T &object) {
-    const auto result = id();
+    const auto result = key();
     save(result, object);
     return result;
   }
-  virtual T load(const Key &id) const = 0;
-  virtual P load(const Key &id, size_t &part_number) const {
+  virtual T load(const Key &key) const = 0;
+  virtual P load(const Key &key, size_t &part_number) const {
     if (part_number == 0)
-      return load(id);
+      return load(key);
     else
-      throw exceptions::NoSuchPart(id, part_number);
+      throw exceptions::NoSuchPart(key, part_number);
   }
   virtual T build(const std::vector<P> &parts) {
     if (parts.size() == 1)
@@ -35,34 +35,34 @@ public:
     else
       throw exceptions::CanNotBuild(parts.size());
   }
-  virtual Bytes raw(const Key &id) const = 0;
-  virtual bool exists(const Key &id) const = 0;
+  virtual Bytes raw(const Key &key) const = 0;
+  virtual bool exists(const Key &key) const = 0;
 
-  Key id() const {
+  Key key() const {
     while (true) {
       const auto result = Key();
       if (!exists(result))
         return result;
     }
   }
-  T load(const Key &id, const T &default_) const {
+  T load(const Key &key, const T &default_) const {
     try {
-      return load(id);
+      return load(key);
     } catch (const exceptions::Base &e) {
       throw;
     } catch (const std::exception &e) {
       return default_;
     }
   }
-  virtual void remove(const Key &id) {
+  virtual void remove(const Key &key) {
     for (auto &i : _indexes)
-      i.second.remove(id);
-    _remove(id);
+      i.second.remove(key);
+    _remove(key);
   }
 
   void clear() {
-    for (const Key &id : keys())
-      remove(id);
+    for (const Key &key : keys())
+      remove(key);
   }
 
   virtual std::set<Key> keys() const = 0;
@@ -73,8 +73,8 @@ public:
       return;
     _indexes[name] = Index(extractor);
     auto &result = _indexes[name];
-    for (const Key &id : keys())
-      result.save(id, load(id));
+    for (const Key &key : keys())
+      result.save(key, load(key));
   }
   const std::set<Key> &keys(const std::string &index_name,
                             const std::string &indexed_value) const {
@@ -109,8 +109,8 @@ public:
   }
 
 protected:
-  virtual void _save(const Key &id, const T &object) = 0;
-  virtual void _remove(const Key &id) = 0;
+  virtual void _save(const Key &key, const T &object) = 0;
+  virtual void _remove(const Key &key) = 0;
 
 private:
   std::map<std::string, Index<T>> _indexes;

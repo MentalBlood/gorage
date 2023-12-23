@@ -19,16 +19,16 @@ public:
                    const std::string &extension)
       : root(folder), extension(extension) {}
 
-  std::filesystem::path path(const Key &id) const {
-    return root / (id.value + "." + extension);
+  std::filesystem::path path(const Key &key) const {
+    return root / (key.value + "." + extension);
   }
 
-  File<T> file(const Key &id) const { return File<T>(path(id)); }
+  File<T> file(const Key &key) const { return File<T>(path(key)); }
 
-  T load(const Key &id) const { return file(id).read(); }
-  virtual bool exists(const Key &id) const { return file(id).exists(); }
+  T load(const Key &key) const { return file(key).read(); }
+  virtual bool exists(const Key &key) const { return file(key).exists(); }
 
-  Bytes raw(const Key &id) const { return File<Bytes>(path(id)).read(); }
+  Bytes raw(const Key &key) const { return File<Bytes>(path(key)).read(); }
 
   virtual std::set<Key> keys() const {
     if (!std::filesystem::exists(root))
@@ -43,7 +43,7 @@ public:
   }
 
 protected:
-  void _save(const Key &id, const T &object) { file(id).write(object); }
-  void _remove(const Key &id) { file(id).remove(); }
+  void _save(const Key &key, const T &object) { file(key).write(object); }
+  void _remove(const Key &key) { file(key).remove(); }
 };
 } // namespace gorage

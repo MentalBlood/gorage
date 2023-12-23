@@ -11,16 +11,16 @@ template <class T> class MemoryStorage : public Storage<T> {
 public:
   MemoryStorage() {}
 
-  virtual T load(const Key &id) const {
-    if (!exists(id))
-      throw exceptions::KeyError(id);
-    return _storage.at(id.value);
+  virtual T load(const Key &key) const {
+    if (!exists(key))
+      throw exceptions::KeyError(key);
+    return _storage.at(key.value);
   }
-  virtual bool exists(const Key &id) const {
-    return _storage.count(id.value);
+  virtual bool exists(const Key &key) const {
+    return _storage.count(key.value);
   }
 
-  virtual Bytes raw(const Key &id) const {
+  virtual Bytes raw(const Key &key) const {
     throw exceptions::NotImplemented("MemoryStorage", "raw");
   }
 
@@ -32,14 +32,14 @@ public:
   }
 
 protected:
-  virtual void _remove(const Key &id) {
-    if (!exists(id))
-      throw exceptions::KeyError(id);
-    _storage.erase(id.value);
+  virtual void _remove(const Key &key) {
+    if (!exists(key))
+      throw exceptions::KeyError(key);
+    _storage.erase(key.value);
   }
-  virtual void _save(const Key &id, const T &object) {
-    _storage.erase(id.value);
-    _storage.emplace(id.value, object);
+  virtual void _save(const Key &key, const T &object) {
+    _storage.erase(key.value);
+    _storage.emplace(key.value, object);
   }
 
 private:

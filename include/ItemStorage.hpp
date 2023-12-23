@@ -49,10 +49,10 @@ public:
               &first = {}) const {
     std::optional<std::shared_ptr<std::pair<Key, T>>> result;
 
-    for (const auto &id : storage->keys()) {
-      const auto item = storage->load(id);
+    for (const auto &key : storage->keys()) {
+      const auto item = storage->load(key);
       if (match(item)) {
-        const auto current = std::make_shared<std::pair<Key, T>>(id, item);
+        const auto current = std::make_shared<std::pair<Key, T>>(key, item);
 
         if (!first.has_value())
           return *current;

@@ -13,13 +13,13 @@ public:
 
   Index(const Extractor &extractor) : extractor(extractor) {}
 
-  void save(const Key &id, const T &object) { _save(id, extractor(object)); }
-  void remove(const Key &id) {
-    if (!_id_to_values.count(id))
+  void save(const Key &key, const T &object) { _save(key, extractor(object)); }
+  void remove(const Key &key) {
+    if (!_key_to_values.count(key))
       return;
-    for (const auto &value : _id_to_values[id])
-      _value_to_keys[value].erase(id);
-    _id_to_values.erase(id);
+    for (const auto &value : _key_to_values[key])
+      _value_to_keys[value].erase(key);
+    _key_to_values.erase(key);
   }
   const std::set<Key> &load(const std::string &value) const {
     static const std::set<Key> empty;
@@ -30,15 +30,15 @@ public:
 
 private:
   std::map<std::string, std::set<Key>> _value_to_keys;
-  std::map<Key, std::set<std::string>> _id_to_values;
-  void _save(const Key &id, const std::string &value) {
-    remove(id);
+  std::map<Key, std::set<std::string>> _key_to_values;
+  void _save(const Key &key, const std::string &value) {
+    remove(key);
     if (!_value_to_keys.count(value))
       _value_to_keys[value] = {};
-    _value_to_keys[value].insert(id);
-    if (!_id_to_values.count(id))
-      _id_to_values[id] = {};
-    _id_to_values[id].insert(value);
+    _value_to_keys[value].insert(key);
+    if (!_key_to_values.count(key))
+      _key_to_values[key] = {};
+    _key_to_values[key].insert(value);
   }
 };
 } // namespace gorage

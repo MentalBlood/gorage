@@ -11,8 +11,8 @@ namespace gorage {
 namespace exceptions {
 class IntegrityError : public Base {
 public:
-  IntegrityError(const gorage::Key &id)
-      : Base("Can not load object with id `" + id.value +
+  IntegrityError(const gorage::Key &key)
+      : Base("Can not load object with key `" + key.value +
              "`: integrity check failed") {}
 };
 } // namespace exceptions
@@ -22,31 +22,31 @@ public:
                             std::shared_ptr<Storage<I>> integrity)
       : _base(base), _integrity(integrity) {}
 
-  T load(const Key &id) const {
-    const T result = _base->load(id);
-    if (digest(result) != _integrity->load(digest_id(id)))
-      throw exceptions::IntegrityError(id);
+  T load(const Key &key) const {
+    const T result = _base->load(key);
+    if (digest(result) != _integrity->load(digest_key(key)))
+      throw exceptions::IntegrityError(key);
     return result;
   }
-  Bytes raw(const Key &id) const {
-    const Bytes result = _base->raw(id);
-    if (digest_raw(result) != _integrity->load(digest_id(id)))
-      throw exceptions::IntegrityError(id);
+  Bytes raw(const Key &key) const {
+    const Bytes result = _base->raw(key);
+    if (digest_raw(result) != _integrity->load(digest_key(key)))
+      throw exceptions::IntegrityError(key);
     return result;
   }
-  bool check(const Key &id) const {
+  bool check(const Key &key) const {
     try {
-      return digest_raw(_base->raw(id)) == _integrity->load(digest_id(id));
+      return digest_raw(_base->raw(key)) == _integrity->load(digest_key(key));
     } catch (const exceptions::CanNotReadFile &e) {
       return false;
     }
   }
-  void recalculate(const Key &id) const {
-    _integrity->save(digest_id(id), digest(_base->load(id)));
+  void recalculate(const Key &key) const {
+    _integrity->save(digest_key(key), digest(_base->load(key)));
   }
 
-  virtual bool exists(const Key &id) const {
-    return _base->exists(id) && _integrity->exists(digest_id(id));
+  virtual bool exists(const Key &key) const {
+    return _base->exists(key) && _integrity->exists(digest_key(key));
   }
 
   virtual std::set<Key> keys() const {
@@ -57,20 +57,20 @@ public:
 protected:
   virtual I digest(const T &content) const = 0;
   virtual I digest_raw(const Bytes &content) const = 0;
-  void _save(const Key &id, const T &content) {
-    _integrity->save(digest_id(id), digest(content));
-    _base->save(id, content);
+  void _save(const Key &key, const T &content) {
+    _integrity->save(digest_key(key), digest(content));
+    _base->save(key, content);
   }
-  void _remove(const Key &id) {
-    _base->remove(id);
-    _integrity->remove(digest_id(id));
+  void _remove(const Key &key) {
+    _base->remove(key);
+    _integrity->remove(digest_key(key));
   }
 
-  virtual Key digest_id(const Key &id) const {
+  virtual Key digest_key(const Key &key) const {
     if constexpr (std::is_same_v<T, I>)
       if (_base == _integrity)
-        return Key(id.value + "_digest");
-    return id;
+        return Key(key.value + "_digest");
+    return key;
   }
 
 private:
