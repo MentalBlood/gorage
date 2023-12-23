@@ -11,19 +11,10 @@ template <class T> class MemoryStorage : public Storage<T> {
 public:
   MemoryStorage() {}
 
-  virtual void save(const Usi &usi, const T &object) {
-    _storage.erase(usi.value);
-    _storage.emplace(usi.value, object);
-  }
   virtual T load(const Usi &usi) const {
     if (!exists(usi))
       throw exceptions::KeyError(usi);
     return _storage.at(usi.value);
-  }
-  virtual void remove(const Usi &usi) {
-    if (!exists(usi))
-      throw exceptions::KeyError(usi);
-    _storage.erase(usi.value);
   }
   virtual bool exists(const Usi &usi) const {
     return _storage.count(usi.value);
@@ -38,6 +29,17 @@ public:
     for (const auto &pair : _storage)
       result.insert(Usi(pair.first));
     return result;
+  }
+
+protected:
+  virtual void _remove(const Usi &usi) {
+    if (!exists(usi))
+      throw exceptions::KeyError(usi);
+    _storage.erase(usi.value);
+  }
+  virtual void _save(const Usi &usi, const T &object) {
+    _storage.erase(usi.value);
+    _storage.emplace(usi.value, object);
   }
 
 private:

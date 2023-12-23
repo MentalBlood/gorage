@@ -4,21 +4,17 @@
 #include <set>
 
 #include "Usi.hpp"
-#include "exceptions.hpp"
 
 namespace gorage {
-class Index {
+template <class T> class Index {
 public:
-  Index() {}
+  using Extractor = std::function<std::any(const T &)>;
+  Extractor extractor;
 
-  void save(const Usi &usi, const std::string &value) {
-    remove(usi);
-    if (!_value_to_usis.count(value))
-      _value_to_usis[value] = {};
-    _value_to_usis[value].insert(usi);
-    if (!_usi_to_values.count(usi))
-      _usi_to_values[usi] = {};
-    _usi_to_values[usi].insert(value);
+  Index(const Extractor &extractor) : extractor(extractor) {}
+
+  void save(const Usi &usi, const T &object) {
+    _save(usi, Json::encode(extractor(object)));
   }
   void remove(const Usi &usi) {
     if (!_usi_to_values.count(usi))
@@ -27,14 +23,24 @@ public:
       _value_to_usis[value].erase(usi);
     _usi_to_values.erase(usi);
   }
-  const std::set<Usi> &get(const std::string &value) const {
+  const std::set<Usi> &load(const std::string &value) const {
+    static const std::set<Usi> empty;
     if (!_value_to_usis.count(value))
-      throw exceptions::KeyError(gorage::Usi(value));
+      return empty;
     return _value_to_usis.at(value);
   }
 
 private:
   std::map<std::string, std::set<Usi>> _value_to_usis;
   std::map<Usi, std::set<std::string>> _usi_to_values;
+  void _save(const Usi &usi, const std::string &value) {
+    remove(usi);
+    if (!_value_to_usis.count(value))
+      _value_to_usis[value] = {};
+    _value_to_usis[value].insert(usi);
+    if (!_usi_to_values.count(usi))
+      _usi_to_values[usi] = {};
+    _usi_to_values[usi].insert(value);
+  }
 };
 } // namespace gorage

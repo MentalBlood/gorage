@@ -25,9 +25,7 @@ public:
 
   File<T> file(const Usi &usi) const { return File<T>(path(usi)); }
 
-  void save(const Usi &usi, const T &object) { file(usi).write(object); }
   T load(const Usi &usi) const { return file(usi).read(); }
-  void remove(const Usi &usi) { file(usi).remove(); }
   virtual bool exists(const Usi &usi) const { return file(usi).exists(); }
 
   Bytes raw(const Usi &usi) const { return File<Bytes>(path(usi)).read(); }
@@ -43,5 +41,9 @@ public:
 
     return result;
   }
+
+protected:
+  void _save(const Usi &usi, const T &object) { file(usi).write(object); }
+  void _remove(const Usi &usi) { file(usi).remove(); }
 };
 } // namespace gorage

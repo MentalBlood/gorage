@@ -22,10 +22,6 @@ public:
                             std::shared_ptr<Storage<I>> integrity)
       : _base(base), _integrity(integrity) {}
 
-  void save(const Usi &usi, const T &content) {
-    _integrity->save(digest_usi(usi), digest(content));
-    _base->save(usi, content);
-  }
   T load(const Usi &usi) const {
     const T result = _base->load(usi);
     if (digest(result) != _integrity->load(digest_usi(usi)))
@@ -53,10 +49,6 @@ public:
     return _base->exists(usi) && _integrity->exists(digest_usi(usi));
   }
 
-  void remove(const Usi &usi) {
-    _base->remove(usi);
-    _integrity->remove(digest_usi(usi));
-  }
   virtual std::set<Usi> usis() const {
     const auto result = _base->usis();
     return std::set<Usi>(result.begin(), result.end());
@@ -65,6 +57,14 @@ public:
 protected:
   virtual I digest(const T &content) const = 0;
   virtual I digest_raw(const Bytes &content) const = 0;
+  void _save(const Usi &usi, const T &content) {
+    _integrity->save(digest_usi(usi), digest(content));
+    _base->save(usi, content);
+  }
+  void _remove(const Usi &usi) {
+    _base->remove(usi);
+    _integrity->remove(digest_usi(usi));
+  }
 
   virtual Usi digest_usi(const Usi &usi) const {
     if constexpr (std::is_same_v<T, I>)

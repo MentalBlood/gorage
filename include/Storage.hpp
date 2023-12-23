@@ -12,7 +12,11 @@
 namespace gorage {
 template <class T, class P = T> class Storage {
 public:
-  virtual void save(const Usi &usi, const T &object) = 0;
+  void save(const Usi &usi, const T &object) {
+    for (auto &i : _indexes)
+      i.second.save(usi, object);
+    _save(usi, object);
+  }
   Usi save(const T &object) {
     const auto result = usi();
     save(result, object);
@@ -50,7 +54,11 @@ public:
       return default_;
     }
   }
-  virtual void remove(const Usi &usi) = 0;
+  virtual void remove(const Usi &usi) {
+    for (auto &i : _indexes)
+      i.second.remove(usi);
+    _remove(usi);
+  }
 
   void clear() {
     for (const Usi &usi : usis())
@@ -59,17 +67,50 @@ public:
 
   virtual std::set<Usi> usis() const = 0;
 
-  using Extractor = std::function<std::any(const T &)>;
-  void index(const Extractor &get_value) {
-    if (_indexes.count(get_value))
+  void index(const std::string &name,
+             const typename Index<T>::Extractor &extractor) {
+    if (_indexes.count(name))
       return;
-    auto result = Index();
+    auto result = Index(extractor);
     for (const Usi &usi : usis())
-      result.save(usi, Json::encode(get_value(load(usi))));
-    _indexes[get_value] = result;
+      result.save(usi, load(usi));
+    _indexes[name] = result;
+  }
+  const std::set<Usi> &usis(const std::string &index_name,
+                            const std::string &indexed_value) const {
+    if (!_indexes.count(index_name))
+      throw exceptions::KeyError(Usi(index_name));
+    return _indexes[index_name].load(indexed_value);
+  }
+  std::set<Usi>
+  usis(const std::map<std::string, std::string> &indexed_values) const {
+    std::set<Usi> result;
+    for (const auto &pair : indexed_values) {
+      const auto &new_usis = load(pair.first, pair.second);
+      if (!result.size())
+        result = new_usis;
+      else
+        for (const auto &u : result)
+          if (!new_usis.count(u)) {
+            if (result.size() == 1)
+              return {};
+            result.erase(u);
+          }
+    }
+    return result;
+  }
+  std::set<T> load(const std::set<Usi> &usis) const {
+    std::set<T> result;
+    for (const auto &u : usis)
+      result.insert(load(u));
+    return result;
   }
 
+protected:
+  virtual void _save(const Usi &usi, const T &object) = 0;
+  virtual void _remove(const Usi &usi) = 0;
+
 private:
-  std::map<Extractor, Index> _indexes;
+  std::map<std::string, Index<T>> _indexes;
 };
 } // namespace gorage
