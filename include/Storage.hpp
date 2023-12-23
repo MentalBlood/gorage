@@ -90,12 +90,12 @@ public:
       if (!result.size())
         result = new_usis;
       else
-        for (const auto &u : result)
-          if (!new_usis.count(u)) {
-            if (result.size() == 1)
-              return {};
-            result.erase(u);
-          }
+        for (auto first = result.begin(), last = result.end(); first != last;) {
+          if (!new_usis.count(*first))
+            first = result.erase(first);
+          else
+            ++first;
+        }
     }
     return result;
   }
