@@ -100,7 +100,7 @@ public:
     return result;
   }
   std::vector<T> load(const std::set<Usi> &usis) const {
-    std::set<T> result;
+    std::vector<T> result;
     for (const auto &u : usis)
       result.insert(load(u));
     return result;
