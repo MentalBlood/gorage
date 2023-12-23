@@ -8,14 +8,12 @@
 namespace gorage {
 template <class T> class Index {
 public:
-  using Extractor = std::function<std::any(const T &)>;
+  using Extractor = std::function<std::string(const T &)>;
   Extractor extractor;
 
   Index(const Extractor &extractor) : extractor(extractor) {}
 
-  void save(const Usi &usi, const T &object) {
-    _save(usi, Json::encode(extractor(object)));
-  }
+  void save(const Usi &usi, const T &object) { _save(usi, extractor(object)); }
   void remove(const Usi &usi) {
     if (!_usi_to_values.count(usi))
       return;
