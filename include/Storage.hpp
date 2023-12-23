@@ -96,6 +96,8 @@ public:
           else
             ++first;
         }
+      if (!result.size())
+        break;
     }
     return result;
   }
