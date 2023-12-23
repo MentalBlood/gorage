@@ -4,15 +4,15 @@
 
 #include "File.hpp"
 #include "Storage.hpp"
-#include "Usi.hpp"
+#include "Id.hpp"
 #include "exceptions.hpp"
 
 namespace gorage {
 namespace exceptions {
 class IntegrityError : public Base {
 public:
-  IntegrityError(const gorage::Usi &usi)
-      : Base("Can not load object with usi `" + usi.value +
+  IntegrityError(const gorage::Id &id)
+      : Base("Can not load object with id `" + id.value +
              "`: integrity check failed") {}
 };
 } // namespace exceptions
@@ -22,55 +22,55 @@ public:
                             std::shared_ptr<Storage<I>> integrity)
       : _base(base), _integrity(integrity) {}
 
-  T load(const Usi &usi) const {
-    const T result = _base->load(usi);
-    if (digest(result) != _integrity->load(digest_usi(usi)))
-      throw exceptions::IntegrityError(usi);
+  T load(const Id &id) const {
+    const T result = _base->load(id);
+    if (digest(result) != _integrity->load(digest_id(id)))
+      throw exceptions::IntegrityError(id);
     return result;
   }
-  Bytes raw(const Usi &usi) const {
-    const Bytes result = _base->raw(usi);
-    if (digest_raw(result) != _integrity->load(digest_usi(usi)))
-      throw exceptions::IntegrityError(usi);
+  Bytes raw(const Id &id) const {
+    const Bytes result = _base->raw(id);
+    if (digest_raw(result) != _integrity->load(digest_id(id)))
+      throw exceptions::IntegrityError(id);
     return result;
   }
-  bool check(const Usi &usi) const {
+  bool check(const Id &id) const {
     try {
-      return digest_raw(_base->raw(usi)) == _integrity->load(digest_usi(usi));
+      return digest_raw(_base->raw(id)) == _integrity->load(digest_id(id));
     } catch (const exceptions::CanNotReadFile &e) {
       return false;
     }
   }
-  void recalculate(const Usi &usi) const {
-    _integrity->save(digest_usi(usi), digest(_base->load(usi)));
+  void recalculate(const Id &id) const {
+    _integrity->save(digest_id(id), digest(_base->load(id)));
   }
 
-  virtual bool exists(const Usi &usi) const {
-    return _base->exists(usi) && _integrity->exists(digest_usi(usi));
+  virtual bool exists(const Id &id) const {
+    return _base->exists(id) && _integrity->exists(digest_id(id));
   }
 
-  virtual std::set<Usi> usis() const {
-    const auto result = _base->usis();
-    return std::set<Usi>(result.begin(), result.end());
+  virtual std::set<Id> ids() const {
+    const auto result = _base->ids();
+    return std::set<Id>(result.begin(), result.end());
   }
 
 protected:
   virtual I digest(const T &content) const = 0;
   virtual I digest_raw(const Bytes &content) const = 0;
-  void _save(const Usi &usi, const T &content) {
-    _integrity->save(digest_usi(usi), digest(content));
-    _base->save(usi, content);
+  void _save(const Id &id, const T &content) {
+    _integrity->save(digest_id(id), digest(content));
+    _base->save(id, content);
   }
-  void _remove(const Usi &usi) {
-    _base->remove(usi);
-    _integrity->remove(digest_usi(usi));
+  void _remove(const Id &id) {
+    _base->remove(id);
+    _integrity->remove(digest_id(id));
   }
 
-  virtual Usi digest_usi(const Usi &usi) const {
+  virtual Id digest_id(const Id &id) const {
     if constexpr (std::is_same_v<T, I>)
       if (_base == _integrity)
-        return Usi(usi.value + "_digest");
-    return usi;
+        return Id(id.value + "_digest");
+    return id;
   }
 
 private:

@@ -31,7 +31,7 @@ RAPIDJSON_NAMESPACE_BEGIN
     \param parseErrorCode Error code obtained in parsing.
     \return the error message.
     \note User can make a copy of this function for localization.
-        Using switch-case is safer for future modification of error codes.
+        Idng switch-case is safer for future modification of error codes.
 */
 inline const RAPIDJSON_ERROR_CHARTYPE* GetParseError_En(ParseErrorCode parseErrorCode) {
     switch (parseErrorCode) {

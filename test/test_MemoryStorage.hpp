@@ -2,10 +2,10 @@
 
 TEST_CASE("`MemoryStorage`") {
   gorage::MemoryStorage<std::string> storage;
-  REQUIRE(storage.usis().size() == 0);
+  REQUIRE(storage.ids().size() == 0);
 
   const auto s = "string";
-  const auto usi = gorage::Usi("usi");
+  const auto usi = gorage::Id("usi");
 
   SUBCASE("saving") {
     storage.save(usi, s);
@@ -15,19 +15,19 @@ TEST_CASE("`MemoryStorage`") {
     storage.save(usi, s);
     storage.remove(usi);
 
-    CHECK_EQ(storage.usis().size(), 0);
+    CHECK_EQ(storage.ids().size(), 0);
   }
   SUBCASE("iterating") {
-    REQUIRE(storage.usis().size() == 0);
+    REQUIRE(storage.ids().size() == 0);
 
-    const auto usis = std::vector<gorage::Usi>(
-        {gorage::Usi("a"), gorage::Usi("b"), gorage::Usi("c")});
-    for (const auto &u : usis)
+    const auto ids = std::vector<gorage::Id>(
+        {gorage::Id("a"), gorage::Id("b"), gorage::Id("c")});
+    for (const auto &u : ids)
       storage.save(u, u.value + "_value");
 
-    CHECK_EQ(storage.usis().size(), usis.size());
+    CHECK_EQ(storage.ids().size(), ids.size());
 
-    for (const auto &u : usis)
+    for (const auto &u : ids)
       CHECK_EQ(storage.load(u), u.value + "_value");
   }
 }

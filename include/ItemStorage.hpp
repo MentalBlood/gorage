@@ -9,7 +9,7 @@
 #include "Bytes.hpp"
 #include "Json.hpp"
 #include "Storage.hpp"
-#include "Usi.hpp"
+#include "Id.hpp"
 
 namespace gorage {
 template <class T> class Item : public Json {
@@ -42,17 +42,17 @@ public:
         return false;
     return true;
   }
-  std::optional<std::pair<Usi, T>>
+  std::optional<std::pair<Id, T>>
   execute(const std::shared_ptr<Storage<T>> storage,
-          const std::optional<std::function<bool(const std::pair<Usi, T> &,
-                                                 const std::pair<Usi, T> &)>>
+          const std::optional<std::function<bool(const std::pair<Id, T> &,
+                                                 const std::pair<Id, T> &)>>
               &first = {}) const {
-    std::optional<std::shared_ptr<std::pair<Usi, T>>> result;
+    std::optional<std::shared_ptr<std::pair<Id, T>>> result;
 
-    for (const auto &usi : storage->usis()) {
-      const auto item = storage->load(usi);
+    for (const auto &id : storage->ids()) {
+      const auto item = storage->load(id);
       if (match(item)) {
-        const auto current = std::make_shared<std::pair<Usi, T>>(usi, item);
+        const auto current = std::make_shared<std::pair<Id, T>>(id, item);
 
         if (!first.has_value())
           return *current;

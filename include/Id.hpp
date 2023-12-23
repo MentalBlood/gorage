@@ -9,21 +9,21 @@
 #include "../modules/cppcodec/base32_rfc4648.hpp"
 
 namespace gorage {
-class Usi : public Json {
+class Id : public Json {
 public:
   std::string value;
 
-  Usi() : Usi(32) {}
-  Usi(const size_t &length) : Usi(random::Name(length).value()) {}
+  Id() : Id(32) {}
+  Id(const size_t &length) : Id(random::Name(length).value()) {}
 
-  explicit Usi(const std::string &value) : value(value) {}
-  explicit Usi(const gorage::Bytes &source)
-      : Usi(std::regex_replace(cppcodec::base32_rfc4648::encode(source),
+  explicit Id(const std::string &value) : value(value) {}
+  explicit Id(const gorage::Bytes &source)
+      : Id(std::regex_replace(cppcodec::base32_rfc4648::encode(source),
                                std::regex("="), "")) {}
 
   Bytes decoded() const { return cppcodec::base32_rfc4648::decode(value); }
 
-  explicit Usi(const Json::Structure &structure)
+  explicit Id(const Json::Structure &structure)
       : value(cast<String>(structure.value()).s) {}
   std::any structure() const { return value; }
 };

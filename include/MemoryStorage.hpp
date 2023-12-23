@@ -3,7 +3,7 @@
 #include <map>
 
 #include "Storage.hpp"
-#include "Usi.hpp"
+#include "Id.hpp"
 #include "exceptions.hpp"
 
 namespace gorage {
@@ -11,35 +11,35 @@ template <class T> class MemoryStorage : public Storage<T> {
 public:
   MemoryStorage() {}
 
-  virtual T load(const Usi &usi) const {
-    if (!exists(usi))
-      throw exceptions::KeyError(usi);
-    return _storage.at(usi.value);
+  virtual T load(const Id &id) const {
+    if (!exists(id))
+      throw exceptions::KeyError(id);
+    return _storage.at(id.value);
   }
-  virtual bool exists(const Usi &usi) const {
-    return _storage.count(usi.value);
+  virtual bool exists(const Id &id) const {
+    return _storage.count(id.value);
   }
 
-  virtual Bytes raw(const Usi &usi) const {
+  virtual Bytes raw(const Id &id) const {
     throw exceptions::NotImplemented("MemoryStorage", "raw");
   }
 
-  virtual std::set<Usi> usis() const {
-    std::set<Usi> result;
+  virtual std::set<Id> ids() const {
+    std::set<Id> result;
     for (const auto &pair : _storage)
-      result.insert(Usi(pair.first));
+      result.insert(Id(pair.first));
     return result;
   }
 
 protected:
-  virtual void _remove(const Usi &usi) {
-    if (!exists(usi))
-      throw exceptions::KeyError(usi);
-    _storage.erase(usi.value);
+  virtual void _remove(const Id &id) {
+    if (!exists(id))
+      throw exceptions::KeyError(id);
+    _storage.erase(id.value);
   }
-  virtual void _save(const Usi &usi, const T &object) {
-    _storage.erase(usi.value);
-    _storage.emplace(usi.value, object);
+  virtual void _save(const Id &id, const T &object) {
+    _storage.erase(id.value);
+    _storage.emplace(id.value, object);
   }
 
 private:

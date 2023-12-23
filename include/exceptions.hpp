@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Usi.hpp"
+#include "Id.hpp"
 
 namespace gorage {
 namespace exceptions {
@@ -23,8 +23,8 @@ public:
 };
 class NoSuchPart : public Base {
 public:
-  explicit NoSuchPart(const Usi &usi, const size_t &number)
-      : Base("Object with USI " + usi.value + "have no part of number " +
+  explicit NoSuchPart(const Id &id, const size_t &number)
+      : Base("Object with USI " + id.value + "have no part of number " +
              std::to_string(number)) {}
 };
 class CanNotBuild : public Base {
@@ -35,8 +35,8 @@ public:
 };
 class KeyError : public Base {
 public:
-  KeyError(const gorage::Usi &usi)
-      : Base("No object with usi `" + usi.value + "`") {}
+  KeyError(const gorage::Id &id)
+      : Base("No object with id `" + id.value + "`") {}
 };
 } // namespace exceptions
 } // namespace gorage
