@@ -26,5 +26,6 @@ public:
   explicit Key(const Json::Structure &structure)
       : value(cast<String>(structure.value()).s) {}
   std::any structure() const { return value; }
+  bool operator<(const Key &other) const { return value < other.value; }
 };
 } // namespace gorage
