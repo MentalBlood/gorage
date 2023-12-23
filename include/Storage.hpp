@@ -71,10 +71,10 @@ public:
              const typename Index<T>::Extractor &extractor) {
     if (_indexes.count(name))
       return;
-    auto result = Index(extractor);
+    _indexes[name] = Index(extractor);
+    auto &result = _indexes[name];
     for (const Usi &usi : usis())
       result.save(usi, load(usi));
-    _indexes[name] = result;
   }
   const std::set<Usi> &usis(const std::string &index_name,
                             const std::string &indexed_value) const {
