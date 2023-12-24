@@ -76,6 +76,9 @@ public:
     for (const Key &key : keys())
       result.save(key, load(key));
   }
+  void index(const std::string &name) {
+    index(name, typename Index<T>::Extractor(name));
+  }
   const std::set<Key> &keys(const std::string &index_name,
                             const std::string &indexed_value) const {
     if (!_indexes.count(index_name))

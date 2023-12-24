@@ -3,12 +3,44 @@
 #include <map>
 #include <set>
 
+#include "Json.hpp"
 #include "Key.hpp"
+#include "exceptions.hpp"
 
 namespace gorage {
+namespace exceptions {
+class NoSuchField : public exceptions::Base {
+public:
+  NoSuchField(const std::string &field_name) : Base(field_name) {}
+};
+} // namespace exceptions
 template <class T> class Index {
 public:
-  using Extractor = std::function<std::string(const T &)>;
+  class Extractor {
+  public:
+    using F = std::function<std::string(const T &)>;
+    F f;
+
+    Extractor(const F &f) : f(f) {}
+    Extractor(const std::string &field_name) {
+      if (std::is_same_v<T, gorage::Json>)
+        f = [field_name](const T &object) {
+          const auto json = object.encoded();
+          static const auto regex = std::regex(std::regex_replace(
+              "\"" + field_name + "\" *: (*)" + "(?:\\n| )*(?:,|})",
+              std::regex("\\[|\\]|\\{|\\}|\\/|\\+|\\.|\\\""), "\\$&"));
+          std::smatch matches;
+          if (std::regex_search(json, matches, regex))
+            if (matches.size() >= 2)
+              return matches[1];
+          throw exceptions::NoSuchField(field_name);
+        };
+      else
+        throw exceptions::NotImplemented(
+            "Index", "Extractor for fields of non-JSON objects");
+    };
+    std::string operator()(const T &object) { return f(object); }
+  };
   Extractor extractor;
 
   Index(const Extractor &extractor) : extractor(extractor) {}
