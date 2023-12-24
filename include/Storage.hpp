@@ -13,8 +13,10 @@ namespace gorage {
 template <class T, class P = T> class Storage {
 public:
   void save(const Key &key, const T &object) {
-    for (auto &i : _indexes)
+    for (auto &i : _indexes) {
+      i.second.remove(key);
       i.second.save(key, object);
+    }
     _save(key, object);
   }
   Key save(const T &object) {
