@@ -71,10 +71,14 @@ public:
              const typename Index<T>::Extractor &extractor) {
     if (_indexes.count(name))
       return;
-    _indexes[name] = Index(extractor);
+    _indexes[name] = Index<T>(extractor);
     auto &result = _indexes[name];
     for (const Key &key : keys())
       result.save(key, load(key));
+  }
+  void index(const std::string &name,
+             const typename Index<T>::Extractor::F &f) {
+    index(name, typename Index<T>::Extractor(f));
   }
   void index(const std::string &name) {
     index(name, typename Index<T>::Extractor(name));
@@ -83,7 +87,7 @@ public:
                             const std::string &indexed_value) const {
     if (!_indexes.count(index_name))
       throw exceptions::KeyError(Key(index_name));
-    return _indexes[index_name].load(indexed_value);
+    return _indexes.at(index_name).load(indexed_value);
   }
   std::set<Key>
   keys(const std::map<std::string, std::string> &indexed_values) const {

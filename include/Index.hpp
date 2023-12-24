@@ -21,6 +21,7 @@ public:
     using F = std::function<std::string(const T &)>;
     F f;
 
+    Extractor() {}
     Extractor(const F &f) : f(f) {}
     Extractor(const std::string &field_name) {
       if (std::is_same_v<T, gorage::Json>)
@@ -43,6 +44,7 @@ public:
   };
   Extractor extractor;
 
+  Index() {}
   Index(const Extractor &extractor) : extractor(extractor) {}
 
   void save(const Key &key, const T &object) { _save(key, extractor(object)); }

@@ -3,7 +3,8 @@
 #define DOCTEST_CONFIG_SUPER_FAST_ASSERTS
 #include "doctest.h"
 
-#include <test_Json.hpp>
-#include <test_IntegrityStorage.hpp>
-#include <test_MemoryStorage.hpp>
-#include <test_ItemStorage.hpp>
+#include "test_Index.hpp"
+#include "test_IntegrityStorage.hpp"
+#include "test_ItemStorage.hpp"
+#include "test_Json.hpp"
+#include "test_MemoryStorage.hpp"
