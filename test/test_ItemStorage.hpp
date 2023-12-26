@@ -1,8 +1,8 @@
-#include <ItemStorage.hpp>
-#include <Json.hpp>
-#include <MemoryStorage.hpp>
-#include <Key.hpp>
-#include <common.hpp>
+#include "../include/ItemStorage.hpp"
+#include "../include/Json.hpp"
+#include "../include/MemoryStorage.hpp"
+#include "common.hpp"
+#include "doctest.h"
 
 TEST_CASE("`ItemStorage`") {
   gorage::MemoryStorage<gorage::Item<C>> storage;

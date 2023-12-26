@@ -1,8 +1,7 @@
-
-#include <IntegrityStorage.hpp>
-#include <MemoryStorage.hpp>
-#include <Storage.hpp>
-#include <common.hpp>
+#include "../include/IntegrityStorage.hpp"
+#include "../include/MemoryStorage.hpp"
+#include "../include/Storage.hpp"
+#include "doctest.h"
 
 class Sample : public gorage::IntegrityStorage<gorage::Bytes, gorage::Bytes> {
 public:
@@ -20,8 +19,9 @@ protected:
     return digest(content);
   }
 };
-void test(std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> base,
-          std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> integrity) {
+inline void
+test(std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> base,
+     std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> integrity) {
   Sample storage(base, integrity);
   REQUIRE(storage.keys().size() == 0);
 

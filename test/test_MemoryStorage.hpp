@@ -1,4 +1,5 @@
-#include <MemoryStorage.hpp>
+#include "../include/MemoryStorage.hpp"
+#include "doctest.h"
 
 TEST_CASE("`MemoryStorage`") {
   gorage::MemoryStorage<std::string> storage;

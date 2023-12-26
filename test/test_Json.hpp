@@ -1,7 +1,7 @@
-
-#include "doctest.h"
-#include <common.hpp>
 #include <regex>
+
+#include "../include/Json.hpp"
+#include "doctest.h"
 
 TEST_CASE("decoding from JSON") {
   SUBCASE("strings") {
