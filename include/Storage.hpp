@@ -75,12 +75,36 @@ public:
       return;
     _indexes[name] = Index<T>(extractor);
     auto &result = _indexes[name];
-    for (const Key &key : keys())
+    for (const auto &key : keys())
       result.save(key, load(key));
+  }
+  void indexes(
+      const std::map<std::string, typename Index<T>::Extractor> &extractors) {
+    for (const auto &n_e : extractors) {
+      if (_indexes.count(n_e.first))
+        continue;
+      _indexes[n_e.first] = Index<T>(n_e.second);
+    }
+    for (const auto &key : keys())
+      for (const auto &n_e : extractors)
+        _indexes[n_e.first].save(key, load(key));
   }
   void index(const std::string &name,
              const typename Index<T>::Extractor::F &f) {
     index(name, typename Index<T>::Extractor(f));
+  }
+  void
+  indexes(const std::map<std::string, typename Index<T>::Extractor::F> &fs) {
+    std::map<std::string, typename Index<T>::Extractor> extractors;
+    for (const auto &n_f : fs)
+      extractors[n_f.first] = n_f.second;
+    indexes(extractors);
+  }
+  void indexes(const std::set<std::string> &names) {
+    std::map<std::string, typename Index<T>::Extractor> extractors;
+    for (const auto &n : names)
+      extractors[n] = Index<T>::Extractor(n);
+    indexes(extractors);
   }
   void index(const std::string &name) {
     index(name, typename Index<T>::Extractor(name));

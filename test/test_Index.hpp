@@ -8,14 +8,17 @@ TEST_CASE("`Index`") {
   const auto s = "string";
   const auto usi = gorage::Key("usi");
 
-  storage.index("first letter", [](const std::string &s) {
-    REQUIRE(s.length() >= 1);
-    return std::string(1, s.at(0));
-  });
-  storage.index("second letter", [](const std::string &s) {
-    REQUIRE(s.length() >= 2);
-    return std::string(1, s.at(1));
-  });
+  storage.indexes(
+      std::map<std::string, typename gorage::Index<std::string>::Extractor::F>(
+          {{"first letter",
+            [](const std::string &s) {
+              REQUIRE(s.length() >= 1);
+              return std::string(1, s.at(0));
+            }},
+           {"second letter", [](const std::string &s) {
+              REQUIRE(s.length() >= 2);
+              return std::string(1, s.at(1));
+            }}}));
 
   SUBCASE("saving") {
     storage.save(usi, s);
