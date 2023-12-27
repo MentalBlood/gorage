@@ -28,14 +28,8 @@ public:
           }) {}
     Extractor(const std::string &field_name) {
       f = [field_name](const T &object) {
-        const auto json = object.encoded();
-        const auto regex =
-            std::regex("\"" + field_name + "\" *: *(.*?)(?:\\n| )*(?:,|})");
-        std::smatch matches;
-        if (std::regex_search(json, matches, regex))
-          if (matches.size() >= 2)
-            return std::string(matches[1].first, matches[1].second);
-        throw exceptions::NoSuchField(field_name);
+        return Json::encode(
+            Json::cast<Json::Dict>(object.structure()).at(field_name));
       };
     };
     std::string operator()(const T &object) const { return f(object); }
