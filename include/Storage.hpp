@@ -1,5 +1,6 @@
 #pragma once
 
+#include <any>
 #include <set>
 
 #include "Bytes.hpp"
@@ -103,20 +104,20 @@ public:
   void indexes(const std::set<std::string> &names) {
     std::map<std::string, typename Index<T>::Extractor> extractors;
     for (const auto &n : names)
-      extractors[n] = Index<T>::Extractor(n);
+      extractors[n] = typename Index<T>::Extractor(n);
     indexes(extractors);
   }
   void index(const std::string &name) {
     index(name, typename Index<T>::Extractor(name));
   }
-  const std::set<Key> &keys(const std::string &index_name,
-                            const std::string &indexed_value) const {
+  const std::set<Key> keys(const std::string &index_name,
+                           const std::any &indexed_value) const {
     if (!_indexes.count(index_name))
       throw exceptions::KeyError(Key(index_name));
-    return _indexes.at(index_name).load(indexed_value);
+    return _indexes.at(index_name).load(gorage::Json::encode(indexed_value));
   }
   std::set<Key>
-  keys(const std::map<std::string, std::string> &indexed_values) const {
+  keys(const std::map<std::string, std::any> &indexed_values) const {
     std::set<Key> result;
     for (const auto &pair : indexed_values) {
       const auto &new_keys = load(pair.first, pair.second);

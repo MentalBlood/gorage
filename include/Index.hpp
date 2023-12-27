@@ -3,7 +3,6 @@
 #include <map>
 #include <set>
 
-#include "Json.hpp"
 #include "Key.hpp"
 #include "exceptions.hpp"
 
@@ -22,25 +21,24 @@ public:
     F f;
 
     Extractor() {}
-    Extractor(const F &f) : f(f) {}
+    Extractor(const F &f)
+        : f([f](const T &object) {
+            const auto _f = f;
+            return gorage::Json::encode(_f(object));
+          }) {}
     Extractor(const std::string &field_name) {
-      if (std::is_same_v<T, gorage::Json>)
-        f = [field_name](const T &object) {
-          const auto json = object.encoded();
-          static const auto regex = std::regex(std::regex_replace(
-              "\"" + field_name + "\" *: (*)" + "(?:\\n| )*(?:,|})",
-              std::regex("\\[|\\]|\\{|\\}|\\/|\\+|\\.|\\\""), "\\$&"));
-          std::smatch matches;
-          if (std::regex_search(json, matches, regex))
-            if (matches.size() >= 2)
-              return matches[1];
-          throw exceptions::NoSuchField(field_name);
-        };
-      else
-        throw exceptions::NotImplemented(
-            "Index", "Extractor for fields of non-JSON objects");
+      f = [field_name](const T &object) {
+        const auto json = object.encoded();
+        const auto regex =
+            std::regex("\"" + field_name + "\" *: *(.*?)(?:\\n| )*(?:,|})");
+        std::smatch matches;
+        if (std::regex_search(json, matches, regex))
+          if (matches.size() >= 2)
+            return std::string(matches[1].first, matches[1].second);
+        throw exceptions::NoSuchField(field_name);
+      };
     };
-    std::string operator()(const T &object) { return f(object); }
+    std::string operator()(const T &object) const { return f(object); }
   };
   Extractor extractor;
 

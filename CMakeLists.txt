@@ -9,6 +9,7 @@ project(${PROJECT_NAME})
 
 add_executable(${PROJECT_NAME}
 	test/main.cpp
+  src/random.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE include test)
