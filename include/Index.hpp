@@ -22,16 +22,12 @@ public:
 
     Extractor() {}
     Extractor(const F &f)
-        : f([f](const T &object) {
-            const auto _f = f;
-            return gorage::Json::encode(_f(object));
-          }) {}
-    Extractor(const std::string &field_name) {
-      f = [field_name](const T &object) {
-        return Json::encode(
-            Json::cast<Json::Dict>(object.structure()).at(field_name));
-      };
-    };
+        : f([f](const T &object) { return gorage::Json::encode(f(object)); }) {}
+    Extractor(const std::string &field_name)
+        : f([field_name](const T &object) {
+            return Json::encode(
+                Json::cast<Json::Dict>(object.structure()).at(field_name));
+          }){};
     std::string operator()(const T &object) const { return f(object); }
   };
   Extractor extractor;
