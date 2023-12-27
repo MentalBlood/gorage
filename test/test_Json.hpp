@@ -223,33 +223,3 @@ TEST_CASE("JSON stability") {
     }
   }
 }
-inline void testJsonSearchingSimpleDict(const std::any &value) {
-  CHECK_EQ(gorage::Json::contains(gorage::Json::Dict({{"key", value}}), "key",
-                                  value),
-           true);
-}
-TEST_CASE("JSON searching") {
-  SUBCASE("strings") {
-    testJsonSearchingSimpleDict("");
-    testJsonSearchingSimpleDict("value");
-    testJsonSearchingSimpleDict(gorage::Bytes{});
-    testJsonSearchingSimpleDict(gorage::Bytes{'v', 'a', 'l', 'u', 'e'});
-  }
-  SUBCASE("integers") {
-    testJsonSearchingSimpleDict(0);
-    testJsonSearchingSimpleDict(1234);
-  }
-  SUBCASE("floating numbers") {
-    testJsonSearchingSimpleDict(0.0);
-    testJsonSearchingSimpleDict(1.234);
-  }
-  SUBCASE("lists") {
-    testJsonSearchingSimpleDict(gorage::Json::List{});
-    testJsonSearchingSimpleDict(gorage::Json::List{"", "1", 2, 3.4});
-  }
-  SUBCASE("dictionaries") {
-    testJsonSearchingSimpleDict(gorage::Json::Dict{});
-    testJsonSearchingSimpleDict(
-        gorage::Json::Dict({{"", ""}, {"1", "1"}, {"2", 2}, {"3.4", 3.4}}));
-  }
-}

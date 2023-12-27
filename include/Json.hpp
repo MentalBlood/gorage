@@ -210,21 +210,6 @@ public:
 
   std::string encoded() const { return encode(structure()); }
 
-  bool contains(const std::string &key, const std::any &structure) const {
-    return contains(this->structure(), key, structure);
-  }
-
-  static bool contains(const std::any &haystack, const std::string &key,
-                       const std::any &needle) {
-    return std::regex_search(
-        encode(haystack),
-        std::regex(std::regex_replace(
-            ("\"" + key + "\" *: *" +
-             std::regex_replace(encode(needle), std::regex("\\(|\\)"), "\\$&") +
-             "(?:\\n| )*(?:,|})"),
-            std::regex("\\[|\\]|\\{|\\}|\\/|\\+|\\.|\\\""), "\\$&")));
-  }
-
   virtual std::any structure() const = 0;
 
   bool operator<(const Json &r) const { return encoded() < r.encoded(); }
