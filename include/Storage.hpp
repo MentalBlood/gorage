@@ -110,8 +110,8 @@ public:
   void index(const std::string &name) {
     index(name, typename Index<T>::Extractor(name));
   }
-  const std::set<Key> keys(const std::string &index_name,
-                           const std::any &indexed_value) const {
+  const std::set<Key> &keys(const std::string &index_name,
+                            const std::any &indexed_value) const {
     if (!_indexes.count(index_name))
       throw exceptions::KeyError(Key(index_name));
     return _indexes.at(index_name).load(gorage::Json::encode(indexed_value));
