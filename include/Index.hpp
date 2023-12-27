@@ -17,18 +17,18 @@ template <class T> class Index {
 public:
   class Extractor {
   public:
-    using F = std::function<std::string(const T &)>;
+    using F = std::function<std::any(const T &)>;
     F f;
 
     Extractor() {}
-    Extractor(const F &f)
-        : f([f](const T &object) { return gorage::Json::encode(f(object)); }) {}
+    Extractor(const F &f) : f(f) {}
     Extractor(const std::string &field_name)
         : f([field_name](const T &object) {
-            return Json::encode(
-                Json::cast<Json::Dict>(object.structure()).at(field_name));
+            return Json::cast<Json::Dict>(object.structure()).at(field_name);
           }){};
-    std::string operator()(const T &object) const { return f(object); }
+    std::string operator()(const T &object) const {
+      return Json::encode(f(object));
+    }
   };
   Extractor extractor;
 
