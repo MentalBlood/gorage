@@ -7,8 +7,8 @@
 
 #include "Bytes.hpp"
 #include "Json.hpp"
-#include "Storage.hpp"
 #include "Key.hpp"
+#include "Storage.hpp"
 #include "exceptions.hpp"
 
 namespace gorage {
@@ -52,8 +52,10 @@ public:
 
       if constexpr (std::is_same_v<T, std::string>)
         file << object;
-      else
+      else if constexpr (std::is_base_of<T, Json>::value)
         file << object.encoded();
+      else
+        file << Json::encode(object);
       file.close();
     }
   }
@@ -87,8 +89,10 @@ public:
       const auto result = result_stream.str();
       if constexpr (std::is_same_v<T, std::string>)
         return result;
-      else
+      else if constexpr (std::is_base_of<T, Json>::value)
         return Json::from<T>(result);
+      else
+        return Json::decode(result);
     }
   }
 };
