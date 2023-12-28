@@ -48,15 +48,6 @@ public:
         return result;
     }
   }
-  T load(const Key &key, const T &default_) const {
-    try {
-      return load(key);
-    } catch (const exceptions::Base &e) {
-      throw;
-    } catch (const std::exception &e) {
-      return default_;
-    }
-  }
   virtual void remove(const Key &key) {
     for (auto &i : _indexes)
       i.second.remove(key);
@@ -124,21 +115,20 @@ public:
       if (!result.size())
         result = new_keys;
       else
-        for (auto first = result.begin(), last = result.end(); first != last;) {
+        for (auto first = result.begin(), last = result.end(); first != last;)
           if (!new_keys.count(*first))
             first = result.erase(first);
           else
             ++first;
-        }
       if (!result.size())
         break;
     }
     return result;
   }
-  std::vector<T> load(const std::set<Key> &keys) const {
-    std::vector<T> result;
+  std::map<std::string, T> load(const std::set<Key> &keys) const {
+    std::map<std::string, T> result;
     for (const auto &u : keys)
-      result.insert(load(u));
+      result[u] = load(u);
     return result;
   }
 
