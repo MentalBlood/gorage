@@ -6,8 +6,8 @@
 #include "Bytes.hpp"
 #include "File.hpp"
 #include "Json.hpp"
-#include "Storage.hpp"
 #include "Key.hpp"
+#include "Storage.hpp"
 
 namespace gorage {
 template <class T> class Storage<File<T>> : public Storage<T> {
@@ -40,6 +40,15 @@ public:
         result.insert(Key(p.path().stem().string()));
 
     return result;
+  }
+
+  Storage(const Json::Structure &structure) {
+    const auto dict = Json::cast<Json::Dict>(structure.value());
+    root = Json::get<Json::String>(dict, "root").s;
+    extension = Json::get<Json::String>(dict, "extension").s;
+  }
+  virtual std::any structure() const {
+    return Json::Dict({{"root", root.string()}, {"extension", extension}});
   }
 
 protected:

@@ -2,8 +2,8 @@
 
 #include <map>
 
-#include "Storage.hpp"
 #include "Key.hpp"
+#include "Storage.hpp"
 #include "exceptions.hpp"
 
 namespace gorage {
@@ -30,6 +30,12 @@ public:
       result.insert(Key(pair.first));
     return result;
   }
+
+  MemoryStorage(const Json::Structure &structure) {
+    for (const auto &[key, value] : Json::cast<Json::Dict>(structure.value()))
+      _storage.emplace(key, Json::cast<T>(value));
+  }
+  virtual std::any structure() const { return _storage; }
 
 protected:
   virtual void _remove(const Key &key) {

@@ -11,12 +11,12 @@
 #include "random.hpp"
 
 namespace gorage {
-template <class T, class P = T> class Storage {
+template <class T, class P = T> class Storage : public Json {
 public:
   void save(const Key &key, const T &object) {
     for (auto &i : _indexes) {
-      i.second->remove(key);
-      i.second->save(key, object);
+      i.second.remove(key);
+      i.second.save(key, object);
     }
     _save(key, object);
   }
@@ -50,7 +50,7 @@ public:
   }
   virtual void remove(const Key &key) {
     for (auto &i : _indexes)
-      i.second->remove(key);
+      i.second.remove(key);
     _remove(key);
   }
 
@@ -65,21 +65,21 @@ public:
              const typename Index<T>::Extractor &extractor) {
     if (_indexes.count(name))
       return;
-    _indexes[name] = std::make_shared<Index<T>>(extractor);
+    _indexes[name] = Index<T>(extractor);
     auto &result = _indexes[name];
     for (const auto &key : keys())
-      result->save(key, load(key));
+      result.save(key, load(key));
   }
   void indexes(
       const std::map<std::string, typename Index<T>::Extractor> &extractors) {
     for (const auto &n_e : extractors) {
       if (_indexes.count(n_e.first))
         continue;
-      _indexes[n_e.first] = std::make_shared<Index<T>>(n_e.second);
+      _indexes[n_e.first] = Index<T>(n_e.second);
     }
     for (const auto &key : keys())
       for (const auto &n_e : extractors)
-        _indexes[n_e.first]->save(key, load(key));
+        _indexes[n_e.first].save(key, load(key));
   }
   void index(const std::string &name,
              const typename Index<T>::Extractor::F &f) {
@@ -105,7 +105,7 @@ public:
                             const std::any &indexed_value) const {
     if (!_indexes.count(index_name))
       throw exceptions::KeyError(Key(index_name));
-    return _indexes.at(index_name)->load(gorage::Json::encode(indexed_value));
+    return _indexes.at(index_name).load(gorage::Json::encode(indexed_value));
   }
   std::set<Key>
   keys(const std::map<std::string, std::any> &indexed_values) const {
@@ -137,6 +137,6 @@ protected:
   virtual void _remove(const Key &key) = 0;
 
 private:
-  std::map<std::string, std::shared_ptr<Index<T>>> _indexes;
+  std::map<std::string, Index<T>> _indexes;
 };
 } // namespace gorage

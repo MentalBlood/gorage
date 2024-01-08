@@ -1,9 +1,9 @@
 #pragma once
 
-#include <map>
 #include <set>
 
 #include "Key.hpp"
+#include "Set.hpp"
 #include "exceptions.hpp"
 
 namespace gorage {
@@ -13,6 +13,7 @@ public:
   NoSuchField(const std::string &field_name) : Base(field_name) {}
 };
 } // namespace exceptions
+// template <class T, template <typename...> class S> class Index {
 template <class T> class Index {
 public:
   class Extractor {
@@ -51,6 +52,8 @@ public:
   }
 
 private:
+  // S<Set<Key>> _value_to_keys;
+  // S<Set<std::string>> _key_to_values;
   std::map<std::string, std::set<Key>> _value_to_keys;
   std::map<Key, std::set<std::string>> _key_to_values;
   void _save(const Key &key, const std::string &value) {

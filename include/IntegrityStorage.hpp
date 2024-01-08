@@ -3,8 +3,8 @@
 #include <memory>
 
 #include "File.hpp"
-#include "Storage.hpp"
 #include "Key.hpp"
+#include "Storage.hpp"
 #include "exceptions.hpp"
 
 namespace gorage {
@@ -52,6 +52,14 @@ public:
   virtual std::set<Key> keys() const {
     const auto result = _base->keys();
     return std::set<Key>(result.begin(), result.end());
+  }
+
+  IntegrityStorage(const Json::Structure &structure) {
+    throw exceptions::NotImplemented("IntegrityStorage", "from_json");
+  }
+  virtual std::any structure() const {
+    return Json::Dict(
+        {{"base", _base->structure()}, {"integrity", _integrity->structure()}});
   }
 
 protected:
