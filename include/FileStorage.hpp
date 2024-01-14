@@ -15,13 +15,10 @@ public:
   std::filesystem::path root;
   std::string extension;
 
-  explicit Storage(const std::filesystem::path &folder,
-                   const std::string &extension)
+  explicit Storage(const std::filesystem::path &folder, const std::string &extension)
       : root(folder), extension(extension) {}
 
-  std::filesystem::path path(const Key &key) const {
-    return root / (key.value + "." + extension);
-  }
+  std::filesystem::path path(const Key &key) const { return root / (key.value + "." + extension); }
 
   File<T> file(const Key &key) const { return File<T>(path(key)); }
 
@@ -47,9 +44,7 @@ public:
     root = Json::get<Json::String>(dict, "root").s;
     extension = Json::get<Json::String>(dict, "extension").s;
   }
-  virtual std::any structure() const {
-    return Json::Dict({{"root", root.string()}, {"extension", extension}});
-  }
+  virtual std::any structure() const { return Json::Dict({{"root", root.string()}, {"extension", extension}}); }
 
 protected:
   void _save(const Key &key, const T &object) { file(key).write(object); }

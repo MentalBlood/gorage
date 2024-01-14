@@ -9,8 +9,7 @@ public:
   const std::string s;
 
   C() {}
-  C(const Structure &structure)
-      : s(get<String>(cast<Dict>(structure.value()), "s").s) {}
+  C(const Structure &structure) : s(get<String>(cast<Dict>(structure.value()), "s").s) {}
 
   virtual std::any structure() const { return Dict({{"s", s}}); }
 };
@@ -20,8 +19,7 @@ public:
   double d;
   std::string s;
 
-  Complex(const int &i, const double &d, const std::string &s)
-      : i(i), d(d), s(s) {}
+  Complex(const int &i, const double &d, const std::string &s) : i(i), d(d), s(s) {}
   Complex(const Structure &structure) {
     const auto dict = cast<Dict>(structure.value());
     i = get<int>(dict, "i");
@@ -29,7 +27,5 @@ public:
     s = get<String>(dict, "s").s;
   }
 
-  virtual std::any structure() const {
-    return Dict({{"i", i}, {"d", d}, {"s", s}});
-  }
+  virtual std::any structure() const { return Dict({{"i", i}, {"d", d}, {"s", s}}); }
 };

@@ -16,13 +16,9 @@ public:
       throw exceptions::KeyError(key);
     return _storage.at(key.value);
   }
-  virtual bool exists(const Key &key) const {
-    return _storage.count(key.value);
-  }
+  virtual bool exists(const Key &key) const { return _storage.count(key.value); }
 
-  virtual Bytes raw(const Key &key) const {
-    throw exceptions::NotImplemented("MemoryStorage", "raw");
-  }
+  virtual Bytes raw(const Key &key) const { throw exceptions::NotImplemented("MemoryStorage", "raw"); }
 
   virtual std::set<Key> keys() const {
     std::set<Key> result;

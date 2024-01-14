@@ -16,15 +16,13 @@ public:
   Key() : Key(32) {}
   Key(const size_t &length) : Key(random::Name(length).value()) {}
 
-  explicit Key(const std::string &value) : value(value) {}
-  explicit Key(const gorage::Bytes &source)
-      : Key(std::regex_replace(cppcodec::base32_rfc4648::encode(source),
-                               std::regex("="), "")) {}
+  Key(const std::string &value) : value(value) {}
+  Key(const gorage::Bytes &source)
+      : Key(std::regex_replace(cppcodec::base32_rfc4648::encode(source), std::regex("="), "")) {}
 
   Bytes decoded() const { return cppcodec::base32_rfc4648::decode(value); }
 
-  explicit Key(const Json::Structure &structure)
-      : value(cast<String>(structure.value()).s) {}
+  explicit Key(const Json::Structure &structure) : value(cast<String>(structure.value()).s) {}
   std::any structure() const { return value; }
   bool operator<(const Key &other) const { return value < other.value; }
 };

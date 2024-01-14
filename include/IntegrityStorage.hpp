@@ -12,14 +12,12 @@ namespace exceptions {
 class IntegrityError : public Base {
 public:
   IntegrityError(const gorage::Key &key)
-      : Base("Can not load object with key `" + key.value +
-             "`: integrity check failed") {}
+      : Base("Can not load object with key `" + key.value + "`: integrity check failed") {}
 };
 } // namespace exceptions
 template <class T, class I> class IntegrityStorage : public Storage<T> {
 public:
-  explicit IntegrityStorage(std::shared_ptr<Storage<T>> base,
-                            std::shared_ptr<Storage<I>> integrity)
+  explicit IntegrityStorage(std::shared_ptr<Storage<T>> base, std::shared_ptr<Storage<I>> integrity)
       : _base(base), _integrity(integrity) {}
 
   T load(const Key &key) const {
@@ -41,13 +39,9 @@ public:
       return false;
     }
   }
-  void recalculate(const Key &key) const {
-    _integrity->save(digest_key(key), digest(_base->load(key)));
-  }
+  void recalculate(const Key &key) const { _integrity->save(digest_key(key), digest(_base->load(key))); }
 
-  virtual bool exists(const Key &key) const {
-    return _base->exists(key) && _integrity->exists(digest_key(key));
-  }
+  virtual bool exists(const Key &key) const { return _base->exists(key) && _integrity->exists(digest_key(key)); }
 
   virtual std::set<Key> keys() const {
     const auto result = _base->keys();
@@ -58,8 +52,7 @@ public:
     throw exceptions::NotImplemented("IntegrityStorage", "from_json");
   }
   virtual std::any structure() const {
-    return Json::Dict(
-        {{"base", _base->structure()}, {"integrity", _integrity->structure()}});
+    return Json::Dict({{"base", _base->structure()}, {"integrity", _integrity->structure()}});
   }
 
 protected:

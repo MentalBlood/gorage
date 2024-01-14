@@ -15,13 +15,11 @@ namespace gorage {
 namespace exceptions {
 class CanNotReadFile : public Base {
 public:
-  explicit CanNotReadFile(const std::filesystem::path &path)
-      : Base("Can not read file `" + path.string() + "`") {}
+  explicit CanNotReadFile(const std::filesystem::path &path) : Base("Can not read file `" + path.string() + "`") {}
 };
 class CanNotWriteFile : public Base {
 public:
-  explicit CanNotWriteFile(const std::filesystem::path &path)
-      : Base("Can not write file `" + path.string() + "`") {}
+  explicit CanNotWriteFile(const std::filesystem::path &path) : Base("Can not write file `" + path.string() + "`") {}
 };
 } // namespace exceptions
 template <class T> class File {

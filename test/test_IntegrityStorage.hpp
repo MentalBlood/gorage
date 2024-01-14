@@ -7,21 +7,16 @@ class Sample : public gorage::IntegrityStorage<gorage::Bytes, gorage::Bytes> {
 public:
   Sample(std::shared_ptr<gorage::Storage<gorage::Bytes>> base,
          std::shared_ptr<gorage::Storage<gorage::Bytes>> integrity)
-      : gorage::IntegrityStorage<gorage::Bytes, gorage::Bytes>(base,
-                                                               integrity) {}
+      : gorage::IntegrityStorage<gorage::Bytes, gorage::Bytes>(base, integrity) {}
 
 protected:
   gorage::Bytes digest(const gorage::Bytes &content) const {
-    return gorage::Bytes(content.begin(),
-                         content.begin() + int(content.size() / 2));
+    return gorage::Bytes(content.begin(), content.begin() + int(content.size() / 2));
   }
-  gorage::Bytes digest_raw(const gorage::Bytes &content) const {
-    return digest(content);
-  }
+  gorage::Bytes digest_raw(const gorage::Bytes &content) const { return digest(content); }
 };
-inline void
-test(std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> base,
-     std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> integrity) {
+inline void test(std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> base,
+                 std::shared_ptr<gorage::MemoryStorage<gorage::Bytes>> integrity) {
   Sample storage(base, integrity);
   REQUIRE(storage.keys().size() == 0);
 

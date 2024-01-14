@@ -10,25 +10,27 @@ TEST_CASE("`Index`") {
     const auto s = "string";
     const auto usi = gorage::Key("usi");
 
-    storage.indexes(std::map<std::string,
-                             typename gorage::Index<std::string>::Extractor::F>(
+    storage.indexes(std::map<std::string, typename gorage::Storage<std::string>::Index>(
         {{"first letter",
-          [](const std::string &s) {
-            REQUIRE(s.length() >= 1);
-            return s.substr(0, 1);
-          }},
-         {"second letter", [](const std::string &s) {
-            REQUIRE(s.length() >= 2);
-            return s.substr(1, 1);
-          }}}));
+          gorage::Storage<std::string>::Index(gorage::Storage<std::string>::Index::Extractor([](const std::string &s) {
+                                                REQUIRE(s.length() >= 1);
+                                                return s.substr(0, 1);
+                                              }),
+                                              std::make_shared<gorage::MemoryStorage<gorage::Set<gorage::Key>>>(),
+                                              std::make_shared<gorage::MemoryStorage<gorage::Set<std::string>>>())},
+         {"second letter",
+          gorage::Storage<std::string>::Index(gorage::Storage<std::string>::Index::Extractor([](const std::string &s) {
+                                                REQUIRE(s.length() >= 2);
+                                                return s.substr(1, 1);
+                                              }),
+                                              std::make_shared<gorage::MemoryStorage<gorage::Set<gorage::Key>>>(),
+                                              std::make_shared<gorage::MemoryStorage<gorage::Set<std::string>>>())}}));
 
     SUBCASE("saving") {
       storage.save(usi, s);
       CHECK_EQ(storage.load(usi), s);
-      CHECK_EQ(storage.Storage::keys("first letter", "s"),
-               std::set<gorage::Key>({gorage::Key("usi")}));
-      CHECK_EQ(storage.Storage::keys("second letter", "t"),
-               std::set<gorage::Key>({gorage::Key("usi")}));
+      CHECK_EQ(storage.Storage::keys("first letter", "s"), std::set<gorage::Key>({gorage::Key("usi")}));
+      CHECK_EQ(storage.Storage::keys("second letter", "t"), std::set<gorage::Key>({gorage::Key("usi")}));
       CHECK_EQ(storage.Storage::keys("first letter", "a").size(), 0);
       CHECK_EQ(storage.Storage::keys("second letter", "a").size(), 0);
     }
@@ -46,8 +48,7 @@ TEST_CASE("`Index`") {
     SUBCASE("iterating") {
       REQUIRE(storage.keys().size() == 0);
 
-      const auto keys = std::vector<gorage::Key>(
-          {gorage::Key("a"), gorage::Key("b"), gorage::Key("c")});
+      const auto keys = std::vector<gorage::Key>({gorage::Key("a"), gorage::Key("b"), gorage::Key("c")});
       for (const auto &u : keys)
         storage.save(u, u.value + "_value");
 
@@ -65,7 +66,13 @@ TEST_CASE("`Index`") {
     const auto a = Complex(1, 1.5, "a");
     const auto b = Complex(2, 2.5, "b");
 
-    storage.indexes(std::set<std::string>({"i", "d", "s"}));
+    storage.indexes(std::map<std::string, typename gorage::Storage<Complex>::Index>(
+        {{"i", gorage::Storage<Complex>::Index("i", std::make_shared<gorage::MemoryStorage<gorage::Set<gorage::Key>>>(),
+                                               std::make_shared<gorage::MemoryStorage<gorage::Set<std::string>>>())},
+         {"d", gorage::Storage<Complex>::Index("d", std::make_shared<gorage::MemoryStorage<gorage::Set<gorage::Key>>>(),
+                                               std::make_shared<gorage::MemoryStorage<gorage::Set<std::string>>>())},
+         {"s", gorage::Storage<Complex>::Index("s", std::make_shared<gorage::MemoryStorage<gorage::Set<gorage::Key>>>(),
+                                               std::make_shared<gorage::MemoryStorage<gorage::Set<std::string>>>())}}));
 
     SUBCASE("saving") {
       const auto a_key = storage.save(a);
