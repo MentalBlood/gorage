@@ -11,20 +11,36 @@ TEST_CASE("`Index`") {
     const auto usi = gorage::Key("usi");
 
     storage.indexes(std::map<std::string, typename gorage::Storage<std::string>::Index>(
-        {{"first letter",
-          gorage::Storage<std::string>::Index(gorage::Storage<std::string>::Index::Extractor([](const std::string &s) {
-                                                REQUIRE(s.length() >= 1);
-                                                return s.substr(0, 1);
-                                              }),
-                                              std::make_shared<gorage::MemoryStorage<gorage::Set<gorage::Key>>>(),
-                                              std::make_shared<gorage::MemoryStorage<gorage::Set<std::string>>>())},
-         {"second letter",
-          gorage::Storage<std::string>::Index(gorage::Storage<std::string>::Index::Extractor([](const std::string &s) {
-                                                REQUIRE(s.length() >= 2);
-                                                return s.substr(1, 1);
-                                              }),
-                                              std::make_shared<gorage::MemoryStorage<gorage::Set<gorage::Key>>>(),
-                                              std::make_shared<gorage::MemoryStorage<gorage::Set<std::string>>>())}}));
+        {{"first letter", gorage::Storage<std::string>::Index(
+                              [](const std::string &s) {
+                                REQUIRE(s.length() >= 1);
+                                return s.substr(0, 1);
+                              },
+                              std::make_shared<gorage::MemoryStorage<gorage::Pointer<gorage::Storage<gorage::Key>>>>(),
+                              std::make_shared<gorage::MemoryStorage<gorage::Pointer<gorage::Storage<std::string>>>>(),
+                              [](const std::string &value) {
+                                return gorage::Pointer<gorage::Storage<gorage::Key>>(
+                                    std::make_shared<gorage::MemoryStorage<gorage::Key>>());
+                              },
+                              [](const gorage::Key &key) {
+                                return gorage::Pointer<gorage::Storage<std::string>>(
+                                    std::make_shared<gorage::MemoryStorage<std::string>>());
+                              })},
+         {"second letter", gorage::Storage<std::string>::Index(
+                               [](const std::string &s) {
+                                 REQUIRE(s.length() >= 2);
+                                 return s.substr(1, 1);
+                               },
+                               std::make_shared<gorage::MemoryStorage<gorage::Pointer<gorage::Storage<gorage::Key>>>>(),
+                               std::make_shared<gorage::MemoryStorage<gorage::Pointer<gorage::Storage<std::string>>>>(),
+                               [](const std::string &value) {
+                                 return gorage::Pointer<gorage::Storage<gorage::Key>>(
+                                     std::make_shared<gorage::MemoryStorage<gorage::Key>>());
+                               },
+                               [](const gorage::Key &key) {
+                                 return gorage::Pointer<gorage::Storage<std::string>>(
+                                     std::make_shared<gorage::MemoryStorage<std::string>>());
+                               })}}));
 
     SUBCASE("saving") {
       storage.save(usi, s);
@@ -67,12 +83,39 @@ TEST_CASE("`Index`") {
     const auto b = Complex(2, 2.5, "b");
 
     storage.indexes(std::map<std::string, typename gorage::Storage<Complex>::Index>(
-        {{"i", gorage::Storage<Complex>::Index("i", std::make_shared<gorage::MemoryStorage<gorage::Set<gorage::Key>>>(),
-                                               std::make_shared<gorage::MemoryStorage<gorage::Set<std::string>>>())},
-         {"d", gorage::Storage<Complex>::Index("d", std::make_shared<gorage::MemoryStorage<gorage::Set<gorage::Key>>>(),
-                                               std::make_shared<gorage::MemoryStorage<gorage::Set<std::string>>>())},
-         {"s", gorage::Storage<Complex>::Index("s", std::make_shared<gorage::MemoryStorage<gorage::Set<gorage::Key>>>(),
-                                               std::make_shared<gorage::MemoryStorage<gorage::Set<std::string>>>())}}));
+        {{"i", gorage::Storage<Complex>::Index(
+                   "i", std::make_shared<gorage::MemoryStorage<gorage::Pointer<gorage::Storage<gorage::Key>>>>(),
+                   std::make_shared<gorage::MemoryStorage<gorage::Pointer<gorage::Storage<std::string>>>>(),
+                   [](const std::string &value) {
+                     return gorage::Pointer<gorage::Storage<gorage::Key>>(
+                         std::make_shared<gorage::MemoryStorage<gorage::Key>>());
+                   },
+                   [](const gorage::Key &key) {
+                     return gorage::Pointer<gorage::Storage<std::string>>(
+                         std::make_shared<gorage::MemoryStorage<std::string>>());
+                   })},
+         {"d", gorage::Storage<Complex>::Index(
+                   "d", std::make_shared<gorage::MemoryStorage<gorage::Pointer<gorage::Storage<gorage::Key>>>>(),
+                   std::make_shared<gorage::MemoryStorage<gorage::Pointer<gorage::Storage<std::string>>>>(),
+                   [](const std::string &value) {
+                     return gorage::Pointer<gorage::Storage<gorage::Key>>(
+                         std::make_shared<gorage::MemoryStorage<gorage::Key>>());
+                   },
+                   [](const gorage::Key &key) {
+                     return gorage::Pointer<gorage::Storage<std::string>>(
+                         std::make_shared<gorage::MemoryStorage<std::string>>());
+                   })},
+         {"s", gorage::Storage<Complex>::Index(
+                   "s", std::make_shared<gorage::MemoryStorage<gorage::Pointer<gorage::Storage<gorage::Key>>>>(),
+                   std::make_shared<gorage::MemoryStorage<gorage::Pointer<gorage::Storage<std::string>>>>(),
+                   [](const std::string &value) {
+                     return gorage::Pointer<gorage::Storage<gorage::Key>>(
+                         std::make_shared<gorage::MemoryStorage<gorage::Key>>());
+                   },
+                   [](const gorage::Key &key) {
+                     return gorage::Pointer<gorage::Storage<std::string>>(
+                         std::make_shared<gorage::MemoryStorage<std::string>>());
+                   })}}));
 
     SUBCASE("saving") {
       const auto a_key = storage.save(a);

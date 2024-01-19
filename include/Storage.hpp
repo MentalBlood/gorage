@@ -1,12 +1,12 @@
 #pragma once
 
 #include <any>
-#include <iostream>
 #include <set>
 
 #include "Bytes.hpp"
 #include "Json.hpp"
 #include "Key.hpp"
+#include "Pointer.hpp"
 #include "Set.hpp"
 #include "exceptions.hpp"
 #include "random.hpp"
@@ -36,47 +36,69 @@ public:
     Extractor extractor;
 
     Index() {}
-    Index(const std::string &field_name, const std::shared_ptr<Storage<Set<Key>>> &value_to_keys,
-          const std::shared_ptr<Storage<Set<std::string>>> &key_to_values)
-        : extractor(Extractor(field_name)), _value_to_keys(value_to_keys), _key_to_values(key_to_values) {}
-    Index(const Extractor &extractor, const std::shared_ptr<Storage<Set<Key>>> &value_to_keys,
-          const std::shared_ptr<Storage<Set<std::string>>> &key_to_values)
-        : extractor(extractor), _value_to_keys(value_to_keys), _key_to_values(key_to_values) {}
+    Index(const std::string &field_name, const std::shared_ptr<Storage<Pointer<Storage<Key>>>> &value_to_keys,
+          const std::shared_ptr<Storage<Pointer<Storage<std::string>>>> &key_to_values,
+          const std::function<Pointer<Storage<Key>>(const std::string &value)> &create_keys_storage,
+          const std::function<Pointer<Storage<std::string>>(const Key &key)> &create_values_storage)
+        : Index(Extractor(field_name), value_to_keys, key_to_values, create_keys_storage, create_values_storage) {}
+    Index(const typename Extractor::F &f, const std::shared_ptr<Storage<Pointer<Storage<Key>>>> &value_to_keys,
+          const std::shared_ptr<Storage<Pointer<Storage<std::string>>>> &key_to_values,
+          const std::function<Pointer<Storage<Key>>(const std::string &value)> &create_keys_storage,
+          const std::function<Pointer<Storage<std::string>>(const Key &key)> &create_values_storage)
+        : Index(Extractor(f), value_to_keys, key_to_values, create_keys_storage, create_values_storage) {}
+    Index(const Extractor &extractor, const std::shared_ptr<Storage<Pointer<Storage<Key>>>> &value_to_keys,
+          const std::shared_ptr<Storage<Pointer<Storage<std::string>>>> &key_to_values,
+          const std::function<Pointer<Storage<Key>>(const std::string &value)> &create_keys_storage,
+          const std::function<Pointer<Storage<std::string>>(const Key &key)> &create_values_storage)
+        : extractor(extractor), _value_to_keys(value_to_keys), _key_to_values(key_to_values),
+          _create_keys_storage(create_keys_storage), _create_values_storage(create_values_storage) {}
 
     void save(const Key &key, const T &object) { _save(key, extractor(object)); }
     void remove(const Key &key) {
       if (!_key_to_values->exists(key))
         return;
-      for (const auto &value : _key_to_values->load(key).value) {
-        auto current = _value_to_keys->load(value);
-        current.value.erase(key);
-        _value_to_keys->save(value, current);
-      }
+
+      auto values_storage = _key_to_values->load(key).value;
+      for (const auto &value_key : values_storage->keys())
+        _value_to_keys->load(values_storage->load(value_key)).value->remove(key);
+
       _key_to_values->remove(key);
     }
     const std::set<Key> load(const std::string &value) const {
       static const std::set<Key> empty;
       if (!_value_to_keys->exists(value))
         return empty;
-      auto result = _value_to_keys->load(value).value;
+
+      std::set<Key> result;
+      const auto keys_storage = _value_to_keys->load(value).value;
+      for (const auto k : keys_storage->keys())
+        result.insert(keys_storage->load(k));
       return result;
     }
 
   private:
-    std::shared_ptr<Storage<Set<Key>>> _value_to_keys;
-    std::shared_ptr<Storage<Set<std::string>>> _key_to_values;
+    std::shared_ptr<Storage<Pointer<Storage<Key>>>> _value_to_keys;
+    std::shared_ptr<Storage<Pointer<Storage<std::string>>>> _key_to_values;
+    std::function<Pointer<Storage<Key>>(const std::string &value)> _create_keys_storage;
+    std::function<Pointer<Storage<std::string>>(const Key &key)> _create_values_storage;
 
     void _save(const Key &key, const std::string &value) {
       remove(key);
       {
-        auto current = _value_to_keys->exists(value) ? _value_to_keys->load(value) : Set<Key>();
-        current.value.insert(key);
-        _value_to_keys->save(value, current);
+        const auto exists = _value_to_keys->exists(value);
+        auto current = exists ? _value_to_keys->load(value) : _create_keys_storage(value);
+        current.value->save(key, key);
+        if (!exists)
+          _value_to_keys->save(value, current);
+        _value_to_keys->load(value).value->load(key);
       }
       {
-        auto current = _key_to_values->exists(key.value) ? _key_to_values->load(key.value) : Set<std::string>();
-        current.value.insert(value);
-        _key_to_values->save(key.value, current);
+        const auto exists = _key_to_values->exists(key);
+        auto current = exists ? _key_to_values->load(key) : _create_values_storage(key);
+        current.value->save(value, value);
+        if (!exists)
+          _key_to_values->save(key, current);
+        _key_to_values->load(key).value->load(value);
       }
     }
   };
