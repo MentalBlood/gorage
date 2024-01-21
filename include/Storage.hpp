@@ -2,6 +2,7 @@
 
 #include <any>
 #include <set>
+#include <variant>
 
 #include "Bytes.hpp"
 #include "Json.hpp"
@@ -28,24 +29,27 @@ public:
       F f;
 
       Extractor() {}
-      Extractor(const F &f) : f(f) {}
-      Extractor(const std::string &field_name)
-          : f([field_name](const T &object) { return Json::cast<Json::Dict>(object.structure()).at(field_name); }){};
+      Extractor(const std::variant<std::string, F> &f_or_field_name) {
+        if (std::holds_alternative<F>(f_or_field_name))
+          f = std::get<F>(f_or_field_name);
+        else if constexpr (std::is_base_of<Json, T>::value)
+          f = [field_name = std::get<std::string>(f_or_field_name)](const T &object) {
+            return Json::cast<Json::Dict>(object.structure()).at(field_name);
+          };
+        else
+          throw exceptions::NotImplemented("Extractors for non-JSON object types is not implemented");
+      }
       std::string operator()(const T &object) const { return Json::encode(f(object)); }
     };
     Extractor extractor;
 
     Index() {}
-    Index(const std::string &field_name, const std::shared_ptr<Storage<Pointer<Storage<Key>>>> &value_to_keys,
+    Index(const std::variant<std::string, typename Extractor::F> &f_or_field_name,
+          const std::shared_ptr<Storage<Pointer<Storage<Key>>>> &value_to_keys,
           const std::shared_ptr<Storage<Pointer<Storage<std::string>>>> &key_to_values,
           const std::function<Pointer<Storage<Key>>(const std::string &value)> &create_keys_storage,
           const std::function<Pointer<Storage<std::string>>(const Key &key)> &create_values_storage)
-        : Index(Extractor(field_name), value_to_keys, key_to_values, create_keys_storage, create_values_storage) {}
-    Index(const typename Extractor::F &f, const std::shared_ptr<Storage<Pointer<Storage<Key>>>> &value_to_keys,
-          const std::shared_ptr<Storage<Pointer<Storage<std::string>>>> &key_to_values,
-          const std::function<Pointer<Storage<Key>>(const std::string &value)> &create_keys_storage,
-          const std::function<Pointer<Storage<std::string>>(const Key &key)> &create_values_storage)
-        : Index(Extractor(f), value_to_keys, key_to_values, create_keys_storage, create_values_storage) {}
+        : Index(Extractor(f_or_field_name), value_to_keys, key_to_values, create_keys_storage, create_values_storage) {}
     Index(const Extractor &extractor, const std::shared_ptr<Storage<Pointer<Storage<Key>>>> &value_to_keys,
           const std::shared_ptr<Storage<Pointer<Storage<std::string>>>> &key_to_values,
           const std::function<Pointer<Storage<Key>>(const std::string &value)> &create_keys_storage,

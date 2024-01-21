@@ -87,7 +87,7 @@ public:
       const auto result = result_stream.str();
       if constexpr (std::is_same_v<T, std::string>)
         return result;
-      else if constexpr (std::is_base_of<T, Json>::value)
+      else if constexpr (std::is_base_of<Json, T>::value)
         return Json::from<T>(result);
       else
         return Json::decode(result);

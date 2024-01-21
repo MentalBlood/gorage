@@ -17,8 +17,9 @@ public:
 };
 class NotImplemented : public Base {
 public:
+  NotImplemented(const std::string &message) : Base(message) {}
   NotImplemented(const std::string &class_, const std::string &method)
-      : Base("Method `" + method + "` not implemented for class `" + class_ + "`") {}
+      : NotImplemented("Method `" + method + "` not implemented for class `" + class_ + "`") {}
 };
 class NoSuchPart : public Base {
 public:
