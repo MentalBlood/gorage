@@ -61,7 +61,7 @@ TEST_CASE("`Index`") {
     const auto a = Complex(1, 1.5, "a");
     const auto b = Complex(2, 2.5, "b");
 
-    gorage::indexes<Complex>(storage, {{"i", "i"}, {"d", "d"}, {"s", "s"}});
+    gorage::indexes<Complex>(storage);
 
     SUBCASE("saving") {
       const auto a_key = storage.save(a);

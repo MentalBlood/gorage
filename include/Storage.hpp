@@ -26,10 +26,11 @@ public:
     class Extractor {
     public:
       using F = std::function<std::any(const T &)>;
+      using V = std::variant<std::string, F>;
       F f;
 
       Extractor() {}
-      Extractor(const std::variant<std::string, F> &f_or_field_name) {
+      Extractor(const V &f_or_field_name) {
         if (std::holds_alternative<F>(f_or_field_name))
           f = std::get<F>(f_or_field_name);
         else if constexpr (std::is_base_of<Json, T>::value)
@@ -44,7 +45,7 @@ public:
     Extractor extractor;
 
     Index() {}
-    Index(const std::variant<std::string, typename Extractor::F> &f_or_field_name,
+    Index(const typename Extractor::V &f_or_field_name,
           const std::shared_ptr<Storage<Pointer<Storage<Key>>>> &value_to_keys,
           const std::shared_ptr<Storage<Pointer<Storage<std::string>>>> &key_to_values,
           const std::function<Pointer<Storage<Key>>(const std::string &value)> &create_keys_storage,

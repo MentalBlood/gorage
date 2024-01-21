@@ -19,6 +19,7 @@ public:
   double d;
   std::string s;
 
+  Complex() {}
   Complex(const int &i, const double &d, const std::string &s) : i(i), d(d), s(s) {}
   Complex(const Structure &structure) {
     const auto dict = cast<Dict>(structure.value());
