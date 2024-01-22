@@ -31,11 +31,11 @@ void indexes(gorage::Storage<T> &storage,
         std::make_shared<gorage::MemoryStorage<gorage::Pointer<gorage::Storage<std::string>>>>(),
         [path](const std::string &value) {
           return gorage::Pointer<gorage::Storage<gorage::File<gorage::Key>>>(
-              std::make_shared<gorage::Storage<gorage::File<gorage::Key>>>(path / "value_to_keys" / value));
+              std::make_shared<gorage::Storage<gorage::File<gorage::Key>>>(path / "value_to_keys" / value, "txt"));
         },
         [path](const gorage::Key &key) {
           return gorage::Pointer<gorage::Storage<gorage::File<std::string>>>(
-              std::make_shared<gorage::Storage<gorage::File<std::string>>>(path / "key_to_values" / key.value));
+              std::make_shared<gorage::Storage<gorage::File<std::string>>>(path / "key_to_values" / key.value, "txt"));
         });
   storage.indexes(indexes);
 }
