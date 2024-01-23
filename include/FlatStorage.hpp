@@ -40,7 +40,10 @@ public:
     else
       return Json::decode(result.value());
   }
-  virtual bool exists(const Key &key) const { return _key_pos(key).has_value(); }
+  virtual bool exists(const Key &key) const {
+    auto f = _ifstream();
+    return _key_pos(f, f.tellg(), key);
+  }
 
   virtual std::set<Key> keys() const {
     auto f = _ifstream();
@@ -126,10 +129,6 @@ private:
         return start;
     }
     return {};
-  }
-  std::optional<Pos> _key_pos(const Key &key) const {
-    auto f = _ifstream();
-    return _key_pos(f, f.tellg(), key);
   }
 
   std::string _pad(const std::string &s, const char &c, const Pos &target_size) {
