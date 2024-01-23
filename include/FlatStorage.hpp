@@ -99,12 +99,6 @@ private:
       throw gorage::exceptions::CanNotReadFile(path);
     return f;
   }
-  std::ofstream _ofstream() const {
-    auto f = std::ofstream(path, std::ios::binary | std::ios::out | std::ios::ate);
-    if (!f.is_open())
-      throw gorage::exceptions::CanNotReadFile(path);
-    return f;
-  }
   std::fstream _fstream() const {
     auto f = std::fstream(path, std::ios::binary | std::ios::in | std::ios::out | std::ios::ate);
     if (!f.is_open())
