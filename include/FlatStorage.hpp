@@ -78,7 +78,13 @@ public:
     f.close();
     if (!result.has_value())
       throw exceptions::KeyError(key);
-    return result.value();
+
+    if constexpr (std::is_same_v<T, std::string>)
+      return result.value();
+    else if constexpr (std::is_base_of<Json, T>::value)
+      return Json::from<T>(result.value());
+    else
+      return Json::decode(result.value());
   }
   virtual bool exists(const Key &key) const { return key_pos(key).has_value(); }
 
