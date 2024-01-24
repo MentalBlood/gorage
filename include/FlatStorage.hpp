@@ -20,7 +20,12 @@ public:
   Pos value_size;
 
   explicit FlatStorage(const std::filesystem::path &path, const Pos &key_size, const Pos &value_size)
-      : path(path), key_size(key_size), value_size(value_size) {}
+      : path(path), key_size(key_size), value_size(value_size) {
+    if (!std::filesystem::exists(path)) {
+      auto f = std::ofstream(path);
+      f.close();
+    }
+  }
 
   Pos row_size() const { return key_size + value_size; }
 
