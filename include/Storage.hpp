@@ -19,8 +19,13 @@ public:
   NoSuchField(const std::string &field_name) : Base(field_name) {}
 };
 } // namespace exceptions
-template <class T, class P = T> class Storage : public Json {
+template <class T = std::string, class P = T> class Storage : public Json {
 public:
+  using Keys = Pointer<Storage<Key>>;
+  using Values = Pointer<Storage<std::string>>;
+  using KeyToValues = std::shared_ptr<Storage<Values>>;
+  using ValueToKeys = std::shared_ptr<Storage<Keys>>;
+
   class Index {
   public:
     class Extractor {
@@ -45,20 +50,20 @@ public:
     Extractor extractor;
 
     Index() {}
-    Index(const typename Extractor::V &f_or_field_name,
-          const std::shared_ptr<Storage<Pointer<Storage<Key>>>> &value_to_keys,
-          const std::shared_ptr<Storage<Pointer<Storage<std::string>>>> &key_to_values,
-          const std::function<Pointer<Storage<Key>>(const std::string &value)> &create_keys_storage,
-          const std::function<Pointer<Storage<std::string>>(const Key &key)> &create_values_storage)
+
+    Index(const typename Extractor::V &f_or_field_name, const ValueToKeys &value_to_keys,
+          const KeyToValues &key_to_values, const std::function<Keys(const std::string &value)> &create_keys_storage,
+          const std::function<Values(const Key &key)> &create_values_storage)
         : Index(Extractor(f_or_field_name), value_to_keys, key_to_values, create_keys_storage, create_values_storage) {}
-    Index(const Extractor &extractor, const std::shared_ptr<Storage<Pointer<Storage<Key>>>> &value_to_keys,
-          const std::shared_ptr<Storage<Pointer<Storage<std::string>>>> &key_to_values,
-          const std::function<Pointer<Storage<Key>>(const std::string &value)> &create_keys_storage,
-          const std::function<Pointer<Storage<std::string>>(const Key &key)> &create_values_storage)
+
+    Index(const Extractor &extractor, const ValueToKeys &value_to_keys, const KeyToValues &key_to_values,
+          const std::function<Keys(const std::string &value)> &create_keys_storage,
+          const std::function<Values(const Key &key)> &create_values_storage)
         : extractor(extractor), _value_to_keys(value_to_keys), _key_to_values(key_to_values),
           _create_keys_storage(create_keys_storage), _create_values_storage(create_values_storage) {}
 
     void save(const Key &key, const T &object) { _save(key, extractor(object)); }
+
     void remove(const Key &key) {
       if (!_key_to_values->exists(key))
         return;
@@ -69,6 +74,7 @@ public:
 
       _key_to_values->remove(key);
     }
+
     const std::set<Key> load(const std::string &value) const {
       static const std::set<Key> empty;
       if (!_value_to_keys->exists(value))
@@ -82,10 +88,10 @@ public:
     }
 
   private:
-    std::shared_ptr<Storage<Pointer<Storage<Key>>>> _value_to_keys;
-    std::shared_ptr<Storage<Pointer<Storage<std::string>>>> _key_to_values;
-    std::function<Pointer<Storage<Key>>(const std::string &value)> _create_keys_storage;
-    std::function<Pointer<Storage<std::string>>(const Key &key)> _create_values_storage;
+    ValueToKeys _value_to_keys;
+    KeyToValues _key_to_values;
+    std::function<Keys(const std::string &value)> _create_keys_storage;
+    std::function<Values(const Key &key)> _create_values_storage;
 
     void _save(const Key &key, const std::string &value) {
       remove(key);
@@ -115,25 +121,31 @@ public:
     }
     _save(key, object);
   }
+
   Key save(const T &object) {
     const auto result = key();
     save(result, object);
     return result;
   }
+
   virtual T load(const Key &key) const = 0;
+
   virtual P load(const Key &key, size_t &part_number) const {
     if (part_number == 0)
       return load(key);
     else
       throw exceptions::NoSuchPart(key, part_number);
   }
+
   virtual T build(const std::vector<P> &parts) {
     if (parts.size() == 1)
       return parts[0];
     else
       throw exceptions::CanNotBuild(parts.size());
   }
+
   virtual Bytes raw(const Key &key) const = 0;
+
   virtual bool exists(const Key &key) const = 0;
 
   Key key() const {
@@ -143,6 +155,7 @@ public:
         return result;
     }
   }
+
   virtual void remove(const Key &key) {
     for (auto &i : _indexes)
       i.second.remove(key);
@@ -164,6 +177,7 @@ public:
     for (const auto &key : keys())
       result.save(key, load(key));
   }
+
   void indexes(const std::map<std::string, Index> &indexes) {
     for (const auto &n_i : indexes) {
       if (_indexes.count(n_i.first))
@@ -174,11 +188,13 @@ public:
       for (const auto &n_i : indexes)
         _indexes[n_i.first].save(key, load(key));
   }
+
   const std::set<Key> keys(const std::string &index_name, const std::any &indexed_value) const {
     if (!_indexes.count(index_name))
       throw exceptions::KeyError(index_name);
     return _indexes.at(index_name).load(gorage::Json::encode(indexed_value));
   }
+
   std::set<Key> keys(const std::map<std::string, std::any> &indexed_values) const {
     std::set<Key> result;
     for (const auto &pair : indexed_values) {
@@ -196,6 +212,7 @@ public:
     }
     return result;
   }
+
   std::map<std::string, T> load(const std::set<Key> &keys) const {
     std::map<std::string, T> result;
     for (const auto &u : keys)
