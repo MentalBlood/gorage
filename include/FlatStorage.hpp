@@ -63,8 +63,8 @@ public:
   FlatStorage(const Json::Structure &structure) {
     const auto dict = Json::cast<Json::Dict>(structure.value());
     path = Json::get<Json::String>(dict, "path").s;
-    key_size = std::atoi(Json::get<Json::String>(dict, "key_size").s.c_str());
-    value_size = std::atoi(Json::get<Json::String>(dict, "value_size").s.c_str());
+    key_size = Json::get<int>(dict, "key_size");
+    value_size = Json::get<int>(dict, "value_size");
   }
   virtual std::any structure() const {
     return Json::Dict({{"path", path.string()}, {"key_size", key_size}, {"value_size", value_size}});
