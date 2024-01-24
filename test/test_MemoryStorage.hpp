@@ -21,8 +21,7 @@ TEST_CASE("`MemoryStorage`") {
   SUBCASE("iterating") {
     REQUIRE(storage.keys().size() == 0);
 
-    const auto keys = std::vector<gorage::Key>(
-        {gorage::Key("a"), gorage::Key("b"), gorage::Key("c")});
+    const auto keys = std::vector<gorage::Key>({gorage::Key("a"), gorage::Key("b"), gorage::Key("c")});
     for (const auto &u : keys)
       storage.save(u, u.value + "_value");
 

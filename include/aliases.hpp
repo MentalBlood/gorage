@@ -6,12 +6,11 @@
 namespace gorage {
 using Keys = Pointer<Storage<Key>>;
 using Values = Pointer<Storage<std::string>>;
+template <class T> using Fields = std::map<std::string, typename gorage::Storage<T>::Index::Extractor::V>;
 
-template <class T>
-void indexes(gorage::Storage<T> &storage,
-             const std::map<std::string, typename gorage::Storage<T>::Index::Extractor::V> &functions) {
-  auto indexes = std::map<std::string, typename gorage::Storage<T>::Index>();
-  for (const auto &n_f : functions)
+template <class T> void indexes(gorage::Storage<T> &storage, const Fields<T> &fields) {
+  auto indexes = Fields<T>();
+  for (const auto &n_f : fields)
     indexes[n_f.first] = typename gorage::Storage<T>::Index(
         n_f.second, std::make_shared<gorage::MemoryStorage<Keys>>(), std::make_shared<gorage::MemoryStorage<Values>>(),
         [](const std::string &value) { return Keys(std::make_shared<gorage::MemoryStorage<gorage::Key>>()); },
@@ -19,12 +18,9 @@ void indexes(gorage::Storage<T> &storage,
   storage.indexes(indexes);
 }
 
-template <class T>
-void indexes(gorage::Storage<T> &storage,
-             const std::map<std::string, typename gorage::Storage<T>::Index::Extractor::V> &functions,
-             const std::filesystem::path &path) {
-  auto indexes = std::map<std::string, typename gorage::Storage<T>::Index>();
-  for (const auto &n_f : functions)
+template <class T> void indexes(gorage::Storage<T> &storage, Fields<T> &fields, const std::filesystem::path &path) {
+  auto indexes = Fields<T>();
+  for (const auto &n_f : fields)
     indexes[n_f.first] = typename gorage::Storage<T>::Index(
         n_f.second, std::make_shared<gorage::MemoryStorage<Keys>>(), std::make_shared<gorage::MemoryStorage<Values>>(),
         [path](const std::string &value) {
@@ -42,7 +38,7 @@ template <class T> void indexes(gorage::Storage<T> &storage) {
   if (!std::is_base_of<gorage::Json, T>::value)
     throw exceptions::NotImplemented("Automatic field indexes for non-JSON objects is not implemented");
 
-  std::map<std::string, typename gorage::Storage<T>::Index::Extractor::V> fields;
+  auto fields = Fields<T>();
   for (const auto &field : Json::cast<Json::Dict>(T().structure()))
     fields[field.first] = field.first;
 
