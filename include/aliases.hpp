@@ -9,7 +9,7 @@ using Values = Pointer<Storage<std::string>>;
 template <class T> using Fields = std::map<std::string, typename gorage::Storage<T>::Index::Extractor::V>;
 
 template <class T> void indexes(gorage::Storage<T> &storage, const Fields<T> &fields) {
-  auto indexes = Fields<T>();
+  auto indexes = std::map<std::string, typename gorage::Storage<T>::Index>();
   for (const auto &n_f : fields)
     indexes[n_f.first] = typename gorage::Storage<T>::Index(
         n_f.second, std::make_shared<gorage::MemoryStorage<Keys>>(), std::make_shared<gorage::MemoryStorage<Values>>(),

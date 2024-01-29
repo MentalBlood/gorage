@@ -5,6 +5,7 @@
 #include <optional>
 #include <regex>
 #include <set>
+#include <sstream>
 #include <vector>
 
 #include "../modules/cppcodec/base64_rfc4648.hpp"
@@ -78,26 +79,20 @@ public:
   class CastError : public std::runtime_error {
   public:
     explicit CastError(const std::string &name, const std::any &a)
-        : std::runtime_error(
-              ("Can not cast " + name + " to " + type_name(a.type())).c_str()) {
-    }
+        : std::runtime_error(("Can not cast " + name + " to " + type_name(a.type())).c_str()) {}
   };
   class KeyError : public std::runtime_error {
   public:
-    explicit KeyError(const std::string &key)
-        : std::runtime_error(("No key \"" + key + "\" found").c_str()) {}
+    explicit KeyError(const std::string &key) : std::runtime_error(("No key \"" + key + "\" found").c_str()) {}
   };
-  template <typename T>
-  static T cast(const std::any &a, const std::string &name = "something") {
+  template <typename T> static T cast(const std::any &a, const std::string &name = "something") {
     try {
       return std::any_cast<T>(a);
     } catch (const std::exception &) {
       throw CastError(name, a);
     }
   }
-  template <typename T>
-  static T get(const Dict &d, const std::string &key,
-               const std::optional<T> &_default = {}) {
+  template <typename T> static T get(const Dict &d, const std::string &key, const std::optional<T> &_default = {}) {
     if (d.count(key))
       return cast<T>(d.at(key), key);
     if (_default)
@@ -105,8 +100,7 @@ public:
     throw KeyError(key);
   }
   template <typename T>
-  static T get_object(const Dict &d, const std::string &key,
-                      const std::optional<T> &_default = {}) {
+  static T get_object(const Dict &d, const std::string &key, const std::optional<T> &_default = {}) {
     if (d.count(key))
       return T(d.at(key));
     if (_default)
@@ -117,6 +111,10 @@ public:
     rapidjson::Document json;
     json.Parse(json_text.c_str());
     return _decode<rapidjson::Document>(json);
+  }
+  static std::any decode_custom(const std::string &json_text) {
+    auto stream = std::stringstream(json_text);
+    return _decode_custom<std::any>(stream);
   }
   static std::string encode(const std::any &a) {
     if (a.type() == typeid(const char *))
@@ -149,19 +147,12 @@ public:
       return encode<double>(std::any_cast<std::vector<double>>(a));
     if (a.type() == typeid(Dict))
       return encode(cast<Dict>(a));
-    throw std::runtime_error("Can not encode type " +
-                             std::string(a.type().name()) + " to JSON");
+    throw std::runtime_error("Can not encode type " + std::string(a.type().name()) + " to JSON");
   }
   static std::string encode(const char *s) { return "\"" + _escaped(s) + "\""; }
-  static std::string encode(const String &s) {
-    return "\"" + _escaped(s.s) + "\"";
-  }
-  static std::string encode(const std::string &s) {
-    return "\"" + _escaped(s) + "\"";
-  }
-  static std::string encode(const Bytes &s) {
-    return "\"" + cppcodec::base64_rfc4648::encode(s) + "\"";
-  }
+  static std::string encode(const String &s) { return "\"" + _escaped(s.s) + "\""; }
+  static std::string encode(const std::string &s) { return "\"" + _escaped(s) + "\""; }
+  static std::string encode(const Bytes &s) { return "\"" + cppcodec::base64_rfc4648::encode(s) + "\""; }
   static std::string encode(const int &i) { return std::to_string(i); }
   static std::string encode(const float &f) { return std::to_string(f); }
   static std::string encode(const double &d) { return std::to_string(d); }
@@ -183,9 +174,7 @@ public:
   template <typename T> static std::string encode(const std::vector<T> &v) {
     return encode_iterable<std::vector<T>>(v);
   }
-  template <typename T> static std::string encode(const std::set<T> &v) {
-    return encode_iterable<std::set<T>>(v);
-  }
+  template <typename T> static std::string encode(const std::set<T> &v) { return encode_iterable<std::set<T>>(v); }
 
   static std::string encode(const Dict &m) {
     if (!m.size())
@@ -204,9 +193,7 @@ public:
     return result;
   }
 
-  template <class T> static T from(const std::string &json_text) {
-    return T(decode(json_text));
-  }
+  template <class T> static T from(const std::string &json_text) { return T(decode(json_text)); }
 
   std::string encoded() const { return encode(structure()); }
 
@@ -240,8 +227,85 @@ private:
     throw std::runtime_error("Can not decode JSON");
   }
   static std::string _escaped(const std::string &s) {
-    return std::regex_replace(std::regex_replace(s, std::regex("\\\\"), "\\\\"),
-                              std::regex("\""), "\\\"");
+    return std::regex_replace(std::regex_replace(s, std::regex("\\\\"), "\\\\"), std::regex("\""), "\\\"");
+  }
+
+  template <typename T> static std::any _decode_custom(std::stringstream &input) {
+    if constexpr (std::is_same_v<T, std::any>)
+      switch (input.peek()) {
+      case '"':
+        return _decode_custom<std::string>(input);
+      case '[':
+        return _decode_custom<List>(input);
+      case '{':
+        return _decode_custom<Dict>(input);
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        try {
+          return _decode_custom<int>(input);
+        } catch (const std::exception &e) {
+          return _decode_custom<double>(input);
+        }
+      }
+    if constexpr (std::is_same_v<T, std::string>) {
+      input.get();
+      return read_till(input, {'"'});
+    }
+    if constexpr (std::is_same_v<T, int>) {
+      const auto result = std::atoi(read_till(input, {']', '}', ','}).c_str());
+      input.unget();
+      return result;
+    }
+    if constexpr (std::is_same_v<T, double>) {
+      const auto result = std::atof(read_till(input, {']', '}', ','}).c_str());
+      input.unget();
+      return result;
+    }
+    if constexpr (std::is_same_v<T, List>) {
+      List result;
+      input.get();
+      if (input.peek() == ']')
+        return result;
+      while (true) {
+        result.push_back(_decode_custom<std::any>(input));
+        if (input.get() == ']')
+          break;
+      }
+      return result;
+    }
+    if constexpr (std::is_same_v<T, Dict>) {
+      Dict result;
+      input.get();
+      if (input.peek() == '}')
+        return result;
+      while (true) {
+        const auto key = std::any_cast<std::string>(_decode_custom<std::string>(input));
+        if (input.get() != ':')
+          throw std::runtime_error("JSON objects keys and values must be separated by ':'");
+        result[key] = _decode_custom<std::any>(input);
+        if (input.get() == '}')
+          break;
+      }
+      return result;
+    }
+    throw std::runtime_error("Can not decode JSON");
+  }
+  static std::string read_till(std::stringstream &input, const std::set<char> &ends) {
+    std::string result;
+    while (const auto c = input.get())
+      if (ends.count(c))
+        break;
+      else
+        result.push_back(c);
+    return result;
   }
 };
 } // namespace gorage
