@@ -19,7 +19,7 @@ template <class T> void indexes(gorage::Storage<T> &storage, const Fields<T> &fi
 }
 
 template <class T> void indexes(gorage::Storage<T> &storage, Fields<T> &fields, const std::filesystem::path &path) {
-  auto indexes = Fields<T>();
+  auto indexes = std::map<std::string, typename gorage::Storage<T>::Index>();
   for (const auto &n_f : fields)
     indexes[n_f.first] = typename gorage::Storage<T>::Index(
         n_f.second, std::make_shared<gorage::MemoryStorage<Keys>>(), std::make_shared<gorage::MemoryStorage<Values>>(),
