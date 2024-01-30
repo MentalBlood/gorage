@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "../modules/cppcodec/base64_rfc4648.hpp"
-#include "../modules/rapidjson/document.h"
 
 #include "Bytes.hpp"
 
@@ -108,13 +107,8 @@ public:
     throw KeyError(key);
   }
   static std::any decode(const std::string &json_text) {
-    rapidjson::Document json;
-    json.Parse(json_text.c_str());
-    return _decode<rapidjson::Document>(json);
-  }
-  static std::any decode_custom(const std::string &json_text) {
     auto stream = std::stringstream(json_text);
-    return _decode_custom<std::any>(stream);
+    return _decode<std::any>(stream);
   }
   static std::string encode(const std::any &a) {
     if (a.type() == typeid(const char *))
@@ -203,42 +197,19 @@ public:
   bool operator==(const Json &r) const { return encoded() == r.encoded(); }
 
 private:
-  template <typename T> static std::any _decode(const T &v) {
-    if (v.IsNumber()) {
-      if (v.IsInt())
-        return v.GetInt();
-      else if (v.IsDouble())
-        return v.GetDouble();
-    } else if (v.IsString())
-      return String(std::string(v.GetString()));
-    else if (v.IsArray()) {
-      List result;
-      for (const auto &e : v.GetArray())
-        result.push_back(_decode<rapidjson::Value>(e));
-      return result;
-    } else if (v.IsObject()) {
-      Dict result;
-      for (const auto &k_v : v.GetObject())
-        result[k_v.name.GetString()] = _decode<rapidjson::Value>(k_v.value);
-      return result;
-    } else if (v.IsBool())
-      return v.GetBool();
-
-    throw std::runtime_error("Can not decode JSON");
-  }
   static std::string _escaped(const std::string &s) {
     return std::regex_replace(std::regex_replace(s, std::regex("\\\\"), "\\\\"), std::regex("\""), "\\\"");
   }
 
-  template <typename T> static std::any _decode_custom(std::stringstream &input) {
+  template <typename T> static std::any _decode(std::stringstream &input) {
     if constexpr (std::is_same_v<T, std::any>)
       switch (input.peek()) {
       case '"':
-        return _decode_custom<std::string>(input);
+        return String(std::any_cast<std::string>(_decode<std::string>(input)));
       case '[':
-        return _decode_custom<List>(input);
+        return _decode<List>(input);
       case '{':
-        return _decode_custom<Dict>(input);
+        return _decode<Dict>(input);
       case '0':
       case '1':
       case '2':
@@ -249,25 +220,20 @@ private:
       case '7':
       case '8':
       case '9':
-        try {
-          return _decode_custom<int>(input);
-        } catch (const std::exception &e) {
-          return _decode_custom<double>(input);
-        }
+        return _decode<int>(input);
       }
     if constexpr (std::is_same_v<T, std::string>) {
       input.get();
       return _read_till(input, {'"'});
     }
-    if constexpr (std::is_same_v<T, int>) {
-      const auto result = std::atoi(_read_till(input, {']', '}', ','}).c_str());
+    if constexpr (std::is_same_v<T, int> || std::is_same_v<T, double>) {
+      const auto s = _read_till(input, {']', '}', ','});
       input.unget();
-      return result;
-    }
-    if constexpr (std::is_same_v<T, double>) {
-      const auto result = std::atof(_read_till(input, {']', '}', ','}).c_str());
-      input.unget();
-      return result;
+
+      if (std::count(s.begin(), s.end(), '.'))
+        return atof(s.c_str());
+      else
+        return atoi(s.c_str());
     }
     if constexpr (std::is_same_v<T, List>) {
       List result;
@@ -277,7 +243,7 @@ private:
         return result;
       while (true) {
         _skip(input);
-        result.push_back(_decode_custom<std::any>(input));
+        result.push_back(_decode<std::any>(input));
         _skip(input);
         if (input.get() == ']')
           break;
@@ -292,12 +258,12 @@ private:
         return result;
       while (true) {
         _skip(input);
-        const auto key = std::any_cast<std::string>(_decode_custom<std::string>(input));
+        const auto key = std::any_cast<std::string>(_decode<std::string>(input));
         _skip(input);
         if (input.get() != ':')
           throw std::runtime_error("JSON objects keys and values must be separated by ':'");
         _skip(input);
-        result[key] = _decode_custom<std::any>(input);
+        result[key] = _decode<std::any>(input);
         _skip(input);
         if (input.get() == '}')
           break;
@@ -313,11 +279,16 @@ private:
   }
   static std::string _read_till(std::stringstream &input, const std::set<char> &ends) {
     std::string result;
-    while (const auto c = input.get())
-      if (ends.count(c))
+    while (true) {
+      const char c = input.get();
+      if (input.eof())
+        break;
+
+      if (ends.count(c) || !c)
         break;
       else
         result.push_back(c);
+    }
     return result;
   }
 };
