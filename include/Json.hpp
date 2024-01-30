@@ -8,7 +8,7 @@
 #include <sstream>
 #include <vector>
 
-#include "../modules/cppcodec/base64_rfc4648.hpp"
+#include "Base64.hpp"
 
 #include "Bytes.hpp"
 
@@ -30,12 +30,12 @@ public:
     std::string encoded() const {
       if (s.length())
         return s;
-      return cppcodec::base64_rfc4648::encode(b);
+      return base64::encode(b);
     }
     Bytes decoded() const {
       if (b.size())
         return b;
-      return cppcodec::base64_rfc4648::decode(s);
+      return base64::decode(s);
     }
     std::string hex() const {
       std::string result;
@@ -146,7 +146,7 @@ public:
   static std::string encode(const char *s) { return "\"" + _escaped(s) + "\""; }
   static std::string encode(const String &s) { return "\"" + _escaped(s.s) + "\""; }
   static std::string encode(const std::string &s) { return "\"" + _escaped(s) + "\""; }
-  static std::string encode(const Bytes &s) { return "\"" + cppcodec::base64_rfc4648::encode(s) + "\""; }
+  static std::string encode(const Bytes &s) { return "\"" + String(s).encoded() + "\""; }
   static std::string encode(const int &i) { return std::to_string(i); }
   static std::string encode(const float &f) { return std::to_string(f); }
   static std::string encode(const double &d) { return std::to_string(d); }

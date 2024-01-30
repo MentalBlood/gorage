@@ -5,7 +5,7 @@
 
 TEST_CASE("decoding from JSON") {
   SUBCASE("strings") {
-    const auto _s = "lalaйцукенгшщзхфывапролджэячсмитьбюъёla";
+    const auto _s = "lalaйцукенгшщзхфывапролджэячсмитьбюъёЙЦУКЕНГШЩЗХФЫВАПРОЛДЖЭЯЧСМИТЬБЮЪЁla";
     const auto s = std::string("\"") + _s + "\"";
     const auto decoded = gorage::Json::decode(s);
     CHECK_EQ(std::any_cast<gorage::Json::String>(decoded).s, _s);
