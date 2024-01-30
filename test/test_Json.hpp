@@ -5,9 +5,10 @@
 
 TEST_CASE("decoding from JSON") {
   SUBCASE("strings") {
-    const auto s = "\"lalala\"";
+    const auto _s = "lalaйцукенгшщзхфывапролджэячсмитьбюъёla";
+    const auto s = std::string("\"") + _s + "\"";
     const auto decoded = gorage::Json::decode(s);
-    CHECK_EQ(std::any_cast<gorage::Json::String>(decoded).s, "lalala");
+    CHECK_EQ(std::any_cast<gorage::Json::String>(decoded).s, _s);
   }
   SUBCASE("numbers") {
     SUBCASE("integer") {
