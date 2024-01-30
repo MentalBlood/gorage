@@ -224,7 +224,7 @@ private:
       }
     if constexpr (std::is_same_v<T, std::string>) {
       input.get();
-      return _read_till(input, {'"'});
+      return _read_till(input, {'"'}, true);
     }
     if constexpr (std::is_same_v<T, int> || std::is_same_v<T, double>) {
       const auto s = _read_till(input, {']', '}', ','});
@@ -277,14 +277,14 @@ private:
     }
     input.unget();
   }
-  static std::string _read_till(std::stringstream &input, const std::set<char> &ends) {
+  static std::string _read_till(std::stringstream &input, const std::set<char> &ends, const bool &escaping = false) {
     std::string result;
-    while (true) {
+    while (!input.eof()) {
       const char c = input.get();
       if (input.eof())
         break;
 
-      if (ends.count(c) || !c)
+      if ((ends.count(c) && (!escaping || !result.length() || (result.at(result.length() - 1) != '\\'))) || !c)
         break;
       else
         result.push_back(c);
