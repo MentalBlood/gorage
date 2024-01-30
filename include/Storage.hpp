@@ -8,7 +8,6 @@
 #include "Json.hpp"
 #include "Key.hpp"
 #include "Pointer.hpp"
-#include "Set.hpp"
 #include "exceptions.hpp"
 #include "random.hpp"
 
