@@ -148,7 +148,6 @@ public:
   static std::string encode(const std::string &s) { return "\"" + _escaped(s) + "\""; }
   static std::string encode(const Bytes &s) { return "\"" + String(s).encoded() + "\""; }
   static std::string encode(const int &i) { return std::to_string(i); }
-  static std::string encode(const float &f) { return std::to_string(f); }
   static std::string encode(const double &d) { return std::to_string(d); }
   static std::string encode(const bool &b) { return b ? "true" : "false"; }
 
