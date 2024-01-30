@@ -257,25 +257,28 @@ private:
       }
     if constexpr (std::is_same_v<T, std::string>) {
       input.get();
-      return read_till(input, {'"'});
+      return _read_till(input, {'"'});
     }
     if constexpr (std::is_same_v<T, int>) {
-      const auto result = std::atoi(read_till(input, {']', '}', ','}).c_str());
+      const auto result = std::atoi(_read_till(input, {']', '}', ','}).c_str());
       input.unget();
       return result;
     }
     if constexpr (std::is_same_v<T, double>) {
-      const auto result = std::atof(read_till(input, {']', '}', ','}).c_str());
+      const auto result = std::atof(_read_till(input, {']', '}', ','}).c_str());
       input.unget();
       return result;
     }
     if constexpr (std::is_same_v<T, List>) {
       List result;
       input.get();
+      _skip(input);
       if (input.peek() == ']')
         return result;
       while (true) {
+        _skip(input);
         result.push_back(_decode_custom<std::any>(input));
+        _skip(input);
         if (input.get() == ']')
           break;
       }
@@ -284,13 +287,18 @@ private:
     if constexpr (std::is_same_v<T, Dict>) {
       Dict result;
       input.get();
+      _skip(input);
       if (input.peek() == '}')
         return result;
       while (true) {
+        _skip(input);
         const auto key = std::any_cast<std::string>(_decode_custom<std::string>(input));
+        _skip(input);
         if (input.get() != ':')
           throw std::runtime_error("JSON objects keys and values must be separated by ':'");
+        _skip(input);
         result[key] = _decode_custom<std::any>(input);
+        _skip(input);
         if (input.get() == '}')
           break;
       }
@@ -298,7 +306,12 @@ private:
     }
     throw std::runtime_error("Can not decode JSON");
   }
-  static std::string read_till(std::stringstream &input, const std::set<char> &ends) {
+  static void _skip(std::stringstream &input, const std::set<char> &chars = {' ', '\n', '\t'}) {
+    while (chars.count(input.get())) {
+    }
+    input.unget();
+  }
+  static std::string _read_till(std::stringstream &input, const std::set<char> &ends) {
     std::string result;
     while (const auto c = input.get())
       if (ends.count(c))
