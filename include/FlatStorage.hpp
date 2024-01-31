@@ -48,7 +48,7 @@ public:
     auto f = _ifstream();
     return _key_pos(f, f.tellg(), key).has_value();
   }
-  void clear() { std::filesystem::remove(path); }
+  void clear() { std::filesystem::resize_file(path, 0); }
 
   virtual std::set<Key> keys() const {
     auto f = _ifstream();

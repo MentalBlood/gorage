@@ -161,7 +161,7 @@ public:
     _remove(key);
   }
 
-  void clear() {
+  virtual void clear() {
     for (const Key &key : keys())
       remove(key);
   }

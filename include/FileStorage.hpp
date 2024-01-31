@@ -33,11 +33,13 @@ public:
 
     std::set<Key> result;
     for (const auto &p : std::filesystem::directory_iterator(root))
-      if (p.path().extension() == extension)
+      if (p.path().extension() == "." + extension)
         result.insert(Key(p.path().stem().string()));
 
     return result;
   }
+
+  void clear() { std::filesystem::remove_all(root); }
 
   Storage(const Json::Structure &structure) {
     const auto dict = Json::cast<Json::Dict>(structure.value());
