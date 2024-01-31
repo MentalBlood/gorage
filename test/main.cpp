@@ -6,4 +6,4 @@
 #include "test_Index.hpp"
 #include "test_IntegrityStorage.hpp"
 #include "test_Json.hpp"
-#include "test_MemoryStorage.hpp"
+#include "test_Storage.hpp"

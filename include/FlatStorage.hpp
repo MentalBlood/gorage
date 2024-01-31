@@ -19,36 +19,36 @@ public:
   Pos key_size;
   Pos value_size;
 
-  explicit FlatStorage(const std::filesystem::path &path, const Pos &key_size, const Pos &value_size)
+  explicit FlatStorage(const std::filesystem::path &path, const Pos &key_size = 24, const Pos &value_size = 24)
       : path(path), key_size(key_size), value_size(value_size) {
-    if (!std::filesystem::exists(path)) {
-      auto f = std::ofstream(path);
-      f.close();
-    }
+    if (!std::filesystem::exists(path))
+      std::ofstream(path).close();
   }
 
   Pos row_size() const { return key_size + value_size; }
 
   T load(const Key &key) const {
     auto f = _ifstream();
-    f.seekg(_key_pos(f, f.tellg(), key).value() + key_size);
-
-    const auto result = _read_till(f, '\n');
-    f.close();
-    if (!result.has_value())
+    const auto pos = _key_pos(f, f.tellg(), key);
+    if (!pos.has_value())
       throw exceptions::KeyError(key);
 
+    f.seekg(pos.value() + key_size);
+    const auto result = _read_till(f, '^');
+    f.close();
+
     if constexpr (std::is_same_v<T, std::string>)
-      return result.value();
+      return result;
     else if constexpr (std::is_base_of<Json, T>::value)
-      return Json::from<T>(result.value());
+      return Json::from<T>(result);
     else
-      return Json::decode(result.value());
+      return Json::decode(result);
   }
   virtual bool exists(const Key &key) const {
     auto f = _ifstream();
-    return _key_pos(f, f.tellg(), key);
+    return _key_pos(f, f.tellg(), key).has_value();
   }
+  void clear() { std::filesystem::remove(path); }
 
   virtual std::set<Key> keys() const {
     auto f = _ifstream();
@@ -56,10 +56,8 @@ public:
     const auto f_size = f.tellg();
 
     for (Pos start = 0; start < f_size; start += row_size()) {
-      f.seekg(start);
-      std::string current;
-      current.reserve(key_size);
-      f.read(&current[0], key_size);
+      f.seekg(start, std::ios::beg);
+      std::string current = _read_till(f, '^');
       result.insert(current);
     }
     return result;
@@ -78,9 +76,11 @@ public:
 protected:
   void _save(const Key &key, const T &object) {
     auto f = _fstream();
-    const auto pos = _key_pos(f, f.tellg(), key);
+    const auto pos = _key_pos<std::fstream>(f, f.tellg(), key);
     if (pos.has_value())
-      f.seekg(pos);
+      f.seekg(pos.value());
+    else
+      f.seekg(0, std::ios::end);
     f << _row(key, object);
     f.close();
   }
@@ -91,13 +91,13 @@ protected:
     if (!pos.has_value())
       return;
 
-    if (pos <= f_size - row_size()) {
-      const auto last_row = _row(f, f_size - row_size());
-      f.seekg(pos);
+    if (pos <= size_t(f_size) - row_size()) {
+      const auto last_row = _row(f, size_t(f_size) - row_size());
+      f.seekg(pos.value());
       f << last_row;
     }
-    std::filesystem::resize_file(path, f_size - row_size());
     f.close();
+    std::filesystem::resize_file(path, size_t(f_size) - row_size());
   }
 
 private:
@@ -114,13 +114,25 @@ private:
     return f;
   }
 
-  std::string _read_till(std::ifstream &f, const char &end) {
+  std::string _read_till(std::ifstream &f, const char &end) const {
     std::string result;
-    for (char c = f.get(); c != end;)
+    while (!f.eof()) {
+      char c = f.get();
+      if (c == end)
+        break;
       result.push_back(c);
+    }
     return result;
   }
-  std::optional<Pos> _key_pos(std::ifstream &f, const std::ifstream::pos_type &f_size, const Key &key) const {
+  std::string _read_till(std::fstream &f, const Pos &amount) const {
+    std::string result;
+    for (Pos i = 0; (i < amount) && !f.eof(); i++)
+      result.push_back(f.get());
+
+    return result;
+  }
+  template <class S = std::ifstream>
+  std::optional<Pos> _key_pos(S &f, const std::ifstream::pos_type &f_size, const Key &key) const {
     f.seekg(0, std::ios::beg);
     for (Pos start = 0; start < f_size; start += row_size()) {
       f.seekg(start);
@@ -155,13 +167,11 @@ private:
       return Json::encode(object);
   }
   std::string _row(const Key &key, const T &object) {
-    return _pad(key.value, '\n', key_size) + _pad(_value(object), '\n', value_size);
+    return _pad(key.value, '^', key_size) + _pad(_value(object), '^', value_size);
   }
   std::string _row(std::fstream &f, const Pos &start) {
-    std::string result;
-    result.reserve(row_size());
-    f.read(&result[0], row_size());
-    return result;
+    f.seekg(start, std::ios::beg);
+    return _read_till(f, row_size());
   }
 };
 } // namespace gorage

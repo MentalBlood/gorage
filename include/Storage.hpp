@@ -143,7 +143,7 @@ public:
       throw exceptions::CanNotBuild(parts.size());
   }
 
-  virtual Bytes raw(const Key &key) const = 0;
+  virtual Bytes raw(const Key &key) const { throw exceptions::NotImplemented("Method `raw` not implemented"); };
 
   virtual bool exists(const Key &key) const = 0;
 

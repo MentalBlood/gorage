@@ -9,7 +9,7 @@ class Key : public Json {
 public:
   std::string value;
 
-  Key() : Key(32) {}
+  Key() : Key(24) {}
   Key(const size_t &length) : Key(random::Name(length).value()) {}
 
   Key(const std::string &value) : value(value) {}
