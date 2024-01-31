@@ -69,4 +69,8 @@ TEST_CASE("MemoryStorage") { test_Storage(std::make_shared<gorage::MemoryStorage
 TEST_CASE("FileStorage") {
   test_Storage(std::make_shared<gorage::Storage<gorage::File<std::string>>>("file_storage", "txt"));
 }
-TEST_CASE("FlatStorage") { test_Storage(std::make_shared<gorage::FlatStorage<std::string>>("flat_storage.txt")); }
+TEST_CASE("FlatStorage") {
+  const auto path = "flat_storage.txt";
+  test_Storage(std::make_shared<gorage::FlatStorage<std::string>>(path));
+  std::filesystem::remove(path);
+}
