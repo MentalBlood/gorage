@@ -4,51 +4,34 @@
 #include "../include/Storage.hpp"
 #include "doctest.h"
 
+inline void test_Storage_remove(std::shared_ptr<gorage::Storage<std::string>> storage, const size_t &initial_size,
+                                const std::string &value) {
+  SUBCASE("removing") {
+    for (size_t i = 0; i < initial_size; i++) {
+      const auto name = "remove from position " + std::to_string(i);
+      SUBCASE(name.c_str()) {
+        storage->clear();
+
+        std::vector<gorage::Key> keys;
+        for (size_t j = 0; j < initial_size; j++)
+          keys.push_back(storage->save(value));
+
+        storage->remove(keys[i]);
+        keys.erase(keys.begin() + i);
+
+        CHECK_EQ(storage->keys().size(), initial_size - 1);
+        for (const auto &k : keys)
+          CHECK_EQ(storage->load(k), value);
+      }
+    }
+  }
+}
+
 inline void test_Storage(std::shared_ptr<gorage::Storage<std::string>> storage) {
   const auto value = "value";
 
   SUBCASE("saving") { CHECK_EQ(storage->load(storage->save(value)), value); }
-  SUBCASE("removing") {
-    SUBCASE("one") {
-      storage->clear();
-      storage->remove(storage->save(value));
-
-      CHECK_EQ(storage->keys().size(), 0);
-    }
-    SUBCASE("first") {
-      storage->clear();
-      const auto first = storage->save(value);
-      const auto middle = storage->save(value);
-      const auto last = storage->save(value);
-      storage->remove(first);
-
-      CHECK_EQ(storage->keys().size(), 2);
-      CHECK_EQ(storage->load(middle), value);
-      CHECK_EQ(storage->load(last), value);
-    }
-    SUBCASE("last") {
-      storage->clear();
-      const auto first = storage->save(value);
-      const auto middle = storage->save(value);
-      const auto last = storage->save(value);
-      storage->remove(last);
-
-      CHECK_EQ(storage->keys().size(), 2);
-      CHECK_EQ(storage->load(first), value);
-      CHECK_EQ(storage->load(middle), value);
-    }
-    SUBCASE("middle") {
-      storage->clear();
-      const auto first = storage->save(value);
-      const auto middle = storage->save(value);
-      const auto last = storage->save(value);
-      storage->remove(middle);
-
-      CHECK_EQ(storage->keys().size(), 2);
-      CHECK_EQ(storage->load(first), value);
-      CHECK_EQ(storage->load(last), value);
-    }
-  }
+  test_Storage_remove(storage, 4, value);
   SUBCASE("iterating") {
     storage->clear();
     REQUIRE(storage->keys().size() == 0);
