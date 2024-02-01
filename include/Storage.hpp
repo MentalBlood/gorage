@@ -190,13 +190,13 @@ public:
         _indexes[n_i.first].save(key, load(key));
   }
 
-  const std::set<Key> keys(const std::string &index_name, const std::any &indexed_value) const {
+  virtual const std::set<Key> keys(const std::string &index_name, const std::any &indexed_value) const {
     if (!_indexes.count(index_name))
       throw exceptions::KeyError(index_name);
     return _indexes.at(index_name).load(gorage::Json::encode(indexed_value));
   }
 
-  std::set<Key> keys(const Query &indexed_values) const {
+  virtual std::set<Key> keys(const Query &indexed_values) const {
     std::set<Key> result;
     for (const auto &pair : indexed_values) {
       const auto &new_keys = load(pair.first, pair.second);
