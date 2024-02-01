@@ -12,13 +12,13 @@ public:
   std::shared_ptr<Storage<F>> first;
   std::shared_ptr<Storage<S>> second;
   std::function<F(const T &)> first_extractor;
-  std::function<S(const T &)> second_extrator;
+  std::function<S(const T &)> second_extractor;
   std::function<T(const F &, const S &)> assembler;
 
   explicit DetailedStorage(std::shared_ptr<Storage<F>> first, std::shared_ptr<Storage<S>> second,
                            std::function<F(const T &)> first_extractor, std::function<S(const T &)> second_extractor,
                            std::function<T(const F &, const S &)> assembler)
-      : first(first), second(second), first_extractor(first_extractor), second_extrator(second_extractor),
+      : first(first), second(second), first_extractor(first_extractor), second_extractor(second_extractor),
         assembler(assembler) {}
 
   T load(const Key &key) const { return assembler(first->load(key), second->load(key)); }
