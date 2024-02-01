@@ -12,6 +12,8 @@
 #include "random.hpp"
 
 namespace gorage {
+using Query = std::map<std::string, std::any>;
+
 namespace exceptions {
 class NoSuchField : public exceptions::Base {
 public:
@@ -194,7 +196,7 @@ public:
     return _indexes.at(index_name).load(gorage::Json::encode(indexed_value));
   }
 
-  std::set<Key> keys(const std::map<std::string, std::any> &indexed_values) const {
+  std::set<Key> keys(const Query &indexed_values) const {
     std::set<Key> result;
     for (const auto &pair : indexed_values) {
       const auto &new_keys = load(pair.first, pair.second);
