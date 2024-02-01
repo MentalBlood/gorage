@@ -43,10 +43,7 @@ public:
 
   virtual bool exists(const Key &key) const { return _base->exists(key) && _integrity->exists(digest_key(key)); }
 
-  virtual std::set<Key> keys() const {
-    const auto result = _base->keys();
-    return std::set<Key>(result.begin(), result.end());
-  }
+  virtual std::set<Key> keys() const { return _base->keys(); }
 
   IntegrityStorage(const Json::Structure &structure) {
     throw exceptions::NotImplemented("IntegrityStorage", "from_json");
