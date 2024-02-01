@@ -32,6 +32,8 @@ public:
     return second->process(m);
   }
 
-  template <class N> Chain<I, O, N> operator<<(const P<Worker<O, N>> &next) { return Chain<I, O, N>(*this, next); }
+  template <class N> Chain<I, O, N> operator<<(const P<Worker<O, N>> &next) {
+    return Chain<I, O, N>(P<Worker<I, O>>(this), next);
+  }
 };
 } // namespace gorage
