@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "Storage.hpp"
 
 namespace gorage {
@@ -5,18 +7,29 @@ template <class T> using P = std::shared_ptr<T>;
 
 template <class T> class Item : public Json {
 public:
+  using time = std::chrono::time_point<std::chrono::system_clock>;
+
   T content;
   std::string chain_id;
+  time created;
 
-  Item(const T &content, const std::string &chain_id) : content(content), chain_id(chain_id) {}
-  Item(const T &content) : Item(content, std::to_string(random::seed()) + random::Name(16).value) {}
+  Item(const T &content, const std::string &chain_id, const time &created)
+      : content(content), chain_id(chain_id), created(created) {}
+  Item(const T &content)
+      : Item(content, std::to_string(random::seed()) + random::Name(16).value, std::chrono::system_clock::now()) {}
 
   Item(const Json::Structure &structure) {
     const auto dict = cast<Dict>(structure.value());
     content = get<T>(dict, "content");
-    chain_id = get<T>(dict, "chain_id");
+    chain_id = get<String>(dict, "chain_id").s;
+    created = time(std::chrono::milliseconds(get<long>(dict, "created")));
   }
-  virtual std::any structure() const { return Dict({{"content", content.structure()}, {"chain_id", chain_id}}); }
+  virtual std::any structure() const {
+    return Dict(
+        {{"content", content.structure()},
+         {"chain_id", chain_id},
+         {"created", std::chrono::time_point_cast<std::chrono::milliseconds>(created).time_since_epoch().count()}});
+  }
 };
 
 template <class I, class O> class Worker {
