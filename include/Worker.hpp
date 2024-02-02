@@ -10,13 +10,16 @@ public:
   using time = std::chrono::time_point<std::chrono::system_clock>;
 
   T content;
-  std::string chain_id;
   time created;
+  std::string chain_id;
 
-  Item(const T &content, const std::string &chain_id, const time &created)
-      : content(content), chain_id(chain_id), created(created) {}
+  long created_as_number() {
+    return std::chrono::time_point_cast<std::chrono::milliseconds>(created).time_since_epoch().count();
+  }
+
   Item(const T &content)
-      : Item(content, std::to_string(random::seed()) + random::Name(16).value, std::chrono::system_clock::now()) {}
+      : content(content), created(std::chrono::system_clock::now()),
+        chain_id(std::to_string(created_as_number()) + random::Name(6).value) {}
 
   Item(const Json::Structure &structure) {
     const auto dict = cast<Dict>(structure.value());
@@ -25,10 +28,7 @@ public:
     created = time(std::chrono::milliseconds(get<long>(dict, "created")));
   }
   virtual std::any structure() const {
-    return Dict(
-        {{"content", content.structure()},
-         {"chain_id", chain_id},
-         {"created", std::chrono::time_point_cast<std::chrono::milliseconds>(created).time_since_epoch().count()}});
+    return Dict({{"content", content.structure()}, {"chain_id", chain_id}, {"created", created_as_number()}});
   }
 };
 
