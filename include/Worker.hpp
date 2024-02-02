@@ -1,5 +1,6 @@
 #include <chrono>
 
+#include "../modules/blake3/blake3.h"
 #include "Storage.hpp"
 
 namespace gorage {
@@ -16,10 +17,21 @@ public:
   long created_as_number() {
     return std::chrono::time_point_cast<std::chrono::milliseconds>(created).time_since_epoch().count();
   }
+  Bytes content_digest() {
+    const auto content_json = encode(content);
+    const auto content_json_bytes = Bytes(content_json.begin(), content_json.end());
+
+    blake3_hasher hasher;
+    blake3_hasher_init(&hasher);
+    blake3_hasher_update(&hasher, content_json_bytes.data(), content_json_bytes.size());
+
+    Bytes result;
+    result.reserve(BLAKE3_OUT_LEN);
+    blake3_hasher_finalize(&hasher, &result[0], BLAKE3_OUT_LEN);
+  }
 
   Item(const T &content)
-      : content(content), created(std::chrono::system_clock::now()),
-        chain_id(std::to_string(created_as_number()) + random::Name(6).value) {}
+      : content(content), created(std::chrono::system_clock::now()), chain_id(String(content_digest()).encoded()) {}
 
   Item(const Json::Structure &structure) {
     const auto dict = cast<Dict>(structure.value());
