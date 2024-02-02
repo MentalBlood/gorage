@@ -10,7 +10,7 @@ public:
   std::string value;
 
   Key() : Key(24) {}
-  Key(const size_t &length) : Key(random::Name(length).value()) {}
+  Key(const size_t &length) : Key(random::Name(length).value) {}
 
   Key(const std::string &value) : value(value) {}
   Key(const gorage::Bytes &source) : Key(Json::String(source).hex()) {}

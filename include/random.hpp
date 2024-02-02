@@ -24,15 +24,13 @@ class Name {
 public:
   static const std::string alphabet;
 
-  explicit Name(const size_t &length) {
-    _value.reserve(length);
-    for (size_t i = 0; i < length; i++)
-      _value += alphabet[generator() % (alphabet.length() - 1)];
-  }
-  std::string value() const { return _value; }
+  std::string value;
 
-private:
-  std::string _value;
+  explicit Name(const size_t &length) {
+    value.reserve(length);
+    for (size_t i = 0; i < length; i++)
+      value += alphabet[generator() % (alphabet.length() - 1)];
+  }
 };
 gorage::Bytes bytes(const size_t &amount);
 } // namespace random
