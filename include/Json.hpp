@@ -61,8 +61,8 @@ public:
       return "String";
     if (type == typeid(std::string))
       return "std::string";
-    if (type == typeid(int))
-      return "int";
+    if (type == typeid(long))
+      return "long";
     if (type == typeid(double))
       return "double";
     if (type == typeid(Bytes))
@@ -119,8 +119,8 @@ public:
       return encode(std::any_cast<std::string>(a));
     if (a.type() == typeid(Bytes))
       return encode(std::any_cast<Bytes>(a));
-    if (a.type() == typeid(int))
-      return encode(std::any_cast<int>(a));
+    if (a.type() == typeid(long))
+      return encode(std::any_cast<long>(a));
     if (a.type() == typeid(float))
       return encode(std::any_cast<float>(a));
     if (a.type() == typeid(double))
@@ -133,8 +133,8 @@ public:
       return encode<std::string>(std::any_cast<std::vector<std::string>>(a));
     if (a.type() == typeid(std::vector<Bytes>))
       return encode<Bytes>(std::any_cast<std::vector<Bytes>>(a));
-    if (a.type() == typeid(std::vector<int>))
-      return encode<int>(std::any_cast<std::vector<int>>(a));
+    if (a.type() == typeid(std::vector<long>))
+      return encode<long>(std::any_cast<std::vector<long>>(a));
     if (a.type() == typeid(std::vector<float>))
       return encode<float>(std::any_cast<std::vector<float>>(a));
     if (a.type() == typeid(std::vector<double>))
@@ -147,7 +147,7 @@ public:
   static std::string encode(const String &s) { return "\"" + _escaped(s.s) + "\""; }
   static std::string encode(const std::string &s) { return "\"" + _escaped(s) + "\""; }
   static std::string encode(const Bytes &s) { return "\"" + String(s).encoded() + "\""; }
-  static std::string encode(const int &i) { return std::to_string(i); }
+  static std::string encode(const long &i) { return std::to_string(i); }
   static std::string encode(const double &d) { return std::to_string(d); }
   static std::string encode(const bool &b) { return b ? "true" : "false"; }
 
@@ -219,20 +219,20 @@ private:
       case '7':
       case '8':
       case '9':
-        return _decode<int>(input);
+        return _decode<long>(input);
       }
     if constexpr (std::is_same_v<T, std::string>) {
       input.get();
       return _read_till(input, {'"'}, true);
     }
-    if constexpr (std::is_same_v<T, int> || std::is_same_v<T, double>) {
+    if constexpr (std::is_same_v<T, long> || std::is_same_v<T, double>) {
       const auto s = _read_till(input, {']', '}', ','});
       input.unget();
 
       if (std::count(s.begin(), s.end(), '.'))
         return atof(s.c_str());
       else
-        return atoi(s.c_str());
+        return atol(s.c_str());
     }
     if constexpr (std::is_same_v<T, List>) {
       List result;
