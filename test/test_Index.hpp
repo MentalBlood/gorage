@@ -69,10 +69,10 @@ TEST_CASE("`Index`") {
 
       CHECK_EQ(storage.load(a_key), a);
       CHECK_EQ(storage.load(b_key), b);
-      CHECK_EQ(storage.Storage::keys("i", 1), std::set({a_key}));
+      CHECK_EQ(storage.Storage::keys("i", long(1)), std::set({a_key}));
       CHECK_EQ(storage.Storage::keys("d", 1.5), std::set({a_key}));
       CHECK_EQ(storage.Storage::keys("s", "a"), std::set({a_key}));
-      CHECK_EQ(storage.Storage::keys("i", 2), std::set({b_key}));
+      CHECK_EQ(storage.Storage::keys("i", long(2)), std::set({b_key}));
       CHECK_EQ(storage.Storage::keys("d", 2.5), std::set({b_key}));
       CHECK_EQ(storage.Storage::keys("s", "b"), std::set({b_key}));
     }
@@ -84,10 +84,10 @@ TEST_CASE("`Index`") {
 
       CHECK_EQ(storage.exists(a_key), false);
       CHECK_EQ(storage.exists(b_key), false);
-      CHECK_EQ(storage.Storage::keys("i", 1).size(), 0);
+      CHECK_EQ(storage.Storage::keys("i", long(1)).size(), 0);
       CHECK_EQ(storage.Storage::keys("d", 1.5).size(), 0);
       CHECK_EQ(storage.Storage::keys("s", "a").size(), 0);
-      CHECK_EQ(storage.Storage::keys("i", 2).size(), 0);
+      CHECK_EQ(storage.Storage::keys("i", long(2)).size(), 0);
       CHECK_EQ(storage.Storage::keys("d", 2.5).size(), 0);
       CHECK_EQ(storage.Storage::keys("s", "b").size(), 0);
     }

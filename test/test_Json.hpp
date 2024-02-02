@@ -14,7 +14,7 @@ TEST_CASE("decoding from JSON") {
     SUBCASE("integer") {
       const auto s = "1234";
       const auto decoded = gorage::Json::decode(s);
-      CHECK_EQ(std::any_cast<int>(decoded), 1234);
+      CHECK_EQ(std::any_cast<long>(decoded), 1234);
     }
     SUBCASE("floating") {
       const auto s = "1234.1234";
@@ -27,7 +27,7 @@ TEST_CASE("decoding from JSON") {
     const auto decoded = std::any_cast<gorage::Json::List>(gorage::Json::decode(s));
 
     CHECK_EQ(std::any_cast<gorage::Json::String>(decoded[0]).s, "lalala");
-    CHECK_EQ(std::any_cast<int>(decoded[1]), 1234);
+    CHECK_EQ(std::any_cast<long>(decoded[1]), 1234);
     CHECK_EQ(std::any_cast<double>(decoded[2]), 1234.1234);
   }
   SUBCASE("dict") {
@@ -35,7 +35,7 @@ TEST_CASE("decoding from JSON") {
     const auto decoded = std::any_cast<gorage::Json::Dict>(gorage::Json::decode(s));
 
     CHECK_EQ(std::any_cast<gorage::Json::String>(decoded.at("string")).s, "lalala");
-    CHECK_EQ(std::any_cast<int>(decoded.at("int")), 1234);
+    CHECK_EQ(std::any_cast<long>(decoded.at("int")), 1234);
     CHECK_EQ(std::any_cast<double>(decoded.at("double")), 1234.1234);
   }
 }
@@ -81,7 +81,7 @@ TEST_CASE("encoding to JSON") {
   }
   SUBCASE("numbers") {
     SUBCASE("`int`") {
-      const int i = 1234;
+      const long i = 1234;
       testEncodedNumber(gorage::Json::encode(i));
     }
     SUBCASE("`double`") {
@@ -147,8 +147,8 @@ TEST_CASE("JSON stability") {
   }
   SUBCASE("integers") {
     SUBCASE("->decoding->encoding->") {
-      const auto i = 1234;
-      CHECK_EQ(std::any_cast<int>(gorage::Json::decode(gorage::Json::encode(i))), i);
+      const long i = 1234;
+      CHECK_EQ(std::any_cast<long>(gorage::Json::decode(gorage::Json::encode(i))), i);
     }
     SUBCASE("->encoding->decoding->") {
       const auto json = "1234";
@@ -172,7 +172,7 @@ TEST_CASE("JSON stability") {
       REQUIRE(l.size() == result.size());
 
       for (size_t i = 0; i < l.size(); i++)
-        CHECK_EQ(std::any_cast<int>(l[i]), std::any_cast<int>(result[i]));
+        CHECK_EQ(std::any_cast<int>(l[i]), std::any_cast<long>(result[i]));
     }
     SUBCASE("->encoding->decoding->") {
       const auto json = "[1,2,3]";
@@ -186,9 +186,9 @@ TEST_CASE("JSON stability") {
       REQUIRE(d.size() == result.size());
 
       for (const auto &k_v : d)
-        CHECK_EQ(std::any_cast<int>(d.at(k_v.first)), std::any_cast<int>(result.at(k_v.first)));
+        CHECK_EQ(std::any_cast<int>(d.at(k_v.first)), std::any_cast<long>(result.at(k_v.first)));
       for (const auto &k_v : result)
-        CHECK_EQ(std::any_cast<int>(d.at(k_v.first)), std::any_cast<int>(result.at(k_v.first)));
+        CHECK_EQ(std::any_cast<int>(d.at(k_v.first)), std::any_cast<long>(result.at(k_v.first)));
     }
     SUBCASE("->encoding->decoding->") {
       const auto json = "{\"a\":1,\"b\":2,\"c\":3}";

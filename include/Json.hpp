@@ -121,6 +121,8 @@ public:
       return encode(std::any_cast<Bytes>(a));
     if (a.type() == typeid(long))
       return encode(std::any_cast<long>(a));
+    if (a.type() == typeid(int))
+      return encode(long(std::any_cast<int>(a)));
     if (a.type() == typeid(float))
       return encode(std::any_cast<float>(a));
     if (a.type() == typeid(double))
@@ -135,6 +137,8 @@ public:
       return encode<Bytes>(std::any_cast<std::vector<Bytes>>(a));
     if (a.type() == typeid(std::vector<long>))
       return encode<long>(std::any_cast<std::vector<long>>(a));
+    if (a.type() == typeid(std::vector<int>))
+      return encode<int>(std::any_cast<std::vector<int>>(a));
     if (a.type() == typeid(std::vector<float>))
       return encode<float>(std::any_cast<std::vector<float>>(a));
     if (a.type() == typeid(std::vector<double>))
@@ -148,6 +152,7 @@ public:
   static std::string encode(const std::string &s) { return "\"" + _escaped(s) + "\""; }
   static std::string encode(const Bytes &s) { return "\"" + String(s).encoded() + "\""; }
   static std::string encode(const long &i) { return std::to_string(i); }
+  static std::string encode(const int &i) { return std::to_string(i); }
   static std::string encode(const double &d) { return std::to_string(d); }
   static std::string encode(const bool &b) { return b ? "true" : "false"; }
 
