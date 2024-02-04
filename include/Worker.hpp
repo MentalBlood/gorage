@@ -14,9 +14,6 @@ public:
   time created;
   std::string chain_id;
 
-  long created_as_number() {
-    return std::chrono::time_point_cast<std::chrono::milliseconds>(created).time_since_epoch().count();
-  }
   Bytes content_digest() {
     const auto content_json = encode(content);
     const auto content_json_bytes = Bytes(content_json.begin(), content_json.end());
@@ -28,6 +25,7 @@ public:
     Bytes result;
     result.reserve(BLAKE3_OUT_LEN);
     blake3_hasher_finalize(&hasher, &result[0], BLAKE3_OUT_LEN);
+    return result;
   }
 
   Item(const T &content)
@@ -35,12 +33,15 @@ public:
 
   Item(const Json::Structure &structure) {
     const auto dict = cast<Dict>(structure.value());
-    content = get<T>(dict, "content");
+    content = T(dict.at("content"));
     chain_id = get<String>(dict, "chain_id").s;
     created = time(std::chrono::milliseconds(get<long>(dict, "created")));
   }
   virtual std::any structure() const {
-    return Dict({{"content", content.structure()}, {"chain_id", chain_id}, {"created", created_as_number()}});
+    return Dict(
+        {{"content", content.structure()},
+         {"chain_id", chain_id},
+         {"created", std::chrono::time_point_cast<std::chrono::milliseconds>(created).time_since_epoch().count()}});
   }
 };
 
