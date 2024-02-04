@@ -28,6 +28,11 @@ public:
     return result;
   }
 
+  Item(const T &input, const T &output) : content(output.content), created(input.created), chain_id(input.chain_id) {}
+
+  template <class O>
+  Item(const T &input, const O &output) : content(output.content), created(output.created), chain_id(input.chain_id) {}
+
   Item(const T &content)
       : content(content), created(std::chrono::system_clock::now()), chain_id(String(content_digest()).encoded()) {}
 
@@ -54,8 +59,10 @@ public:
   virtual O process(const Item<I> &input) = 0;
 
   virtual void operator()() {
-    for (const auto k : input_storage->keys(query))
-      output_storage->save(process(input_storage->load(k)));
+    for (const auto k : input_storage->keys(query)) {
+      const auto input = input_storage->load(k);
+      output_storage->save(Item(input, process(input)));
+    }
   }
 };
 
